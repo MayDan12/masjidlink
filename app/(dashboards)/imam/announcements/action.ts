@@ -1,0 +1,238 @@
+"use server";
+
+import { firestore, serverAuth, messaging } from "@/firebase/server";
+// import { firestore, serverAuth, messaging } from "@/firebase/server";
+import { checkUserRole } from "@/utils/server/auth";
+import { Timestamp } from "firebase-admin/firestore";
+
+export const createAnnouncements = async (data: {
+  title: string;
+  content: string;
+  isEmergency?: boolean;
+  type: string;
+  severity?: "low" | "medium" | "high" | "critical";
+  token: string;
+}) => {
+  const { token, ...announcementData } = data;
+
+  const verifiedToken = await serverAuth.verifyIdToken(token);
+  const userRole = await checkUserRole(verifiedToken.uid);
+
+  if (userRole !== "imam") {
+    return {
+      error: true,
+      message: "Unauthorized: Only imams can create announcements.",
+    };
+  }
+
+  const uid = verifiedToken.uid;
+  const timestamp = Timestamp.now();
+
+  const announcementToStore = {
+    ...announcementData,
+    createdBy: uid,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    rsvps: [], // 👈 Initialize RSVP list
+  };
+
+  // Use auto-generated ID for each new event
+  const announcementRef = firestore.collection("announcements").doc(); // 👈 New doc ID
+  await announcementRef.set(announcementToStore);
+
+  // try {
+  //   const masjidFollowers = await firestore.collection("users").get();
+
+  //   const tokens = masjidFollowers.docs
+  //     .map((doc) => doc.data().fcmToken)
+  //     .filter((token) => token);
+
+  //   if (tokens.length > 0) {
+  //     await messaging.sendEachForMulticast({
+  //       tokens,
+  //       notification: {
+  //         title: `[URGENT] ${announcementData.title}`,
+  //         body: announcementData.content,
+  //       },
+  //     });
+  //   }
+  // } catch (error) {
+  //   console.error("Error sending notifications:", error);
+  // }
+
+  return {
+    success: true,
+    message: "Announcements successfully created.",
+    announcementId: announcementRef.id,
+  };
+};
+
+export const getAnnouncementsByUserId = async (data: { token: string }) => {
+  try {
+    const { token } = data;
+
+    const verifiedToken = await serverAuth.verifyIdToken(token);
+    const userRole = await checkUserRole(verifiedToken.uid);
+    const userId = verifiedToken.uid;
+
+    if (userRole !== "imam") {
+      return {
+        error: true,
+        message: "Unauthorized: Only imams can view events.",
+      };
+    }
+
+    const announcementRef = firestore.collection("announcements");
+    const snapshot = await announcementRef
+      .where("createdBy", "==", userId)
+      .get();
+
+    const announcements = snapshot.docs.map((doc) => {
+      const data = doc.data();
+
+      // Convert Firestore Timestamps to ISO strings
+      const convertedData: Record<string, any> = {};
+      for (const [key, value] of Object.entries(data)) {
+        if (value?.toDate) {
+          // Check if it's a Firestore Timestamp
+          convertedData[key] = value.toDate().toISOString();
+        } else {
+          convertedData[key] = value;
+        }
+      }
+
+      return {
+        id: doc.id,
+        ...convertedData,
+      };
+    });
+
+    return {
+      success: true,
+      announcements,
+    };
+  } catch (error) {
+    console.error("Error fetching announcements:", error);
+    return {
+      error: true,
+      message: "An unexpected error occurred while fetching announcements.",
+    };
+  }
+};
+
+// Define the EmergencyAlert type
+
+type EmergencyAlert = {
+  title: string;
+  description: string;
+  alertType:
+    | "janazah"
+    | "missing_child"
+    | "security"
+    | "disaster"
+    | "closure"
+    | "other";
+  severity: "low" | "medium" | "high" | "critical";
+  isResolved: boolean;
+  resolvedAt?: Timestamp;
+  relatedMasjidId: string;
+};
+
+export const createEmergencyAlert = async (
+  data: { token: string } & Omit<EmergencyAlert, "isResolved" | "resolvedAt">
+) => {
+  const { token, ...alertData } = data;
+
+  // Authorization
+  const verifiedToken = await serverAuth.verifyIdToken(token);
+  const userRole = await checkUserRole(verifiedToken.uid);
+
+  if (userRole !== "imam") {
+    return {
+      error: true,
+      message:
+        "Unauthorized: Only imams and admins can create emergency alerts.",
+    };
+  }
+
+  const uid = verifiedToken.uid;
+  const timestamp = Timestamp.now();
+
+  const alertToStore: EmergencyAlert = {
+    ...alertData,
+    isResolved: false,
+    createdBy: uid,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
+
+  // Store alert
+  const alertRef = firestore.collection("emergencyAlerts").doc();
+  await alertRef.set(alertToStore);
+
+  // Send push notifications to all followers
+  try {
+    const masjidFollowers = await firestore
+      .collection("users")
+      .where("followedMasjids", "array-contains", alertData.relatedMasjidId)
+      .get();
+
+    const tokens = masjidFollowers.docs
+      .map((doc) => doc.data().fcmToken)
+      .filter((token) => token);
+
+    if (tokens.length > 0) {
+      await messaging.sendEachForMulticast({
+        tokens,
+        notification: {
+          title: `[URGENT] ${alertData.title}`,
+          body: alertData.description,
+        },
+        data: {
+          alertId: alertRef.id,
+          masjidId: alertData.relatedMasjidId,
+          type: alertData.alertType,
+        },
+      });
+    }
+  } catch (error) {
+    console.error("Error sending notifications:", error);
+  }
+
+  return {
+    success: true,
+    message: "Emergency alert successfully created and notifications sent.",
+    alertId: alertRef.id,
+  };
+};
+
+export const resolveEmergencyAlert = async (data: {
+  token: string;
+  alertId: string;
+}) => {
+  const { token, alertId } = data;
+
+  // Authorization
+  const verifiedToken = await serverAuth.verifyIdToken(token);
+  const userRole = await checkUserRole(verifiedToken.uid);
+
+  if (userRole !== "imam" && userRole !== "admin") {
+    return {
+      error: true,
+      message: "Unauthorized: Only imams and admins can resolve alerts.",
+    };
+  }
+
+  const timestamp = Timestamp.now();
+
+  await firestore.collection("emergencyAlerts").doc(alertId).update({
+    isResolved: true,
+    resolvedAt: timestamp,
+    updatedAt: timestamp,
+  });
+
+  return {
+    success: true,
+    message: "Emergency alert marked as resolved.",
+  };
+};
