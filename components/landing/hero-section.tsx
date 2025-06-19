@@ -65,14 +65,24 @@ export function HeroSection() {
           </div>
 
           {/* Hero Image */}
-          <div className="mt-10 rounded-xl overflow-hidden border shadow-lg">
+          {/* <div className="mt-10 rounded-xl overflow-hidden border shadow-lg">
             <Image
-              src="/darkdashboard.png"
+              src="/dashboarddark.png"
               alt="MasjidLink Dashboard Preview"
               height={600}
               width={1200}
               priority
               className="w-full h-full border-primary border-4 "
+            />
+          </div> */}
+          <div className="relative mt-10 aspect-video rounded-xl overflow-hidden shadow-lg border-primary border-4">
+            <Image
+              src="/dashboarddark.png"
+              alt="MasjidLink Dashboard Preview"
+              height={600}
+              width={1200}
+              priority
+              className="object-cover"
             />
           </div>
         </div>

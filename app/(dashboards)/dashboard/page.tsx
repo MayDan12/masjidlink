@@ -19,12 +19,12 @@ export default function UserDashboard() {
   const fullName = user?.displayName;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-7">
       <h1 className="text-2xl">Welcome {fullName}</h1>
 
       <PrayerTimesWidget />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
         <Card>
           <CardHeader className="space-y-1">
             <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-2">
