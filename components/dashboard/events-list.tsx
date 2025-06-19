@@ -84,9 +84,7 @@ export function EventsList() {
               <Calendar className="h-4 w-4" />
               <span className="font-medium">{event.date}</span>
             </div>
-            <Badge variant={event.registered ? "default" : "secondary"}>
-              {event.type}
-            </Badge>
+            <Badge variant="default">{event.type}</Badge>
           </div>
 
           {/* Title */}
@@ -121,14 +119,14 @@ export function EventsList() {
           </div>
 
           {/* Register Button */}
-          <Button
+          {/* <Button
             onClick={() => toggleRegistration(event.id)}
             variant={event.registered ? "outline" : "default"}
             size="sm"
             className="w-full mt-auto"
           >
             {event.registered ? "Registered ✓" : "Register"}
-          </Button>
+          </Button> */}
         </CardContent>
       </Card>
     ),

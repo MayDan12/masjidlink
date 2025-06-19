@@ -18,12 +18,6 @@ export const createViewerOnlyClient = (
       },
     },
     tokenProvider,
-    // Additional options to restrict capabilities
-    options: {
-      // Disable local media by default for viewers
-      video: false,
-      audio: false,
-    },
   });
 };
 
