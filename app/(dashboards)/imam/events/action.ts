@@ -1,6 +1,7 @@
 "use server";
 
 import { firestore, serverAuth } from "@/firebase/server";
+import { Event } from "@/types/events";
 import { checkUserRole } from "@/utils/server/auth";
 import { Timestamp } from "firebase-admin/firestore";
 
@@ -16,6 +17,7 @@ export const createEvents = async (data: {
   location: string;
   type: EventType | "";
   isRecurring: boolean;
+  enableDonations: boolean;
   recurringFrequency?: RecurringFrequency | "";
   isPublic: boolean;
   maxAttendees?: string;
@@ -38,6 +40,7 @@ export const createEvents = async (data: {
 
   const eventToStore = {
     ...eventData,
+    status: "upcoming", // 👈 Default status for new events
     createdBy: uid,
     createdAt: timestamp,
     updatedAt: timestamp,
@@ -59,14 +62,14 @@ export const updateEvent = async (data: {
   eventId: string;
   title: string;
   description: string;
-  date: string;
+  date: Date;
   startTime: string;
   endTime?: string;
   location: string;
   type: EventType | "";
-  isRecurring: boolean;
+  isRecurring?: boolean;
   recurringFrequency?: RecurringFrequency | "";
-  isPublic: boolean;
+  isPublic?: boolean;
   maxAttendees?: string;
   token: string;
 }) => {
@@ -291,45 +294,139 @@ export const getEventById = async (data: {
 //   };
 // };
 
-export const getEventsByUserId = async (data: { token: string }) => {
+// export const getEventsByUserId = async (data: { token: string }) => {
+//   const { token } = data;
+
+//   const verifiedToken = await serverAuth.verifyIdToken(token);
+//   const userRole = await checkUserRole(verifiedToken.uid);
+//   const userId = verifiedToken.uid;
+
+//   if (userRole !== "imam") {
+//     return {
+//       error: true,
+//       message: "Unauthorized: Only imams can view events.",
+//     };
+//   }
+
+//   const eventsRef = firestore.collection("events");
+//   const snapshot = await eventsRef.where("createdBy", "==", userId).get();
+
+//   const events = snapshot.docs.map((doc) => {
+//     const data = doc.data();
+
+//     // Convert Firestore Timestamps to ISO strings
+//     const convertedData: Record<string, any> = {};
+//     for (const [key, value] of Object.entries(data)) {
+//       if (value?.toDate) {
+//         // Check if it's a Firestore Timestamp
+//         convertedData[key] = value.toDate().toISOString();
+//       } else {
+//         convertedData[key] = value;
+//       }
+//     }
+
+//     return {
+//       id: doc.id,
+//       ...convertedData,
+//     };
+//   });
+
+//   return {
+//     success: true,
+//     events,
+//   };
+// };
+export const getEventsByUserId = async (data: {
+  token: string;
+}): Promise<{
+  success?: boolean;
+  events?: Event[];
+  error?: boolean;
+  message?: string;
+}> => {
   const { token } = data;
 
-  const verifiedToken = await serverAuth.verifyIdToken(token);
-  const userRole = await checkUserRole(verifiedToken.uid);
-  const userId = verifiedToken.uid;
+  try {
+    const verifiedToken = await serverAuth.verifyIdToken(token);
+    const userRole = await checkUserRole(verifiedToken.uid);
+    const userId = verifiedToken.uid;
 
-  if (userRole !== "imam") {
-    return {
-      error: true,
-      message: "Unauthorized: Only imams can view events.",
-    };
-  }
-
-  const eventsRef = firestore.collection("events");
-  const snapshot = await eventsRef.where("createdBy", "==", userId).get();
-
-  const events = snapshot.docs.map((doc) => {
-    const data = doc.data();
-
-    // Convert Firestore Timestamps to ISO strings
-    const convertedData: Record<string, any> = {};
-    for (const [key, value] of Object.entries(data)) {
-      if (value?.toDate) {
-        // Check if it's a Firestore Timestamp
-        convertedData[key] = value.toDate().toISOString();
-      } else {
-        convertedData[key] = value;
-      }
+    if (userRole !== "imam") {
+      return {
+        error: true,
+        message: "Unauthorized: Only imams can view events.",
+      };
     }
 
-    return {
-      id: doc.id,
-      ...convertedData,
-    };
-  });
+    const eventsRef = firestore.collection("events");
+    const snapshot = await eventsRef.where("createdBy", "==", userId).get();
 
-  return {
-    success: true,
-    events,
-  };
+    const events: Event[] = snapshot.docs.map((doc) => {
+      const data = doc.data();
+
+      // Convert Firestore data to Event type
+      const event: Partial<Event> = { id: doc.id };
+
+      for (const [key, value] of Object.entries(data)) {
+        if (value?.toDate) {
+          // Convert Timestamps to ISO strings
+          event[key as keyof Event] = value.toDate().toISOString();
+        } else {
+          event[key as keyof Event] = value;
+        }
+      }
+
+      // Validate required fields exist
+      if (
+        !event.title ||
+        !event.description ||
+        !event.date ||
+        !event.startTime
+      ) {
+        console.warn(`Event ${doc.id} is missing required fields`);
+      }
+
+      return event as Event;
+    });
+
+    return {
+      success: true,
+      events,
+    };
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    return {
+      error: true,
+      message:
+        error instanceof Error ? error.message : "Failed to fetch events",
+    };
+  }
+};
+
+export const addLivestreamDetails = async (data: {
+  meetingLink: string;
+  eventId: string;
+}) => {
+  const { meetingLink, eventId } = data;
+
+  try {
+    const eventRef = firestore.collection("events").doc(eventId);
+
+    await eventRef.update({
+      meetingLink, // 👈 this field will be added/updated in the event doc
+    });
+
+    return {
+      success: true,
+      message: "Livestream details added successfully.",
+      meetingLink,
+    };
+  } catch (error) {
+    console.error("Error updating livestream details:", error);
+    return {
+      success: false,
+      message: "Failed to add livestream details.",
+      error,
+    };
+  }
 };

@@ -55,7 +55,7 @@ export default function RegisterPage() {
               </blockquote>
             </div>
           </div>
-          <div className="lg:p-8 w-full">
+          <div className="lg:p-8 w-full mt-10 mb-20">
             <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px] md:w-[450px]">
               <div className="flex flex-col space-y-2 text-center">
                 <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">

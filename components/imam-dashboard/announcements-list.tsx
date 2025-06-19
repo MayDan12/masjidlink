@@ -27,12 +27,15 @@ import {
   Eye,
   Bell,
   Calendar,
+  AlertCircle,
 } from "lucide-react";
 import { auth } from "@/firebase/client";
 import { toast } from "sonner";
 import { getAnnouncementsByUserId } from "@/app/(dashboards)/imam/announcements/action";
+import { Card, CardContent } from "../ui/card";
 
 type Announcement = {
+  id: string;
   title: string;
   content: string;
   createdAt: string;
@@ -170,7 +173,58 @@ export function AnnouncementsList() {
         </div>
       </div>
 
-      <div className="rounded-md border">
+      {/* Mobile card view (visible on small screens) */}
+      <div className="md:hidden space-y-4">
+        {filteredAnnouncements.length > 0 ? (
+          filteredAnnouncements.map((announcement, i) => (
+            <Card key={i} className="overflow-hidden">
+              <CardContent className="p-4">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h3 className="font-medium text-base">
+                      {announcement.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                      {announcement.content}
+                    </p>
+                  </div>
+                  <Badge className={getTypeColor(announcement.type)}>
+                    {announcement.type.charAt(0).toUpperCase() +
+                      announcement.type.slice(1)}
+                  </Badge>
+                </div>
+
+                <div className="space-y-2 mt-3 text-sm">
+                  <div className="flex items-center">
+                    <Calendar className="h-3.5 w-3.5 mr-2 text-muted-foreground" />
+                    <span>{formatDate(announcement.createdAt)}</span>
+                  </div>
+                  <div className="flex items-center">
+                    {/* <Clock className="h-3.5 w-3.5 mr-2 text-muted-foreground" />
+                    <span>
+                      
+                    </span> */}
+                  </div>
+                  <div className="flex items-center">
+                    <AlertCircle className="h-3.5 w-3.5 mr-2 text-muted-foreground" />
+                    <span>{announcement.severity}</span>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex justify-end">
+                  {/* <EventActions event={evenannouncement} /> */}
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <div className="text-center py-8 text-muted-foreground">
+            No events found
+          </div>
+        )}
+      </div>
+
+      <div className="hidden md:block rounded-md border">
         <ScrollArea className="h-[500px]">
           <Table>
             <TableHeader>

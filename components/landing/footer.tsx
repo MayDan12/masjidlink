@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChurchIcon as Mosque } from "lucide-react";
+import Image from "next/image";
 
 export function FooterSection() {
   return (
@@ -8,7 +8,13 @@ export function FooterSection() {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div className="flex flex-col">
             <div className="flex items-center gap-2 mb-4">
-              <Mosque className="h-6 w-6 text-primary" />
+              <Image
+                src="/masjidlink.png"
+                alt="MasjidLink Logo"
+                width={40}
+                height={40}
+                className="h-9 w-9 "
+              />
               <h3 className="text-lg font-bold text-primary">MasjidLink</h3>
             </div>
             <p className="text-sm text-muted-foreground mb-4">

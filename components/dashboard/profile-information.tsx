@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useEffect, useRef, useMemo, useCallback, useState } from "react";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Save, Upload } from "lucide-react";
+import { toast } from "sonner";
+
 import {
   Form,
   FormControl,
@@ -16,30 +18,26 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, Save, Upload } from "lucide-react";
+
 import { auth } from "@/firebase/client";
 import {
   getUsersProfile,
   updateProfile,
   uploadImage,
 } from "@/app/(dashboards)/dashboard/profile/action";
-import { toast } from "sonner";
 import { useAuth } from "@/context/auth";
 
 const profileFormSchema = z.object({
-  name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
-  }),
+  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   phone: z.string().optional(),
   profilePicture: z.string().optional(),
   location: z.string().optional(),
   bio: z
     .string()
-    .max(500, {
-      message: "Bio must not be longer than 500 characters.",
-    })
+    .max(500, { message: "Bio must not be longer than 500 characters." })
     .optional(),
   skills: z.string().optional(),
   occupation: z.string().optional(),
@@ -50,131 +48,138 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export function ProfileInformation() {
   const { user, refreshUser } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [previewImage, setPreviewImage] = useState<string>("");
-  const [userImage, setImage] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const fullName = user?.displayName;
-  const email = user?.email;
-  const initials = fullName
-    ?.split(" ")
-    .filter((word: string) => word)
-    .map((word: string) => word[0])
-    .join("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [previewImage, setPreviewImage] = useState("");
+  const [profileImage, setProfileImage] = useState("");
 
-  // Mock default values
-  const defaultValues: Partial<ProfileFormValues> = {
-    name: "",
-    phone: "",
-    location: "",
-    bio: "",
-    skills: "",
-    occupation: "",
-    languages: "",
-  };
+  // Get image sources with priority: preview > Firebase Auth > Profile DB
+  const displayImage = previewImage || user?.photoURL || profileImage;
+
+  const { fullName, email, initials, joinDate } = useMemo(() => {
+    const fullName = user?.displayName || "";
+    const email = user?.email || "";
+    const initials = fullName
+      .split(" ")
+      .filter(Boolean)
+      .map((n) => n[0])
+      .join("");
+    const joinDate = new Date(
+      user?.metadata?.creationTime || Date.now()
+    ).toLocaleDateString();
+
+    return { fullName, email, initials, joinDate };
+  }, [user]);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
-    defaultValues,
+    defaultValues: {
+      name: "",
+      phone: "",
+      location: "",
+      bio: "",
+      skills: "",
+      occupation: "",
+      languages: "",
+    },
   });
 
+  // Fetch user profile
   useEffect(() => {
-    async function fetchUsersProfile() {
+    let isMounted = true;
+
+    const fetchProfile = async () => {
       try {
-        const token = await auth?.currentUser?.getIdToken();
-        if (!token) {
-          throw new Error("User not authenticated");
-        }
-        const response = await getUsersProfile(token);
-        if (response.error) {
-          throw new Error(response.message);
-        }
-        if (response.success && response.data) {
-          const userProfile = response.data;
-          setImage(userProfile?.profilePicture);
+        const token = await auth.currentUser?.getIdToken();
+        if (!token) throw new Error("User not authenticated");
+
+        const res = await getUsersProfile(token);
+        if (!res.success || !res.data) throw new Error(res.message);
+
+        if (isMounted) {
+          setProfileImage(res.data.profilePicture || "");
           form.reset({
-            name: userProfile?.name || "",
-            phone: userProfile?.phone || "",
-            location: userProfile?.location || "",
-            bio: userProfile?.bio || "",
-            skills: userProfile?.skills || "",
-            occupation: userProfile?.occupation || "",
-            languages: userProfile?.languages || "",
+            name: res.data.name || "",
+            phone: res.data.phone || "",
+            location: res.data.location || "",
+            bio: res.data.bio || "",
+            skills: res.data.skills || "",
+            occupation: res.data.occupation || "",
+            languages: res.data.languages || "",
           });
         }
-      } catch (error) {
-        console.log("Error fetching user profile:", error);
+      } catch (err) {
+        console.error("Profile fetch failed:", err);
       }
-    }
-    // Fetch user profile on component mount
-    fetchUsersProfile();
-  }, [form]);
+    };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    fetchProfile();
 
-    setIsUploading(true);
+    return () => {
+      isMounted = false;
+    };
+  }, [form, user]); // Added user to dependencies
 
-    try {
-      // Create preview
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
+  const handleImageUpload = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
 
-      // Upload to server
-      const token = await auth?.currentUser?.getIdToken();
-      if (!token) throw new Error("Not authenticated");
+      setIsUploading(true);
+      try {
+        // Create preview
+        const preview = URL.createObjectURL(file);
+        setPreviewImage(preview);
 
-      const formData = new FormData();
-      formData.append("image", file);
+        // Upload to server
+        const token = await auth.currentUser?.getIdToken();
+        if (!token) throw new Error("Not authenticated");
 
-      const response = await uploadImage(formData, token);
+        const formData = new FormData();
+        formData.append("image", file);
 
-      if (!response.success) throw new Error(response.message);
-      await refreshUser();
-      toast.success("Image uploaded successfully");
-      setPreviewImage(response.imageUrl);
-      // You might want to update the form with the new image URL
-      form.setValue("profilePicture", response.imageUrl); // Adjust according to your form structure
-      // or handle it in your onSubmit function
-    } catch (error) {
-      console.error("Upload failed:", error);
-    } finally {
-      setIsUploading(false);
-    }
-  };
+        const res = await uploadImage(formData, token);
+        if (!res.success) throw new Error(res.message);
 
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
+        // Update both Firebase Auth and local state
+        await refreshUser(); // This will update user.photoURL
+        setProfileImage(res.imageUrl); // Update profile image state
+        form.setValue("profilePicture", res.imageUrl);
 
-  // Update your onSubmit function to include the image
-  async function onSubmit(data: ProfileFormValues) {
+        toast.success("Profile picture updated successfully");
+      } catch (err) {
+        console.error("Image upload error:", err);
+        toast.error("Failed to upload image");
+        setPreviewImage(""); // Clear failed preview
+      } finally {
+        setIsUploading(false);
+      }
+    },
+    [form, refreshUser]
+  );
+
+  const triggerFileInput = () => fileInputRef.current?.click();
+
+  const onSubmit = async (data: ProfileFormValues) => {
     setIsLoading(true);
-
     try {
-      const token = await auth?.currentUser?.getIdToken();
+      const token = await auth.currentUser?.getIdToken();
       if (!token) throw new Error("Not authenticated");
 
-      // Include the image URL if available
-      const profileData = {
-        ...data,
-        token,
-      };
+      const res = await updateProfile({ ...data, token });
+      if (!res.success) throw new Error(res.message);
 
-      // Call your update API
-      const response = await updateProfile(profileData);
-      if (!response.success) throw new Error(response.message);
       await refreshUser();
       toast.success("Profile updated successfully");
-    } catch (error) {
-      console.error("Update failed:", error);
+    } catch (err) {
+      console.error("Profile update failed:", err);
+      toast.error("Failed to update profile");
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -182,10 +187,16 @@ export function ProfileInformation() {
         <div className="flex flex-col items-center gap-2">
           <Avatar className="h-24 w-24">
             <AvatarImage
-              src={previewImage || userImage}
-              alt="Profile picture"
+              src={displayImage}
+              alt={displayImage ? `Profile picture of ${fullName}` : ""}
+              className="object-cover"
+              onError={() => {
+                // Fallback if image fails to load
+                setPreviewImage("");
+                setProfileImage("");
+              }}
             />
-            <AvatarFallback>{initials}</AvatarFallback>
+            <AvatarFallback delayMs={600}>{initials}</AvatarFallback>
           </Avatar>
           <input
             type="file"
@@ -193,6 +204,7 @@ export function ProfileInformation() {
             onChange={handleImageUpload}
             accept="image/*"
             className="hidden"
+            disabled={isUploading}
           />
           <Button
             variant="outline"
@@ -209,11 +221,12 @@ export function ProfileInformation() {
             <span>{isUploading ? "Uploading..." : "Change Photo"}</span>
           </Button>
         </div>
+
         <div>
           <h3 className="text-lg font-medium">{fullName}</h3>
           <p className="text-sm text-muted-foreground">{email}</p>
           <p className="text-sm text-muted-foreground mt-1">
-            Member since {new Date(2021, 5, 15).toLocaleDateString()}
+            Member since {joinDate}
           </p>
         </div>
       </div>
@@ -223,57 +236,18 @@ export function ProfileInformation() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Full Name</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
+            <Field name="name" label="Full Name" control={form.control} />
+            <Field name="phone" label="Phone Number" control={form.control} />
+            <Field
               name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Location</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="City, State" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
+              label="Location"
               control={form.control}
+              placeholder="City, State"
+            />
+            <Field
               name="occupation"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Occupation</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Occupation"
+              control={form.control}
             />
           </div>
 
@@ -284,11 +258,7 @@ export function ProfileInformation() {
               <FormItem>
                 <FormLabel>Bio</FormLabel>
                 <FormControl>
-                  <Textarea
-                    {...field}
-                    placeholder="Tell us about yourself"
-                    className="resize-none min-h-[100px]"
-                  />
+                  <Textarea {...field} className="resize-none min-h-[100px]" />
                 </FormControl>
                 <FormDescription>
                   Brief description that will be visible on your profile. Max
@@ -300,40 +270,18 @@ export function ProfileInformation() {
           />
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormField
-              control={form.control}
+            <Field
               name="skills"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Skills</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Separate skills with commas"
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Skills you&apos;d like to share with the community
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
+              label="Skills"
               control={form.control}
+              placeholder="Separate skills with commas"
+              description="Skills you'd like to share with the community"
+            />
+            <Field
               name="languages"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Languages</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Separate languages with commas"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Languages"
+              control={form.control}
+              placeholder="Separate languages with commas"
             />
           </div>
 
@@ -353,5 +301,37 @@ export function ProfileInformation() {
         </form>
       </Form>
     </div>
+  );
+}
+
+// Reusable Field component remains the same
+
+// ----------------------
+// Reusable Field Component
+// ----------------------
+type FieldProps = {
+  name: keyof ProfileFormValues;
+  label: string;
+  control: any;
+  placeholder?: string;
+  description?: string;
+};
+
+function Field({ name, label, control, placeholder, description }: FieldProps) {
+  return (
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>{label}</FormLabel>
+          <FormControl>
+            <Input {...field} placeholder={placeholder} />
+          </FormControl>
+          {description && <FormDescription>{description}</FormDescription>}
+          <FormMessage />
+        </FormItem>
+      )}
+    />
   );
 }

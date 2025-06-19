@@ -2,116 +2,92 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { decodeJwt } from "jose";
 
-// Type for role data
-type RoleResponse = {
-  role?: "user" | "imam" | "admin";
-  error?: string;
-};
+type Role = "user" | "imam" | "admin";
+type RoleResponse = { role?: Role; error?: string };
 
 export async function middleware(request: NextRequest) {
-  const BaseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+  // Skip POST requests
+  if (request.method === "POST") return NextResponse.next();
 
-  // Skip middleware for POST requests
-  if (request.method === "POST") {
-    return NextResponse.next();
-  }
+  const { token, userId } = getAuthTokens(request);
 
-  // Get tokens with retry fallback
-  const { token, userId } = await getAuthTokens(request);
-
-  if (!token || !userId) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
+  if (!token || !userId) return redirectToLogin(request);
 
   try {
-    // Verify token
-    const decodedToken = decodeJwt(token);
+    const decoded = decodeJwt(token);
+    if (!decoded?.user_id) return redirectToLogin(request);
 
-    if (!decodedToken?.user_id) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+    const { role, error } = await checkUserRole(userId);
+    if (error || !role) return redirectToLogin(request);
 
-    // Check user role
-    const { role: firestoreRole, error } = await checkUserRole(userId, BaseUrl);
-
-    if (error || !firestoreRole) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-
-    // Route authorization
-    return authorizeRoute(request, firestoreRole);
-  } catch (error) {
-    console.error("MIDDLEWARE ERROR:", error);
-    return NextResponse.redirect(new URL("/", request.url));
+    return authorizeRoute(request, role);
+  } catch (err) {
+    console.error("[Middleware Error]", err);
+    return redirectToLogin(request);
   }
 }
 
-// Helper function to get auth tokens with retry
-async function getAuthTokens(request: NextRequest) {
-  let token = request.cookies.get("firebaseAuthToken")?.value;
-  let userId = request.cookies.get("firebaseUserId")?.value;
-
-  if (!token || !userId) {
-    const maxRetries = 3;
-    const retryDelay = 100; // ms
-
-    for (let i = 0; i < maxRetries; i++) {
-      await new Promise((resolve) => setTimeout(resolve, retryDelay));
-      const cookieStore = cookies();
-      token = token || cookieStore.get("firebaseAuthToken")?.value;
-      userId = userId || cookieStore.get("firebaseUserId")?.value;
-      if (token && userId) break;
-    }
-  }
-
+function getAuthTokens(request: NextRequest) {
+  const cookieStore = cookies();
+  const token =
+    request.cookies.get("firebaseAuthToken")?.value ||
+    cookieStore.get("firebaseAuthToken")?.value;
+  const userId =
+    request.cookies.get("firebaseUserId")?.value ||
+    cookieStore.get("firebaseUserId")?.value;
   return { token, userId };
 }
 
-// Helper function to check user role
-async function checkUserRole(
-  userId: string,
-  baseUrl: string
-): Promise<RoleResponse> {
+async function checkUserRole(userId: string): Promise<RoleResponse> {
   try {
-    const roleResponse = await fetch(`${baseUrl}/api/auth/checkroles`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ uid: userId }),
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/checkroles`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: userId }),
+        cache: "no-store",
+      }
+    );
 
-    if (!roleResponse.ok) {
-      return { error: `HTTP ${roleResponse.status}` };
-    }
-
-    return (await roleResponse.json()) as RoleResponse;
-  } catch (error) {
-    console.error("Role check failed:", error);
+    if (!res.ok) return { error: `HTTP ${res.status}` };
+    return (await res.json()) as RoleResponse;
+  } catch (err) {
+    console.error("[Role Check Error]", err);
     return { error: "Network error" };
   }
 }
 
-// Helper function for route authorization
-function authorizeRoute(request: NextRequest, role: string) {
+function authorizeRoute(request: NextRequest, role: Role) {
   const pathname = request.nextUrl.pathname;
 
-  // Admin routes
-  if (pathname.startsWith("/admin") && role !== "admin") {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+  const accessMap: Record<string, Role[]> = {
+    "/admin": ["admin"],
+    "/imam": ["imam"],
+    "/dashboard": ["user"],
+    "/livestream": ["admin", "imam", "user"],
+  };
 
-  // Imam routes
-  if (pathname.startsWith("/imam") && role !== "imam") {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  // User routes
-  if (pathname.startsWith("/dashboard") && role !== "user") {
-    return NextResponse.redirect(new URL("/login", request.url));
+  for (const [routePrefix, allowedRoles] of Object.entries(accessMap)) {
+    if (pathname.startsWith(routePrefix) && !allowedRoles.includes(role)) {
+      return redirectToLogin(request);
+    }
   }
 
   return NextResponse.next();
 }
 
+function redirectToLogin(request: NextRequest) {
+  const loginUrl = new URL("/login", request.url);
+  loginUrl.searchParams.set("from", request.nextUrl.pathname);
+  return NextResponse.redirect(loginUrl);
+}
+
 export const config = {
-  matcher: ["/admin/:path*", "/imam/:path*", "/dashboard/:path*"],
+  matcher: [
+    "/admin/:path*",
+    "/imam/:path*",
+    "/dashboard/:path*",
+    "/livestream/:path*",
+  ],
 };

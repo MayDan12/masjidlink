@@ -1,21 +1,28 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { DonationStats } from "@/components/imam-dashboard/donation-stats"
-import { DonationCampaigns } from "@/components/imam-dashboard/donation-campaigns"
-import { DonorsList } from "@/components/imam-dashboard/donors-list"
-import { DonationReports } from "@/components/imam-dashboard/donation-reports"
-import { Button } from "@/components/ui/button"
-import { PlusCircle } from "lucide-react"
-import { CreateCampaignDialog } from "@/components/imam-dashboard/create-campaign-dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { DonationStats } from "@/components/imam-dashboard/donation-stats";
+import { DonationCampaigns } from "@/components/imam-dashboard/donation-campaigns";
+import { DonorsList } from "@/components/imam-dashboard/donors-list";
+import { DonationReports } from "@/components/imam-dashboard/donation-reports";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
+import { CreateCampaignDialog } from "@/components/imam-dashboard/create-campaign-dialog";
 
 export default function DonationsPage() {
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Donations</h1>
           <p className="text-muted-foreground">
-            Manage donation campaigns, track contributions, and engage with donors.
+            Manage donation campaigns, track contributions, and engage with
+            donors.
           </p>
         </div>
         <CreateCampaignDialog>
@@ -41,7 +48,9 @@ export default function DonationsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Donation Campaigns</CardTitle>
-              <CardDescription>Manage your ongoing and past donation campaigns.</CardDescription>
+              <CardDescription>
+                Manage your ongoing and past donation campaigns.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <DonationCampaigns />
@@ -53,7 +62,10 @@ export default function DonationsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Donors</CardTitle>
-              <CardDescription>View and manage your masjid's donors and their contributions.</CardDescription>
+              <CardDescription>
+                View and manage your masjid&apos;s donors and their
+                contributions.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <DonorsList />
@@ -65,7 +77,9 @@ export default function DonationsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Financial Reports</CardTitle>
-              <CardDescription>Generate and view financial reports for your masjid.</CardDescription>
+              <CardDescription>
+                Generate and view financial reports for your masjid.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <DonationReports />
@@ -74,5 +88,5 @@ export default function DonationsPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

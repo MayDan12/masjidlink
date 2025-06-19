@@ -7,6 +7,7 @@ export async function POST() {
   response.cookies.delete("firebaseAuthToken");
   response.cookies.delete("firebaseAuthRefreshToken");
   response.cookies.delete("firebaseUserId");
+  response.cookies.delete("userRole");
 
   return response;
 }

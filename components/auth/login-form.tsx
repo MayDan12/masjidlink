@@ -19,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import GoogleButton from "./google-button";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth";
 import { toast } from "sonner";
 
@@ -36,7 +36,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export function LoginForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  // const searchParams = useSearchParams();
   const { signIn, error } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -50,63 +50,148 @@ export function LoginForm() {
     },
   });
 
+  // const onSubmit: SubmitHandler<FormValues> = async (data) => {
+  //   setIsLoading(true);
+  //   setErrorMessage("");
+
+  //   try {
+  //     // Call signIn function from auth context
+  //     const result = await signIn(data.email, data.password);
+  //     if (result && result.user) {
+  //       const response = await fetch(
+  //         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/checkroles`,
+  //         {
+  //           method: "POST",
+  //           body: JSON.stringify({ uid: result.user.uid }),
+  //           headers: { "Content-Type": "application/json" },
+  //         }
+  //       );
+
+  //       if (!response.ok) throw new Error("Failed to fetch user role");
+
+  //       const { role: firestoreRole } = await response.json();
+
+  //       await new Promise((resolve) => setTimeout(resolve, 100));
+
+  //       toast("Login successful", {
+  //         description: "You are now logged in.",
+  //         duration: 2000,
+  //       });
+
+  //       // Check if the response is ok
+
+  //       // Decide which role to use (custom claims or Firestore)
+  //       const userRole = firestoreRole;
+  //       // Now you can perform actions based on the role/claims
+  //       switch (userRole) {
+  //         case "admin":
+  //           router.push("/admin");
+  //           break;
+  //         case "imam":
+  //           router.push("/imam");
+  //           break;
+  //         case "user":
+  //           router.push("/dashboard");
+  //           break;
+  //         default:
+  //           throw new Error("Unauthorized: No valid role assigned");
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Login error:", error);
+  //     setErrorMessage(
+  //       error instanceof Error
+  //         ? error.message
+  //         : "Login failed. Please check your credentials."
+  //     );
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
     setErrorMessage("");
 
     try {
-      // Call signIn function from auth context
       const result = await signIn(data.email, data.password);
-      // console.log("Login result:", result);
-      if (result && result.user) {
-        const response = await fetch("/api/auth/checkroles", {
-          method: "POST",
-          body: JSON.stringify({ uid: result.user.uid }),
-          headers: { "Content-Type": "application/json" },
-        });
 
-        if (!response.ok) throw new Error("Failed to fetch user role");
-
-        toast("Login successful", {
-          description: "You are now logged in.",
-          duration: 2000,
-          action: {
-            label: "Close",
-            onClick: () => toast.dismiss(),
-          },
-        });
-        // Check if the response is ok
-        const { role: firestoreRole } = await response.json();
-
-        // Decide which role to use (custom claims or Firestore)
-        const userRole = firestoreRole;
-        // Now you can perform actions based on the role/claims
-        switch (userRole) {
-          case "admin":
-            router.push("/admin");
-            break;
-          case "imam":
-            router.push("/imam");
-            break;
-          case "user":
-            const redirectTo = searchParams.get("from") || "/dashboard";
-            router.push(redirectTo);
-            break;
-          default:
-            throw new Error("Unauthorized: No valid role assigned");
-        }
+      if (!result || !result.user) {
+        throw new Error("Invalid login credentials.");
       }
+
+      await waitForAuthCookies(result.user.uid);
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/checkroles`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ uid: result.user.uid }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user role");
+      }
+
+      const { role: userRole } = await response.json();
+
+      if (!userRole) {
+        throw new Error("Unauthorized: No role assigned to user.");
+      }
+
+      toast("Login successful", {
+        description: "You are now logged in.",
+        duration: 2000,
+      });
+
+      // Redirect based on role
+      const roleRoutes: Record<string, string> = {
+        admin: "/admin",
+        imam: "/imam",
+        user: "/dashboard",
+      };
+
+      const redirectTo = roleRoutes[userRole] ?? "/login";
+      router.push(redirectTo);
     } catch (error) {
       console.error("Login error:", error);
       setErrorMessage(
         error instanceof Error
           ? error.message
-          : "Login failed. Please check your credentials."
+          : "Login failed. Please try again."
       );
     } finally {
       setIsLoading(false);
     }
   };
+
+  async function waitForAuthCookies(
+    uid: string,
+    timeout = 3000
+  ): Promise<void> {
+    const start = Date.now();
+    while (Date.now() - start < timeout) {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/checkroles`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ uid }),
+        }
+      );
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.role) return;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    }
+
+    throw new Error("Timeout waiting for auth cookies to be set.");
+  }
 
   return (
     <div className="grid gap-6">

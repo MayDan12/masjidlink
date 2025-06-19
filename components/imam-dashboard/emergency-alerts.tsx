@@ -55,9 +55,9 @@ const formSchema = z.object({
   alertType: z.string().min(1, {
     message: "Alert type is required.",
   }),
-  sendSMS: z.boolean().default(true),
-  sendEmail: z.boolean().default(true),
-  sendPush: z.boolean().default(true),
+  sendSMS: z.boolean(),
+  sendEmail: z.boolean(),
+  sendPush: z.boolean(),
   targetGroups: z.string().min(1, {
     message: "Target group is required.",
   }),

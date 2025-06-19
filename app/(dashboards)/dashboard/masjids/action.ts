@@ -130,6 +130,8 @@ export const joinMasjid = async (data: { token: string; masjidId: string }) => {
       photoURL = userData?.photoURL || "";
     }
 
+    const masjidRef = firestore.collection("masjids").doc(masjidId);
+
     const followerRef = firestore
       .collection("masjids")
       .doc(masjidId)
@@ -144,6 +146,13 @@ export const joinMasjid = async (data: { token: string; masjidId: string }) => {
         message: "You have already joined this masjid.",
       };
     }
+
+    await masjidRef.set(
+      {
+        followersCount: FieldValue.increment(1),
+      },
+      { merge: true }
+    );
 
     // Add user to masjid's followers subcollection
     await followerRef.set({

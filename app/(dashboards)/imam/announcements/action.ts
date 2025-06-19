@@ -67,10 +67,96 @@ export const createAnnouncements = async (data: {
   };
 };
 
-export const getAnnouncementsByUserId = async (data: { token: string }) => {
+// export const getAnnouncementsByUserId = async (data: { token: string }) => {
+//   try {
+//     const { token } = data;
+
+//     const verifiedToken = await serverAuth.verifyIdToken(token);
+//     const userRole = await checkUserRole(verifiedToken.uid);
+//     const userId = verifiedToken.uid;
+
+//     if (userRole !== "imam") {
+//       return {
+//         error: true,
+//         message: "Unauthorized: Only imams can view events.",
+//       };
+//     }
+
+//     const announcementRef = firestore.collection("announcements");
+//     const snapshot = await announcementRef
+//       .where("createdBy", "==", userId)
+//       .get();
+
+//     const announcements = snapshot.docs.map((doc) => {
+//       const data = doc.data();
+
+//       // Convert Firestore Timestamps to ISO strings
+
+//       const convertedData: Record<string, any> = {};
+//       for (const [key, value] of Object.entries(data)) {
+//         if (value?.toDate) {
+//           // Check if it's a Firestore Timestamp
+//           convertedData[key] = value.toDate().toISOString();
+//         } else {
+//           convertedData[key] = value;
+//         }
+//       }
+
+//       return {
+//         id: doc.id,
+//         ...convertedData,
+//       };
+//     });
+
+//     return {
+//       success: true,
+//       announcements,
+//     };
+//   } catch (error) {
+//     console.error("Error fetching announcements:", error);
+//     return {
+//       error: true,
+//       message: "An unexpected error occurred while fetching announcements.",
+//     };
+//   }
+// };
+
+// Define the EmergencyAlert type
+
+// Define types for better type safety
+interface Announcement {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  expiryDate?: string;
+  isEmergency: boolean;
+  type: string;
+  status: "active" | "scheduled" | "expired";
+  severity?: "low" | "medium" | "high" | "critical";
+  createdBy: string; // Added missing field from your Firestore query
+}
+
+// More precise API response types using discriminated union
+type ApiResponse =
+  | {
+      success: true;
+      announcements: Announcement[];
+      error?: never; // Ensures error can't be present in success case
+      message?: never;
+    }
+  | {
+      error: true;
+      message: string;
+      success?: never; // Ensures success can't be present in error case
+      announcements?: never;
+    };
+
+export const getAnnouncementsByUserId = async (data: {
+  token: string;
+}): Promise<ApiResponse> => {
   try {
     const { token } = data;
-
     const verifiedToken = await serverAuth.verifyIdToken(token);
     const userRole = await checkUserRole(verifiedToken.uid);
     const userId = verifiedToken.uid;
@@ -78,7 +164,7 @@ export const getAnnouncementsByUserId = async (data: { token: string }) => {
     if (userRole !== "imam") {
       return {
         error: true,
-        message: "Unauthorized: Only imams can view events.",
+        message: "Unauthorized: Only imams can view announcements.",
       };
     }
 
@@ -90,21 +176,22 @@ export const getAnnouncementsByUserId = async (data: { token: string }) => {
     const announcements = snapshot.docs.map((doc) => {
       const data = doc.data();
 
-      // Convert Firestore Timestamps to ISO strings
-      const convertedData: Record<string, any> = {};
-      for (const [key, value] of Object.entries(data)) {
-        if (value?.toDate) {
-          // Check if it's a Firestore Timestamp
-          convertedData[key] = value.toDate().toISOString();
-        } else {
-          convertedData[key] = value;
-        }
-      }
-
-      return {
+      // Explicit mapping for better type safety
+      const announcement: Announcement = {
         id: doc.id,
-        ...convertedData,
+        title: data.title,
+        content: data.content,
+        createdAt: data.createdAt.toDate().toISOString(),
+        isEmergency: data.isEmergency,
+        type: data.type,
+        status: data.status,
+        createdBy: data.createdBy,
+        // Optional fields with null checks
+        expiryDate: data.expiryDate?.toDate?.()?.toISOString?.(),
+        severity: data.severity,
       };
+
+      return announcement;
     });
 
     return {
@@ -115,12 +202,13 @@ export const getAnnouncementsByUserId = async (data: { token: string }) => {
     console.error("Error fetching announcements:", error);
     return {
       error: true,
-      message: "An unexpected error occurred while fetching announcements.",
+      message:
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred while fetching announcements.",
     };
   }
 };
-
-// Define the EmergencyAlert type
 
 type EmergencyAlert = {
   title: string;
@@ -136,6 +224,9 @@ type EmergencyAlert = {
   isResolved: boolean;
   resolvedAt?: Timestamp;
   relatedMasjidId: string;
+  createdAt: Timestamp;
+  createdBy: string;
+  updatedAt: Timestamp;
 };
 
 export const createEmergencyAlert = async (

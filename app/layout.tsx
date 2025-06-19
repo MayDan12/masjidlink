@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Providers from "@/components/auth-provider";
 import { Toaster } from "@/components/ui/sonner";
+import "@stream-io/video-react-sdk/dist/css/styles.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const amiri = Amiri({

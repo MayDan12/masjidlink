@@ -92,7 +92,7 @@ export default function LandingPage() {
                   </li>
                 </ul>
                 <Button className="mt-6 w-full" asChild>
-                  <Link href="/imam-dashboard">Imam Dashboard</Link>
+                  <Link href="/imam">Imam Dashboard</Link>
                 </Button>
               </div>
 

@@ -18,8 +18,8 @@ export default function MasjidProfilePage() {
       <Tabs defaultValue="general" className="space-y-4">
         <TabsList>
           <TabsTrigger value="general">General Information</TabsTrigger>
-          <TabsTrigger value="media">Photos & Media</TabsTrigger>
-          <TabsTrigger value="contact">Contact & Social</TabsTrigger>
+          <TabsTrigger value="media">Photos</TabsTrigger>
+          <TabsTrigger value="contact">Socials</TabsTrigger>
           {/* <TabsTrigger value="facilities">Facilities</TabsTrigger> */}
         </TabsList>
 

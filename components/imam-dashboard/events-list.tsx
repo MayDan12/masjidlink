@@ -12,20 +12,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Search,
-  MoreHorizontal,
   Edit,
   Trash,
-  Eye,
   Calendar,
   Clock,
   MapPin,
@@ -40,6 +32,8 @@ import { toast } from "sonner";
 import type { Event, EventType } from "@/types/events";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { EventEditForm } from "./event-edit-form";
+import CreateMeetingButton from "@/app/(dashboards)/livestream/CreateMeetingButton";
+import Link from "next/link";
 
 export function EventsList() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -157,10 +151,6 @@ export function EventsList() {
 
   const EventActions = ({ event }: { event: Event }) => (
     <div className="flex justify-end gap-2">
-      <Button variant="ghost" size="icon" className="h-8 w-8">
-        <Eye className="h-4 w-4" />
-        <span className="sr-only">View</span>
-      </Button>
       <Button
         variant="ghost"
         size="icon"
@@ -171,34 +161,15 @@ export function EventsList() {
         <span className="sr-only">Edit</span>
       </Button>
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <MoreHorizontal className="h-4 w-4" />
-            <span className="sr-only">Actions</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem className="flex items-center">
-            <Eye className="mr-2 h-4 w-4" />
-            View Details
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            className="flex items-center"
-            onClick={() => handleEditClick(event)}
-          >
-            <Edit className="mr-2 h-4 w-4" />
-            Edit Event
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => handleDelete(event.id)}
-            className="flex items-center text-destructive"
-          >
-            <Trash className="mr-2 h-4 w-4" />
-            {isDeleting ? "Deleting..." : "Delete Event"}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8"
+        onClick={() => handleDelete(event.id)}
+      >
+        <Trash className={`h-4 w-4 ${isDeleting ? "animate-spin" : ""}`} />
+        <span className="sr-only">Delete</span>
+      </Button>
     </div>
   );
 
@@ -238,7 +209,7 @@ export function EventsList() {
       </Dialog>
 
       {/* Mobile card view (visible on small screens) */}
-      <div className="md:hidden space-y-4">
+      <div className="lg:hidden space-y-4">
         {filteredEvents.length > 0 ? (
           filteredEvents.map((event) => (
             <Card key={event.id} className="overflow-hidden">
@@ -277,7 +248,22 @@ export function EventsList() {
                   </div>
                 </div>
 
-                <div className="mt-4 flex justify-end">
+                <div className="mt-4 flex justify-between">
+                  {!event.meetingLink ? (
+                    <CreateMeetingButton
+                      buttonText="Start Event"
+                      eventId={event.id}
+                      description={event.description}
+                      dateTime={new Date(event.date + " " + event.startTime)}
+                      onMeetingCreated={(call) => {
+                        console.log("Call created:", call);
+                      }}
+                    />
+                  ) : (
+                    <Button>
+                      <Link href={event.meetingLink}>Join livestream</Link>
+                    </Button>
+                  )}
                   <EventActions event={event} />
                 </div>
               </CardContent>
@@ -291,7 +277,7 @@ export function EventsList() {
       </div>
 
       {/* Desktop table view (hidden on small screens) */}
-      <div className="hidden md:block rounded-md border">
+      <div className="hidden lg:block rounded-md border">
         <ScrollArea className="h-[500px]">
           <Table>
             <TableHeader>
@@ -347,8 +333,25 @@ export function EventsList() {
                           event.type.slice(1)}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right flex flex-col gap-2">
                       <EventActions event={event} />
+                      {!event.meetingLink ? (
+                        <CreateMeetingButton
+                          buttonText="Start Event"
+                          eventId={event.id}
+                          description={event.description}
+                          dateTime={
+                            new Date(event.date + " " + event.startTime)
+                          }
+                          onMeetingCreated={(call) => {
+                            console.log("Call created:", call);
+                          }}
+                        />
+                      ) : (
+                        <Button size="sm" className="px-2">
+                          <Link href={event.meetingLink}>Join livestream</Link>
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))

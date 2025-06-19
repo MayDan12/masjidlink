@@ -9,13 +9,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MasjidsList } from "@/components/dashboard/masjids-list";
 import { MasjidMap } from "@/components/dashboard/masjid-map";
 import { SavedMasjids } from "@/components/dashboard/saved-masjids";
-import { MasjidSearch } from "@/components/dashboard/masjid-search";
+// import { MasjidSearch } from "@/components/dashboard/masjid-search";
 import { MapPin, Heart, Search } from "lucide-react";
 
 export default function MasjidsPage() {
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Masjids</h1>
           <p className="text-muted-foreground">
@@ -23,7 +23,6 @@ export default function MasjidsPage() {
             around the world.
           </p>
         </div>
-        <MasjidSearch />
       </div>
 
       <Tabs defaultValue="discover" className="space-y-4">

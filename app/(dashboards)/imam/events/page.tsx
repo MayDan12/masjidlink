@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -10,7 +9,6 @@ import {
 import { EventCalendar } from "@/components/imam-dashboard/event-calendar";
 import { EventsList } from "@/components/imam-dashboard/events-list";
 // import { EventCategoriesManager } from "@/components/imam-dashboard/event-categories-manager";
-import { PlusCircle } from "lucide-react";
 import { CreateEvent } from "@/components/imam-dashboard/create-event";
 
 export default function EventsPage() {
@@ -24,11 +22,6 @@ export default function EventsPage() {
             community.
           </p>
         </div>
-
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Create Event
-        </Button>
       </div>
 
       <Tabs defaultValue="calendar" className="space-y-4">

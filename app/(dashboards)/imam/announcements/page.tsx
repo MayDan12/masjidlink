@@ -9,6 +9,7 @@ import {
 import { AnnouncementsList } from "@/components/imam-dashboard/announcements-list";
 import { AnnouncementEditor } from "@/components/imam-dashboard/announcements";
 import { EmergencyAlerts } from "@/components/imam-dashboard/emergency-alerts";
+import { AlertCircle, Edit, PlusCircle } from "lucide-react";
 
 export default function AnnouncementsPage() {
   return (
@@ -21,11 +22,19 @@ export default function AnnouncementsPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="create" className="space-y-4">
+      <Tabs defaultValue="create" className="space-y-3">
         <TabsList>
-          <TabsTrigger value="create">Create Announcement</TabsTrigger>
-          <TabsTrigger value="manage">Manage Announcements</TabsTrigger>
-          <TabsTrigger value="emergency">Emergency Alerts</TabsTrigger>
+          <TabsTrigger value="create" className="gap-1">
+            <PlusCircle className="h-5 w-5" />
+            Create
+          </TabsTrigger>
+          <TabsTrigger value="manage" className="gap-1">
+            <Edit className="h-5 w-5" />
+            View
+          </TabsTrigger>
+          <TabsTrigger value="emergency" className="gap-1">
+            <AlertCircle className="h-5 w-5" /> Emergency
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="create" className="space-y-4">

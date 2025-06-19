@@ -1,11 +1,17 @@
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CommunityMembers } from "@/components/imam-dashboard/community-members"
-import { CommunityGroups } from "@/components/imam-dashboard/community-groups"
-import { VolunteerManagement } from "@/components/imam-dashboard/volunteer-management"
-import { MessageCenter } from "@/components/imam-dashboard/message-center"
-import { PlusCircle, Send } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { CommunityMembers } from "@/components/imam-dashboard/community-members";
+import { CommunityGroups } from "@/components/imam-dashboard/community-groups";
+import { VolunteerManagement } from "@/components/imam-dashboard/volunteer-management";
+import { MessageCenter } from "@/components/imam-dashboard/message-center";
+import { PlusCircle } from "lucide-react";
 
 export default function CommunityPage() {
   return (
@@ -14,13 +20,10 @@ export default function CommunityPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Community</h1>
           <p className="text-muted-foreground">
-            Manage your masjid community, organize groups, and coordinate volunteers.
+            Manage your masjid community, organize groups, and coordinate
+            volunteers.
           </p>
         </div>
-        <Button>
-          <Send className="mr-2 h-4 w-4" />
-          Send Message
-        </Button>
       </div>
 
       <Tabs defaultValue="members" className="space-y-4">
@@ -35,7 +38,9 @@ export default function CommunityPage() {
           <Card>
             <CardHeader>
               <CardTitle>Community Members</CardTitle>
-              <CardDescription>View and manage members of your masjid community.</CardDescription>
+              <CardDescription>
+                View and manage members of your masjid community.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <CommunityMembers />
@@ -48,7 +53,9 @@ export default function CommunityPage() {
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <div>
                 <CardTitle>Community Groups</CardTitle>
-                <CardDescription>Organize your community into groups and committees.</CardDescription>
+                <CardDescription>
+                  Organize your community into groups and committees.
+                </CardDescription>
               </div>
               <Button size="sm">
                 <PlusCircle className="mr-2 h-4 w-4" />
@@ -65,7 +72,9 @@ export default function CommunityPage() {
           <Card>
             <CardHeader>
               <CardTitle>Volunteer Management</CardTitle>
-              <CardDescription>Coordinate volunteers for masjid activities and events.</CardDescription>
+              <CardDescription>
+                Coordinate volunteers for masjid activities and events.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <VolunteerManagement />
@@ -77,7 +86,9 @@ export default function CommunityPage() {
           <Card>
             <CardHeader>
               <CardTitle>Message Center</CardTitle>
-              <CardDescription>Send messages and communicate with your community.</CardDescription>
+              <CardDescription>
+                Send messages and communicate with your community.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <MessageCenter />
@@ -86,5 +97,5 @@ export default function CommunityPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

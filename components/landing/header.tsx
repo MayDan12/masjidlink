@@ -1,16 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { ChurchIcon as Mosque, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import Image from "next/image";
 
 export default function Header() {
   return (
     <header className="border-b bg-background/95 sticky top-0 z-50 w-full backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
-          <Mosque className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+          <Image
+            src="/masjidlink.png"
+            alt="MasjidLink Logo"
+            width={40}
+            height={40}
+            className="h-10 w-10 "
+          />
           <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-primary">
             MasjidLink
           </h1>
@@ -26,7 +33,13 @@ export default function Header() {
           </SheetTrigger>
           <SheetContent side="left" className="w-[250px] sm:w-[300px]">
             <div className="flex items-center gap-2 mb-6 mt-2">
-              <Mosque className="h-6 w-6 text-primary" />
+              <Image
+                src="/masjidlink.png"
+                alt="MasjidLink Logo"
+                width={40}
+                height={40}
+                className="h-10 w-10 "
+              />
               <h2 className="text-xl font-bold text-primary">MasjidLink</h2>
             </div>
             <nav className="flex flex-col gap-4">

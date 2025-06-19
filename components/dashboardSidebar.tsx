@@ -16,18 +16,17 @@ import {
   Settings,
   Users,
   AlertTriangle,
-  Heart,
   Menu,
   Shield,
   Flag,
   BarChart,
   MessageSquare,
-  UserCog,
   Home,
   User2,
   User,
 } from "lucide-react";
 import Logout from "./auth/logout-button";
+import Image from "next/image";
 
 type SidebarProps = {
   role: "imam" | "admin" | "user";
@@ -105,11 +104,11 @@ export function UnifiedSidebar({ role }: SidebarProps) {
       icon: User,
       href: "/imam/my-profile",
     },
-    {
-      title: "Settings",
-      icon: Settings,
-      href: "/imam/settings",
-    },
+    // {
+    //   title: "Settings",
+    //   icon: Settings,
+    //   href: "/imam/settings",
+    // },
   ];
 
   const adminRoutes = [
@@ -191,16 +190,16 @@ export function UnifiedSidebar({ role }: SidebarProps) {
       href: "/dashboard/azan-settings",
       icon: Bell,
     },
-    {
-      title: "Donate",
-      href: "/dashboard/donate",
-      icon: Heart,
-    },
-    {
-      title: "Community",
-      href: "/dashboard/community",
-      icon: Users,
-    },
+    // {
+    //   title: "Donate",
+    //   href: "/dashboard/donate",
+    //   icon: Heart,
+    // },
+    // {
+    //   title: "Community",
+    //   href: "/dashboard/community",
+    //   icon: Users,
+    // },
     {
       title: "Emergency Alerts",
       href: "/dashboard/emergency-alerts",
@@ -211,26 +210,24 @@ export function UnifiedSidebar({ role }: SidebarProps) {
   let routes;
   let dashboardTitle;
   let dashboardPath;
-  let DashboardIcon;
 
   switch (role) {
     case "imam":
       routes = imamRoutes;
       dashboardTitle = "Imam Dashboard";
       dashboardPath = "/imam";
-      DashboardIcon = UserCog;
+
       break;
     case "admin":
       routes = adminRoutes;
       dashboardTitle = "Admin Dashboard";
       dashboardPath = "/admin";
-      DashboardIcon = Shield;
+
       break;
     default:
       routes = userRoutes;
       dashboardTitle = "Dashboard";
       dashboardPath = "/";
-      DashboardIcon = UserCog; // if you want a fallback
       break;
   }
 
@@ -252,7 +249,12 @@ export function UnifiedSidebar({ role }: SidebarProps) {
               onClick={() => setIsOpen(false)}
             >
               {/* {DashboardIcon && ( */}
-              <DashboardIcon className="h-6 w-6 text-primary" />
+              <Image
+                src="/masjidlink.png"
+                alt="masjidlink logo"
+                width={30}
+                height={30}
+              />
               {/* )} */}
               <span>{dashboardTitle}</span>
             </Link>
@@ -306,7 +308,12 @@ export function UnifiedSidebar({ role }: SidebarProps) {
           href={dashboardPath}
           className="flex items-center gap-2 font-semibold"
         >
-          {/* <dashboardIcon className="h-6 w-6 text-primary" /> */}
+          <Image
+            src="/masjidlink.png"
+            alt="masjidlink logo"
+            width={35}
+            height={35}
+          />
           <span>{dashboardTitle}</span>
         </Link>
       </div>

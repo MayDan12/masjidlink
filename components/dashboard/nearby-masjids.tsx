@@ -64,7 +64,7 @@ export function NearbyMasjids() {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-3 sm:flex-row justify-between items-center">
         <Button variant="outline" size="sm" className="gap-1">
           <Navigation className="h-4 w-4" />
           Update Location

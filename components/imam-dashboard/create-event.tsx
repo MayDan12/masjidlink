@@ -44,6 +44,7 @@ interface FormData {
   recurringFrequency?: RecurringFrequency | "";
   isPublic: boolean;
   maxAttendees?: string;
+  enableDonations: boolean; // Toggle for donation features
 }
 
 // Define types for form errors
@@ -63,6 +64,7 @@ interface FormErrors {
   recurringFrequency?: FormError;
   isPublic?: FormError;
   maxAttendees?: FormError;
+  // enableDonations: FormError;
 }
 
 // Create a validation function
@@ -121,6 +123,7 @@ export function CreateEvent() {
       recurringFrequency: "",
       isPublic: true,
       maxAttendees: "",
+      enableDonations: false,
     },
   });
 
@@ -131,7 +134,10 @@ export function CreateEvent() {
     const errors = validateForm(data);
     if (Object.keys(errors).length > 0) {
       Object.entries(errors).forEach(([key, value]) => {
-        form.setError(key as keyof FormData, value as string);
+        form.setError(key as keyof FormData, {
+          type: "manual",
+          message: value,
+        });
       });
       return;
     }
@@ -301,6 +307,27 @@ export function CreateEvent() {
               )}
             />
           </div>
+
+          <FormField
+            control={form.control}
+            name="enableDonations"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                <div className="space-y-0.5">
+                  <FormLabel>Enable Donations</FormLabel>
+                  <FormDescription>
+                    Allow viewers to donate during the livestream.
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField

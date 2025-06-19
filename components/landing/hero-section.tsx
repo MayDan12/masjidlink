@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ChurchIcon as Mosque } from "lucide-react";
 import Image from "next/image";
 
 export function HeroSection() {
@@ -11,8 +10,14 @@ export function HeroSection() {
 
       <div className="container px-4 md:px-6 relative">
         <div className="flex flex-col items-center text-center">
-          <div className="flex items-center justify-center h-20 w-20 rounded-full bg-primary/10 text-primary mb-8">
-            <Mosque size={48} />
+          <div className="flex items-center justify-center h-24 w-24 rounded-full bg-primary/10 text-primary mb-5">
+            <Image
+              src="/masjidlink.png"
+              alt="MasjidLink Logo"
+              width={70}
+              height={70}
+              className="h-16 w-16 "
+            />
           </div>
 
           <h1 className="text-4xl font-bold tracking-tight text-primary sm:text-5xl md:text-6xl lg:text-7xl">

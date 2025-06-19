@@ -188,6 +188,13 @@ export function MasjidProfileForm() {
         return;
       }
 
+      if (data.facilityTypes.length < 2) {
+        toast("Error", {
+          description: "Please select at least 3 facility types.",
+        });
+        return;
+      }
+
       const response = await saveMasjidProfile({ ...data, token });
 
       if (response.success) {
@@ -381,13 +388,10 @@ export function MasjidProfileForm() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Sunni">Sunni</SelectItem>
-                        <SelectItem value="Shia">Shia</SelectItem>
-                        <SelectItem value="Salafi">Salafi</SelectItem>
-                        <SelectItem value="Sufi">Sufi</SelectItem>
-                        <SelectItem value="Non-denominational">
-                          Non-denominational
-                        </SelectItem>
+                        <SelectItem value="Hanafi">Hanafi</SelectItem>
+                        <SelectItem value="Maliki">Maliki</SelectItem>
+                        <SelectItem value="Shafii">Shafi&apos;i</SelectItem>
+                        <SelectItem value="Hanbali">Hanbali</SelectItem>
                         <SelectItem value="Other">Other</SelectItem>
                       </SelectContent>
                     </Select>

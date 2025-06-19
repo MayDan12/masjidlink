@@ -28,9 +28,6 @@ export default function ImamDashboardLayout({
           </div>
           <div className="flex-1">
             <div className="flex items-center">
-              <h1 className="text-lg font-semibold md:text-xl">
-                Imam Dashboard
-              </h1>
               <UserIcon
                 links={[
                   {

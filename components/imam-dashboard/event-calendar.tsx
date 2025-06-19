@@ -62,20 +62,26 @@ export function EventCalendar() {
           return;
         }
 
-        const data = result.events;
+        // Ensure we have events data, fallback to empty array if undefined
+        const eventsData = result.events || [];
 
         // Convert date strings to Date objects with validation
-        const formattedEvents = data
-          .map((event: any) => {
-            const date = new Date(event.date);
-            return isNaN(date.getTime()) ? null : { ...event, date };
+        const formattedEvents = eventsData
+          .map((event) => {
+            try {
+              const date = new Date(event.date);
+              return isNaN(date.getTime()) ? null : { ...event, date };
+            } catch {
+              return null;
+            }
           })
-          .filter(Boolean) as Events[];
+          .filter((event): event is Events => event !== null);
 
         setEvents(formattedEvents);
       } catch (error) {
         toast.error("Failed to fetch events");
         console.error("Error fetching events:", error);
+        setEvents([]); // Reset to empty array on error
       } finally {
         setIsLoading(false);
       }
@@ -224,8 +230,8 @@ export function EventCalendar() {
                   selectedEvent ? getEventTypeColor(selectedEvent.type) : ""
                 }`}
               >
-                {selectedEvent?.type.charAt(0).toUpperCase() +
-                  selectedEvent?.type.slice(1)}
+                {/* {selectedEvent?.type.charAt(0).toUpperCase() +
+                  selectedEvent?.type.slice(1)} */}
               </Badge>
               <Button variant="outline" size="sm" className="gap-1">
                 <Users className="h-4 w-4" />

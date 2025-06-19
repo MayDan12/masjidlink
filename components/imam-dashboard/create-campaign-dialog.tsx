@@ -57,9 +57,9 @@ const formSchema = z.object({
   category: z.string().min(1, {
     message: "Category is required.",
   }),
-  isPublic: z.boolean().default(true),
-  allowAnonymous: z.boolean().default(true),
-  showProgress: z.boolean().default(true),
+  isPublic: z.boolean(),
+  allowAnonymous: z.boolean(),
+  showProgress: z.boolean(),
 });
 
 export function CreateCampaignDialog({

@@ -18,6 +18,7 @@ export interface Event {
   createdAt: string;
   updatedAt: string;
   createdBy: string;
+  meetingLink?: string;
 }
 export interface Events {
   id: string;

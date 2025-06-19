@@ -20,24 +20,6 @@ export default function UserDashboard() {
 
   return (
     <div className="space-y-8">
-      {/* <section className="py-12 text-center">
-        <h1 className="text-4xl font-bold tracking-tight text-primary mb-4 font-amiri">
-          بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ
-        </h1>
-        <p className="text-3xl font-semibold mb-6">Welcome to MasjidLink</p>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-          Connect with your local masjid, track prayer times, and strengthen
-          bonds within the Ummah
-        </p>
-        <div className="flex justify-center gap-4">
-          <Button size="lg" asChild>
-            <Link href="/masjids">Find Masjids</Link>
-          </Button>
-          <Button size="lg" variant="outline" asChild>
-            <Link href="/prayers">Prayer Times</Link>
-          </Button>
-        </div>
-      </section> */}
       <h1 className="text-2xl">Welcome {fullName}</h1>
 
       <PrayerTimesWidget />
@@ -55,7 +37,7 @@ export default function UserDashboard() {
           </CardHeader>
           <CardFooter>
             <Button variant="ghost" className="w-full" asChild>
-              <Link href="/masjids">Explore Masjids</Link>
+              <Link href="/dashboard/masjids">Explore Masjids</Link>
             </Button>
           </CardFooter>
         </Card>
@@ -72,7 +54,7 @@ export default function UserDashboard() {
           </CardHeader>
           <CardFooter>
             <Button variant="ghost" className="w-full" asChild>
-              <Link href="/azan-settings">Azan Settings</Link>
+              <Link href="/dashboard/azan-settings">Azan Settings</Link>
             </Button>
           </CardFooter>
         </Card>
@@ -89,7 +71,7 @@ export default function UserDashboard() {
           </CardHeader>
           <CardFooter>
             <Button variant="ghost" className="w-full" asChild>
-              <Link href="/events">View Events</Link>
+              <Link href="/dashboard/events">View Events</Link>
             </Button>
           </CardFooter>
         </Card>
@@ -106,7 +88,7 @@ export default function UserDashboard() {
           </CardHeader>
           <CardFooter>
             <Button variant="ghost" className="w-full" asChild>
-              <Link href="/donate">Donate Now</Link>
+              <Link href="/dashboard/donate">Donate Now</Link>
             </Button>
           </CardFooter>
         </Card>

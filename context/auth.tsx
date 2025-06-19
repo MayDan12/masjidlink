@@ -10,7 +10,6 @@ import {
   User,
   UserCredential,
   onAuthStateChanged,
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
   GoogleAuthProvider,
@@ -18,9 +17,9 @@ import {
   getIdToken,
   getIdTokenResult,
   ParsedToken,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "@/firebase/client"; // Import from your firebase.ts file
-// import { removeToken, setToken } from "./action";
 
 // Extended user interface with tokens
 interface AuthUser extends User {
@@ -36,11 +35,7 @@ interface AuthContextType {
   error: Error | null;
   signIn: (email: string, password: string) => Promise<UserCredential>;
   signInWithGoogle: () => Promise<UserCredential>;
-  signUp: (
-    email: string,
-    password: string,
-    role: string
-  ) => Promise<UserCredential>;
+  signUp: (email: string, password: string) => Promise<UserCredential>;
   signOut: () => Promise<void>;
   getAccessToken: () => Promise<string | null>;
   refreshUser: () => Promise<void>;
@@ -89,17 +84,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           tokenClaims: tokenResult.claims,
         };
 
-        // Call API to set cookies
-        await fetch("/api/auth/set-cookies", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            accessToken,
-            refreshToken: firebaseUser.refreshToken,
-            userId: firebaseUser.uid,
-          }),
-        });
-
         setUser(authUser);
       } else {
         // User is signed out
@@ -125,66 +109,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     return () => unsubscribe();
   }, []);
-  // Set up auth state listener
-  // useEffect(() => {
-  //   const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-  //     try {
-  //       if (firebaseUser) {
-  //         // Get the ID token
-  //         const accessToken = await getIdToken(firebaseUser, true);
-  //         const tokenResult = await getIdTokenResult(firebaseUser);
-  //         const refreshToken = firebaseUser.refreshToken;
-  //         // Create extended user object with tokens
-  //         const authUser: AuthUser = {
-  //           ...firebaseUser,
-  //           accessToken,
-  //           refreshToken,
-  //           tokenClaims: tokenResult.claims,
-  //         };
-
-  //         await fetch("/api/auth/set-cookies", {
-  //           method: "POST",
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //           },
-  //           body: JSON.stringify({
-  //             accessToken,
-  //             refreshToken: firebaseUser.refreshToken,
-  //             userId: firebaseUser.uid,
-  //           }),
-  //         });
-
-  //         // if (accessToken && refreshToken) {
-  //         //   await setToken({ accessToken, refreshToken });
-  //         // }
-
-  //         setUser(authUser);
-  //       } else {
-  //         // User is signed out
-  //         // Clear cookies via API route
-  //         await fetch("/api/auth/clear-cookies", { method: "POST" });
-  //         setUser(null);
-  //         // await removeToken();
-  //         // setUser(null);
-  //       }
-  //     } catch (error) {
-  //       console.error("Auth state change error:", error);
-  //       setError(error instanceof Error ? error : new Error(String(error)));
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   });
-
-  //   // Clean up subscription
-  //   return () => unsubscribe();
-  // }, []);
 
   // Sign in with email/password
   const signIn = async (email: string, password: string) => {
     try {
       setLoading(true);
       setError(null);
-      return await signInWithEmailAndPassword(auth, email, password);
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Login failed");
+      }
+
+      const data = await response.json();
+
+      await signInWithEmailAndPassword(auth, email, password);
+
+      return data.user;
     } catch (error) {
       console.error("Sign in error:", error);
       setError(error instanceof Error ? error : new Error(String(error)));
