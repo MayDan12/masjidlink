@@ -29,7 +29,7 @@ export default function PlanPopup() {
       <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl mx-8">
         <h2 className="text-xl font-semibold mb-2">Welcome back!</h2>
         <p className="text-gray-700 mb-4">
-          You're currently on the <strong>great</strong> plan.
+          You're and me currently on the <strong>great</strong> plan.
         </p>
         <button
           onClick={() => setVisible(false)}
