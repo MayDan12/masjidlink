@@ -35,7 +35,7 @@ export default function PlanPopup() {
           onClick={() => setVisible(false)}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          Got it
+          Okay Got it
         </button>
       </div>
     </div>
