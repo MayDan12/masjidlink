@@ -75,7 +75,7 @@ export function HeroSection() {
               className="w-full h-full border-primary border-4 "
             />
           </div> */}
-          <div className="relative mt-10 aspect-video rounded-xl overflow-hidden shadow-lg border-primary border-4">
+          <div className="relative mt-10 p-2 rounded-xl overflow-hidden shadow-lg border-primary border-4">
             <Image
               src="/dashboarddark.png"
               alt="MasjidLink Dashboard Preview"

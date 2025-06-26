@@ -8,30 +8,30 @@ export function DonationStats() {
   const stats = [
     {
       title: "Total Donations",
-      value: "$12,345",
+      value: "$0",
       icon: DollarSign,
-      change: "+12%",
+      change: "+0%",
       description: "from last month",
     },
     {
       title: "Total Donors",
-      value: "324",
+      value: "0",
       icon: Users,
-      change: "+8%",
+      change: "+0%",
       description: "from last month",
     },
     {
       title: "Average Donation",
-      value: "$38",
+      value: "$0",
       icon: TrendingUp,
-      change: "+5%",
+      change: "+0%",
       description: "from last month",
     },
     {
       title: "This Month",
-      value: "$2,845",
+      value: "$0",
       icon: Calendar,
-      change: "+18%",
+      change: "+0%",
       description: "from last month",
     },
   ];

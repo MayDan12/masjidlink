@@ -573,17 +573,17 @@ function MasjidCard({ masjid }: { masjid: Masjid }) {
           </Button>
         </div>
 
-        <div className="flex xs:hidden items-center justify-center text-xs text-muted-foreground mt-1 mb-2">
+        {/* <div className="flex xs:hidden items-center justify-center text-xs text-muted-foreground mt-1 mb-2">
           <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
           <span className="truncate">
             {masjid.address}, {masjid.city}, {masjid.state}
           </span>
-        </div>
+        </div> */}
 
         <div className="mt-2 flex flex-wrap items-center justify-center sm:justify-between gap-2">
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-xs">
-              {masjid.followersCount} followers
+              {masjid.followersCount ? masjid.followersCount : 0} followers
             </Badge>
           </div>
           <Button variant="link" size="sm" asChild className="px-0 sm:px-4">

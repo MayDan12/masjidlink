@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Bell, Calendar, Clock, MapPin, Settings } from "lucide-react";
+import { Bell, Calendar, Clock, MapPin, PlayIcon } from "lucide-react";
 
 type PrayerTime = {
   name: string;
@@ -181,7 +181,7 @@ export function PrayerTimesDisplay({
         </Card>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {prayerTimes.map((prayer) => (
           <Card
             key={prayer.name}
@@ -212,19 +212,23 @@ export function PrayerTimesDisplay({
                   <Bell className="h-4 w-4" />
                   <span className="sr-only">Set Reminder</span>
                 </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <PlayIcon className="h-4 w-4" />
+                  <span className="sr-only">Listen to Azan</span>
+                </Button>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <div className="flex justify-between items-center text-sm text-muted-foreground border-t pt-4">
+      {/* <div className="flex justify-between items-center text-sm text-muted-foreground border-t pt-4">
         <div>Calculation Method: Muslim World League</div>
         <Button variant="link" size="sm" className="gap-1">
           <Settings className="h-3 w-3" />
           Adjust Settings
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 }

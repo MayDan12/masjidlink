@@ -8,7 +8,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PrayerTimesDisplay } from "@/components/dashboard/prayer-times-display";
 import { NearbyMasjids } from "@/components/dashboard/nearby-masjids";
-import { PrayerTimeSettings } from "@/components/dashboard/prayer-time-settings";
+// import { PrayerTimeSettings } from "@/components/dashboard/prayer-time-settings";
 import { QiblaFinder } from "@/components/dashboard/qibla-finder";
 
 export default function PrayerTimesPage() {
@@ -27,7 +27,7 @@ export default function PrayerTimesPage() {
           <TabsTrigger value="today">Today</TabsTrigger>
           <TabsTrigger value="weekly">Weekly</TabsTrigger>
           <TabsTrigger value="monthly">Monthly</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+          {/* <TabsTrigger value="settings">Settings</TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="today" className="space-y-4">
@@ -98,7 +98,7 @@ export default function PrayerTimesPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="settings" className="space-y-4">
+        {/* <TabsContent value="settings" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Prayer Time Settings</CardTitle>
@@ -110,7 +110,7 @@ export default function PrayerTimesPage() {
               <PrayerTimeSettings />
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
     </div>
   );

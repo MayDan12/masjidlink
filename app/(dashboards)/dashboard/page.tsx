@@ -14,19 +14,64 @@ import { ChurchIcon as Mosque, Calendar, Bell, Heart } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/auth";
 
+// components/PlanPopup.tsx
+import { useEffect, useState } from "react";
+
+function PlanPopup() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const showPopup = () => {
+      setVisible(true);
+      // Hide after 15 seconds (optional)
+      setTimeout(() => setVisible(false), 15000);
+    };
+
+    // Show on initial mount
+    showPopup();
+
+    // Show again every 10 minutes (600,000 ms)
+    const interval = setInterval(() => {
+      showPopup();
+    }, 600000); // 10 minutes
+
+    return () => clearInterval(interval);
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
+        <h2 className="text-xl font-semibold mb-2">Welcome back!</h2>
+        <p className="text-gray-700 mb-4">
+          You're currently on the <strong>great</strong> plan.
+        </p>
+        <button
+          onClick={() => setVisible(false)}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Got it
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function UserDashboard() {
   const { user } = useAuth();
   const fullName = user?.displayName;
 
   return (
     <div className="space-y-7">
-      <h1 className="text-2xl">Welcome {fullName}</h1>
+      <PlanPopup />
+      <h1 className="text-xl">Welcome {fullName}</h1>
 
       <PrayerTimesWidget />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-2 lg:grid-cols-4 md:gap-4 mt-5">
         <Card>
-          <CardHeader className="space-y-1">
+          <CardHeader className="space-y-1 p-3 md:p-4">
             <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-2">
               <Mosque size={24} />
             </div>
@@ -43,7 +88,7 @@ export default function UserDashboard() {
         </Card>
 
         <Card>
-          <CardHeader className="space-y-1">
+          <CardHeader className="space-y-1 p-3 md:p-4">
             <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-2">
               <Bell size={24} />
             </div>
@@ -60,7 +105,7 @@ export default function UserDashboard() {
         </Card>
 
         <Card>
-          <CardHeader className="space-y-1">
+          <CardHeader className="space-y-1 p-3 md:p-4">
             <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-2">
               <Calendar size={24} />
             </div>
@@ -77,7 +122,7 @@ export default function UserDashboard() {
         </Card>
 
         <Card>
-          <CardHeader className="space-y-1">
+          <CardHeader className="space-y-1 p-3 md:p-4">
             <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-2">
               <Heart size={24} />
             </div>
@@ -94,7 +139,7 @@ export default function UserDashboard() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
         <div className="lg:col-span-2">
           <MasjidDiscovery />
         </div>

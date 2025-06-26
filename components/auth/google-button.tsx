@@ -38,13 +38,6 @@ function GoogleButton() {
         });
       }
       if (result && result.user) {
-        // Call getIdTokenResult() on the user object - this is ASYNCHRONOUS
-        const idTokenResult = await result.user.getIdTokenResult();
-        // Custom claims are inside the 'claims' property
-        const customClaims = idTokenResult.claims;
-        // Example: Accessing a specific role claim
-        const userAdminRole = customClaims.role; // Assuming you set a 'role' claim
-
         const response = await fetch("/api/auth/checkroles", {
           method: "POST",
           body: JSON.stringify({ uid: result.user.uid }),
@@ -54,7 +47,7 @@ function GoogleButton() {
         const userRole = await response.json(); // Fetch user role from Firestore
         console.log(userRole.role);
         // Now you can perform actions based on the role/claims
-        if (userAdminRole === "admin") {
+        if (userRole.role === "admin") {
           // Redirect to admin dashboard
           router.push("/admin");
         } else if (userRole.role === "imam") {

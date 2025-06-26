@@ -1,107 +1,3 @@
-// import { cn } from "@/lib/utils";
-// import {
-//   CallControls,
-//   CallParticipantsList,
-//   CallStatsButton,
-//   CallingState,
-//   PaginatedGridLayout,
-//   SpeakerLayout,
-//   useCallStateHooks,
-// } from "@stream-io/video-react-sdk";
-// import { useState } from "react";
-// import {
-//   DropdownMenu,
-//   DropdownMenuContent,
-//   DropdownMenuItem,
-//   DropdownMenuSeparator,
-//   DropdownMenuTrigger,
-// } from "@/components/ui/dropdown-menu";
-// import { LayoutList, Loader, User } from "lucide-react";
-// import { Button } from "../ui/button";
-// import { useSearchParams } from "next/navigation";
-// import EndCallButton from "./endcallButton";
-
-// type CallLayoutType = "grid" | "speaker-left" | "speaker-right";
-
-// function LiveStreamRoom() {
-//   const searchParams = useSearchParams();
-//   const isPersonalRoom = !!searchParams.get("personal");
-//   const [layout, setLayout] = useState<CallLayoutType>("speaker-left");
-//   const [showParticipants, setShowParticipants] = useState(false);
-
-//   const { useCallCallingState } = useCallStateHooks();
-//   const callingState = useCallCallingState();
-
-//   if (callingState !== CallingState.JOINED) {
-//     return (
-//       <div className="flex h-screen w-full items-center justify-center">
-//         <Loader className="animate-spin" />
-//       </div>
-//     );
-//   }
-//   const CallLayout = () => {
-//     switch (layout) {
-//       case "grid":
-//         return <PaginatedGridLayout />;
-//       case "speaker-right":
-//         return <SpeakerLayout participantsBarPosition="left" />;
-//       default:
-//         return <SpeakerLayout participantsBarPosition="right" />;
-//     }
-//   };
-
-//   return (
-//     <section className="relative h-screen w-ful overflow-hidden pt-4 ">
-//       <div className="relative flex size-full items-center justify-center">
-//         <div className="flex size-full max-w-[1000px] items-center">
-//           <CallLayout />
-//         </div>
-//         <div
-//           className={cn(
-//             "h-[calc(100vh-86px)] ml-2",
-//             showParticipants ? "block" : "hidden"
-//           )}
-//         >
-//           <CallParticipantsList onClose={() => setShowParticipants(false)} />
-//         </div>
-//         <div className="fixed flex-wrap bottom-0 flex items-center justify-center gap-5 p-2">
-//           <CallControls />
-//           <DropdownMenu>
-//             <DropdownMenuTrigger className="cursor-pointer rounded-full bg-gray-800 px-2 py-2 hover:bg-gray-700">
-//               <LayoutList size={20} className="" />
-//             </DropdownMenuTrigger>
-//             <DropdownMenuContent>
-//               {["Grid", "Speaker Left", "Speaker Right"].map((item, index) => (
-//                 <div key={index}>
-//                   <DropdownMenuItem
-//                     className="cursor-pointer"
-//                     onClick={() => {
-//                       setLayout(item.toLowerCase() as CallLayoutType);
-//                     }}
-//                   >
-//                     {item}
-//                   </DropdownMenuItem>
-//                   <DropdownMenuSeparator />
-//                 </div>
-//               ))}
-//             </DropdownMenuContent>
-//           </DropdownMenu>
-//           <CallStatsButton />
-//           <Button
-//             className="cursor-pointer rounded-full bg-gray-800 px-2 py-2 hover:bg-gray-700"
-//             onClick={() => setShowParticipants((prev) => !prev)}
-//           >
-//             <User size={20} />
-//           </Button>
-//           {!isPersonalRoom && <EndCallButton />}
-//         </div>
-//       </div>
-//     </section>
-//   );
-// }
-
-// export default LiveStreamRoom;
-
 "use client";
 
 import type React from "react";
@@ -521,17 +417,19 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
                     <Send className="w-4 h-4" />
                   </Button>
                 </form>
-                <Button
-                  onClick={() => {
-                    setShowDonationModal(true);
-                    setShowChat(false);
-                  }}
-                  className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-medium h-11"
-                  size="sm"
-                >
-                  <Gift className="w-4 h-4 mr-2" />
-                  Send Donation
-                </Button>
+                {userRole === "viewer" && (
+                  <Button
+                    onClick={() => {
+                      setShowDonationModal(true);
+                      setShowChat(false);
+                    }}
+                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-medium h-11"
+                    size="sm"
+                  >
+                    <Gift className="w-4 h-4 mr-2" />
+                    Send Donation
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -636,14 +534,19 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
                 <Send className="w-4 h-4" />
               </Button>
             </form>
-            <Button
-              onClick={() => setShowDonationModal(true)}
-              className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-medium"
-              size="sm"
-            >
-              <Gift className="w-4 h-4 mr-2" />
-              Send Donation
-            </Button>
+            {userRole === "viewer" && (
+              <Button
+                onClick={() => {
+                  setShowDonationModal(true);
+                  setShowChat(false);
+                }}
+                className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-medium h-11"
+                size="sm"
+              >
+                <Gift className="w-4 h-4 mr-2" />
+                Send Donation
+              </Button>
+            )}
           </div>
         </div>
       </div>

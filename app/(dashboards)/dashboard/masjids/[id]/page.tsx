@@ -14,9 +14,6 @@ export default function MasjidDetails({
           </p>
         </div>
       </div>
-
-      {/* Add your components here to display masjid details */}
-      {/* Example: MasjidInfo, MasjidEvents, MasjidMembers, etc. */}
     </div>
   );
 }
