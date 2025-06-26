@@ -121,8 +121,6 @@ export function LoginForm() {
         throw new Error("Invalid login credentials.");
       }
 
-      await waitForAuthCookies(result.user.uid);
-
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/checkroles`,
         {
@@ -167,32 +165,6 @@ export function LoginForm() {
       setIsLoading(false);
     }
   };
-
-  async function waitForAuthCookies(
-    uid: string,
-    timeout = 3000
-  ): Promise<void> {
-    const start = Date.now();
-    while (Date.now() - start < timeout) {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/checkroles`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ uid }),
-        }
-      );
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data?.role) return;
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 200));
-    }
-
-    throw new Error("Timeout waiting for auth cookies to be set.");
-  }
 
   return (
     <div className="grid gap-6">
