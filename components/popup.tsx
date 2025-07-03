@@ -9,7 +9,7 @@ export default function PlanPopup() {
     const showPopup = () => {
       setVisible(true);
       // Hide after 15 seconds (optional)
-      setTimeout(() => setVisible(false), 15000);
+      setTimeout(() => setVisible(false), 10000);
     };
 
     // Show on initial mount
@@ -31,13 +31,13 @@ export default function PlanPopup() {
         <h2 className="text-xl font-semibold mb-2 text-gray-700">
           Welcome back!
         </h2>
-        <p className="text-gray-700 mb-4">You're currently on the free plan.</p>
-        <Button
-          onClick={() => setVisible(false)}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Okay Got it
-        </Button>
+        <p className="text-gray-700 mb-4">
+          You&apos;re currently on the free plan.
+        </p>
+        <div className="flex gap-4">
+          <Button onClick={() => setVisible(false)}>Okay Got it</Button>
+          <Button onClick={() => setVisible(false)}>Upgrade to Premium</Button>
+        </div>
       </div>
     </div>
   );
