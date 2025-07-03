@@ -13,6 +13,38 @@ import { UpcomingEvents } from "@/components/upcoming-events";
 import { ChurchIcon as Mosque, Calendar, Bell, Heart } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/auth";
+import { CarouselDemo } from "@/components/carousel";
+
+const dashboardCards = [
+  {
+    icon: <Mosque size={24} />,
+    title: "Masjid Profiles",
+    description: "Discover and connect with masjids in your area",
+    link: "/dashboard/masjids",
+    buttonText: "Explore Masjids",
+  },
+  {
+    icon: <Bell size={24} />,
+    title: "Azan System",
+    description: "Customize your azan notifications and preferences",
+    link: "/dashboard/azan-settings",
+    buttonText: "Azan Settings",
+  },
+  {
+    icon: <Calendar size={24} />,
+    title: "Events",
+    description: "Stay updated with community events and gatherings",
+    link: "/dashboard/events",
+    buttonText: "View Events",
+  },
+  {
+    icon: <Heart size={24} />,
+    title: "Donations",
+    description: "Support your local masjid with secure donations",
+    link: "/dashboard/donate",
+    buttonText: "Donate Now",
+  },
+];
 
 export default function UserDashboard() {
   const { user } = useAuth();
@@ -22,74 +54,26 @@ export default function UserDashboard() {
     <div className="space-y-7">
       <h1 className="text-xl">Welcome {fullName}</h1>
       <PrayerTimesWidget />
-      <div className="grid grid-cols-2 gap-2 md:grid-cols-2 lg:grid-cols-4 md:gap-4 mt-5">
-        <Card>
-          <CardHeader className="space-y-1 p-3 md:p-4">
-            <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-2">
-              <Mosque size={24} />
-            </div>
-            <CardTitle>Masjid Profiles</CardTitle>
-            <CardDescription>
-              Discover and connect with masjids in your area
-            </CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Button variant="ghost" className="w-full" asChild>
-              <Link href="/dashboard/masjids">Explore Masjids</Link>
-            </Button>
-          </CardFooter>
-        </Card>
-
-        <Card>
-          <CardHeader className="space-y-1 p-3 md:p-4">
-            <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-2">
-              <Bell size={24} />
-            </div>
-            <CardTitle>Azan System</CardTitle>
-            <CardDescription>
-              Customize your azan notifications and preferences
-            </CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Button variant="ghost" className="w-full" asChild>
-              <Link href="/dashboard/azan-settings">Azan Settings</Link>
-            </Button>
-          </CardFooter>
-        </Card>
-
-        <Card>
-          <CardHeader className="space-y-1 p-3 md:p-4">
-            <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-2">
-              <Calendar size={24} />
-            </div>
-            <CardTitle>Events</CardTitle>
-            <CardDescription>
-              Stay updated with community events and gatherings
-            </CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Button variant="ghost" className="w-full" asChild>
-              <Link href="/dashboard/events">View Events</Link>
-            </Button>
-          </CardFooter>
-        </Card>
-
-        <Card>
-          <CardHeader className="space-y-1 p-3 md:p-4">
-            <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-2">
-              <Heart size={24} />
-            </div>
-            <CardTitle>Donations</CardTitle>
-            <CardDescription>
-              Support your local masjid with secure donations
-            </CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Button variant="ghost" className="w-full" asChild>
-              <Link href="/dashboard/donate">Donate Now</Link>
-            </Button>
-          </CardFooter>
-        </Card>
+      <div className="mx-10 sm:hidden">
+        <CarouselDemo />
+      </div>
+      <div className="hidden sm:grid grid-cols-4 gap-2 md:grid-cols-2 lg:grid-cols-4 md:gap-4 mt-5">
+        {dashboardCards.map((card, index) => (
+          <Card key={index}>
+            <CardHeader className="space-y-1 p-3 md:p-4">
+              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-2">
+                {card.icon}
+              </div>
+              <CardTitle>{card.title}</CardTitle>
+              <CardDescription>{card.description}</CardDescription>
+            </CardHeader>
+            <CardFooter>
+              <Button variant="ghost" className="w-full" asChild>
+                <Link href={card.link}>{card.buttonText}</Link>
+              </Button>
+            </CardFooter>
+          </Card>
+        ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">

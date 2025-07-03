@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { Button } from "./ui/button";
 
 export default function PlanPopup() {
   const [visible, setVisible] = useState(false);
@@ -27,16 +28,16 @@ export default function PlanPopup() {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 ">
       <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl mx-8">
-        <h2 className="text-xl font-semibold mb-2">Welcome back!</h2>
-        <p className="text-gray-700 mb-4">
-          You're and me currently on the <strong>great</strong> plan.
-        </p>
-        <button
+        <h2 className="text-xl font-semibold mb-2 text-gray-700">
+          Welcome back!
+        </h2>
+        <p className="text-gray-700 mb-4">You're currently on the free plan.</p>
+        <Button
           onClick={() => setVisible(false)}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           Okay Got it
-        </button>
+        </Button>
       </div>
     </div>
   );

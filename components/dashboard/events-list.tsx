@@ -16,6 +16,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, MapPin, Clock, Users, Search } from "lucide-react";
 import { getEvents } from "@/app/(dashboards)/dashboard/events/action";
 import { Event } from "@/types/events";
+import Link from "next/link";
 
 export function EventsList() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -117,6 +118,18 @@ export function EventsList() {
               </span>
             </div>
           </div>
+          <Button
+            size="sm"
+            className="px-2"
+            disabled={!event.meetingLink}
+            aria-label={`livestream for ${event.title}`}
+          >
+            {!event.meetingLink ? (
+              "Not yet Started"
+            ) : (
+              <Link href={event?.meetingLink}> Join Livestream</Link>
+            )}
+          </Button>
 
           {/* Register Button */}
           {/* <Button
