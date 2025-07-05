@@ -2,14 +2,14 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { decodeJwt } from "jose";
 
-type Role = "user" | "imam" | "admin";
-type RoleResponse = { role?: Role; error?: string };
+type Role = "user" | "imam" | "admin" | undefined;
+// type RoleResponse = { role?: Role; error?: string };
 
 export async function middleware(request: NextRequest) {
   // Skip POST requests
   if (request.method === "POST") return NextResponse.next();
 
-  const { token, userId } = getAuthTokens(request);
+  const { token, userId, role } = getAuthTokens(request);
 
   if (!token || !userId) return redirectToLogin(request);
 
@@ -17,8 +17,8 @@ export async function middleware(request: NextRequest) {
     const decoded = decodeJwt(token);
     if (!decoded?.user_id) return redirectToLogin(request);
 
-    const { role, error } = await checkUserRole(userId);
-    if (error || !role) return redirectToLogin(request);
+    // const { role, error } = await checkUserRole(userId);
+    // if (error || !role) return redirectToLogin(request);
 
     return authorizeRoute(request, role);
   } catch (err) {
@@ -26,6 +26,10 @@ export async function middleware(request: NextRequest) {
     return redirectToLogin(request);
   }
 }
+
+const isValidRole = (value: string | undefined): value is Role => {
+  return value === "user" || value === "imam" || value === "admin";
+};
 
 function getAuthTokens(request: NextRequest) {
   const cookieStore = cookies();
@@ -35,28 +39,30 @@ function getAuthTokens(request: NextRequest) {
   const userId =
     request.cookies.get("firebaseUserId")?.value ||
     cookieStore.get("firebaseUserId")?.value;
-  return { token, userId };
+  const cookieRole = request.cookies.get("userRole")?.value;
+  const role: Role = isValidRole(cookieRole) ? cookieRole : undefined;
+  return { token, userId, role };
 }
 
-async function checkUserRole(userId: string): Promise<RoleResponse> {
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/checkroles`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ uid: userId }),
-        cache: "no-store",
-      }
-    );
+// async function checkUserRole(userId: string): Promise<RoleResponse> {
+//   try {
+//     const res = await fetch(
+//       `${process.env.NEXT_PUBLIC_API_URL}/api/auth/checkroles`,
+//       {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ uid: userId }),
+//         cache: "no-store",
+//       }
+//     );
 
-    if (!res.ok) return { error: `HTTP ${res.status}` };
-    return (await res.json()) as RoleResponse;
-  } catch (err) {
-    console.error("[Role Check Error]", err);
-    return { error: "Network error" };
-  }
-}
+//     if (!res.ok) return { error: `HTTP ${res.status}` };
+//     return (await res.json()) as RoleResponse;
+//   } catch (err) {
+//     console.error("[Role Check Error]", err);
+//     return { error: "Network error" };
+//   }
+// }
 
 function authorizeRoute(request: NextRequest, role: Role) {
   const pathname = request.nextUrl.pathname;

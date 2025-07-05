@@ -245,9 +245,9 @@
 
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 
-import { Bell, Calendar, Clock, MapPin, PlayIcon, Pause } from "lucide-react";
+import { Bell, Calendar, MapPin, PlayIcon, Pause } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -259,6 +259,10 @@ import { Card, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Progress } from "../ui/progress";
+
+type PrayerTimesDisplayProps = {
+  view?: "daily" | "weekly" | "monthly";
+};
 
 /* --------------------------------------------------------------
    1️⃣  CONFIG — map prayer → audio file in /public/audio/
@@ -288,7 +292,9 @@ type PrayerTime = {
   time: string;
 };
 
-export function PrayerTimesDisplay() {
+export function PrayerTimesDisplay({
+  view = "daily",
+}: PrayerTimesDisplayProps) {
   /* -------------------- 2️⃣  STATE --------------------------- */
   const [selectedMasjid, setSelectedMasjid] = useState("masjid-al-noor");
   const [currentPrayer, setCurrentPrayer] = useState<string | null>(null);
@@ -297,29 +303,32 @@ export function PrayerTimesDisplay() {
   const nextTimeout = useRef<NodeJS.Timeout | null>(null);
 
   /* -------------------- 3️⃣  DAILY DATA (mock) --------------- */
-  const prayerTimes: PrayerTime[] = [
-    { name: "Fajr", time: "5:15 AM" },
-    { name: "Sunrise", time: "6:30 AM" },
-    { name: "Dhuhr", time: "12:30 PM" },
-    { name: "Asr", time: "3:45 PM" },
-    { name: "Maghrib", time: "6:15 PM" },
-    { name: "Isha", time: "7:45 PM" },
-  ];
+  const prayerTimes = useMemo<PrayerTime[]>(
+    () => [
+      { name: "Fajr", time: "5:15 AM" },
+      { name: "Sunrise", time: "6:30 AM" },
+      { name: "Dhuhr", time: "12:30 PM" },
+      { name: "Asr", time: "3:45 PM" },
+      { name: "Maghrib", time: "6:15 PM" },
+      { name: "Isha", time: "7:45 PM" },
+    ],
+    []
+  );
 
   /* -------------------- 4️⃣  CORE AUDIO LOGIC ---------------- */
-  const playPrayer = (prayerName: string) => {
-    /* stop any previous adhan */
+  const playPrayer = useCallback((prayerName: string) => {
     audioRef.current?.pause();
-    /* load new source */
+
     const src = audioFiles[prayerName] ?? "/audio/default.mp3";
     const audio = new Audio(src);
     audioRef.current = audio;
-    audio.play().catch(() => {}); // ignore if blocked
+
+    audio.play().catch(() => {});
     setCurrentPrayer(prayerName);
     setIsPlaying(true);
-    /* when adhan finishes mark not‑playing */
+
     audio.onended = () => setIsPlaying(false);
-  };
+  }, []); // Include audioFiles if it changes
 
   const togglePlayPause = () => {
     if (!audioRef.current) return;
@@ -341,33 +350,110 @@ export function PrayerTimesDisplay() {
   };
 
   /* -------------------- 5️⃣  AUTO‑SCHEDULER ------------------ */
-  const scheduleNextPrayer = () => {
-    /* clear existing timer */
+  const scheduleNextPrayer = useCallback(() => {
     if (nextTimeout.current) clearTimeout(nextTimeout.current);
 
     const now = new Date();
-    /* find the first prayer whose Date is still ahead */
+
     const upcoming = prayerTimes
       .map((p) => ({ ...p, date: toTodayDate(p.time) }))
       .find((p) => p.date > now);
 
-    if (!upcoming) return; // today done
+    if (!upcoming) return;
 
-    const diff = upcoming.date.getTime() - now.getTime(); // ms
+    const diff = upcoming.date.getTime() - now.getTime();
+
     nextTimeout.current = setTimeout(() => {
       playPrayer(upcoming.name);
-      scheduleNextPrayer(); // schedule the one after it
+      scheduleNextPrayer(); // schedule the next one
     }, diff);
-  };
+  }, [prayerTimes, playPrayer]);
 
-  /* set up scheduler on mount */
   useEffect(() => {
     scheduleNextPrayer();
-    return () => nextTimeout.current && clearTimeout(nextTimeout.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedMasjid]); // or rebuild when prayer table changes
+
+    return () => {
+      if (nextTimeout.current) {
+        clearTimeout(nextTimeout.current);
+      }
+    };
+  }, [selectedMasjid, scheduleNextPrayer]);
 
   /* -------------------- 6️⃣  RENDER -------------------------- */
+
+  if (view === "weekly" || view === "monthly") {
+    return (
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <Select value={selectedMasjid} onValueChange={setSelectedMasjid}>
+            <SelectTrigger className="w-full sm:w-[250px]">
+              <SelectValue placeholder="Select a masjid" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="masjid-al-noor">Masjid Al-Noor</SelectItem>
+              <SelectItem value="islamic-center">Islamic Center</SelectItem>
+              <SelectItem value="masjid-al-rahman">Masjid Al-Rahman</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm">
+              <Calendar className="h-4 w-4 mr-2" />
+              {view === "weekly" ? "Previous Week" : "Previous Month"}
+            </Button>
+            <Button variant="outline" size="sm">
+              {view === "weekly" ? "Next Week" : "Next Month"}
+              <Calendar className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+        </div>
+
+        <div className="border rounded-md">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b">
+                <th className="text-left p-3">Date</th>
+                <th className="text-center p-3">Fajr</th>
+                <th className="text-center p-3">Sunrise</th>
+                <th className="text-center p-3">Dhuhr</th>
+                <th className="text-center p-3">Asr</th>
+                <th className="text-center p-3">Maghrib</th>
+                <th className="text-center p-3">Isha</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: view === "weekly" ? 7 : 10 }).map(
+                (_, index) => {
+                  const date = new Date();
+                  date.setDate(date.getDate() + index);
+                  return (
+                    <tr
+                      key={index}
+                      className={index % 2 === 0 ? "bg-muted/50" : ""}
+                    >
+                      <td className="p-3 font-medium">
+                        {date.toLocaleDateString("en-US", {
+                          weekday: "short",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </td>
+                      <td className="text-center p-3">5:15 AM</td>
+                      <td className="text-center p-3">6:30 AM</td>
+                      <td className="text-center p-3">12:30 PM</td>
+                      <td className="text-center p-3">3:45 PM</td>
+                      <td className="text-center p-3">6:15 PM</td>
+                      <td className="text-center p-3">7:45 PM</td>
+                    </tr>
+                  );
+                }
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="space-y-6">
       {/* Masjid + date header */}
