@@ -22,12 +22,14 @@ const StreamVideoProvider = ({
   userRole = "viewer",
 }: StreamVideoProviderProps) => {
   const [videoClient, setVideoClient] = useState<StreamVideoClient>();
+  const [isSignedOut, setIsSignedOut] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (!firebaseUser) {
         console.warn("No Firebase user signed in.");
         setVideoClient(undefined);
+        setIsSignedOut(true);
         return;
       }
 
@@ -58,6 +60,10 @@ const StreamVideoProvider = ({
 
     return () => unsubscribe();
   }, [userRole]);
+
+  if (isSignedOut) {
+    return null; // or redirect to login, or show a message
+  }
 
   if (!videoClient) {
     return (
