@@ -27,7 +27,7 @@ export const createHostClient = (
   userName: string,
   tokenProvider: () => Promise<string>
 ) => {
-  return new StreamVideoClient({
+  return StreamVideoClient.getOrCreateInstance({
     apiKey,
     user: {
       id: userId,

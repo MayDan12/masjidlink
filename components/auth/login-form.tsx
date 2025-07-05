@@ -38,7 +38,7 @@ export function LoginForm() {
   const router = useRouter();
   // const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
-  const { signIn, error } = useAuth();
+  const { signIn } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -51,65 +51,6 @@ export function LoginForm() {
     },
   });
 
-  // const onSubmit: SubmitHandler<FormValues> = async (data) => {
-  //   setIsLoading(true);
-  //   setErrorMessage("");
-
-  //   try {
-  //     // Call signIn function from auth context
-  //     const result = await signIn(data.email, data.password);
-  //     if (result && result.user) {
-  //       const response = await fetch(
-  //         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/checkroles`,
-  //         {
-  //           method: "POST",
-  //           body: JSON.stringify({ uid: result.user.uid }),
-  //           headers: { "Content-Type": "application/json" },
-  //         }
-  //       );
-
-  //       if (!response.ok) throw new Error("Failed to fetch user role");
-
-  //       const { role: firestoreRole } = await response.json();
-
-  //       await new Promise((resolve) => setTimeout(resolve, 100));
-
-  //       toast("Login successful", {
-  //         description: "You are now logged in.",
-  //         duration: 2000,
-  //       });
-
-  //       // Check if the response is ok
-
-  //       // Decide which role to use (custom claims or Firestore)
-  //       const userRole = firestoreRole;
-  //       // Now you can perform actions based on the role/claims
-  //       switch (userRole) {
-  //         case "admin":
-  //           router.push("/admin");
-  //           break;
-  //         case "imam":
-  //           router.push("/imam");
-  //           break;
-  //         case "user":
-  //           router.push("/dashboard");
-  //           break;
-  //         default:
-  //           throw new Error("Unauthorized: No valid role assigned");
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error("Login error:", error);
-  //     setErrorMessage(
-  //       error instanceof Error
-  //         ? error.message
-  //         : "Login failed. Please check your credentials."
-  //     );
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
     setErrorMessage("");
@@ -121,20 +62,7 @@ export function LoginForm() {
         throw new Error("Invalid login credentials.");
       }
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/checkroles`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ uid: result.user.uid }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch user role");
-      }
-
-      const { role: userRole } = await response.json();
+      const userRole = result.role;
 
       if (!userRole) {
         throw new Error("Unauthorized: No role assigned to user.");
@@ -155,12 +83,12 @@ export function LoginForm() {
       const redirectTo = roleRoutes[userRole] ?? "/login";
       router.push(redirectTo);
     } catch (error) {
-      console.error("Login error:", error);
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Login failed. Please try again."
-      );
+      // console.error("Login error:", error);
+      if (error instanceof Error) {
+        setErrorMessage(error.message); // already clean
+      } else {
+        setErrorMessage("Login failed. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -246,15 +174,7 @@ export function LoginForm() {
           </Button>
         </form>
       </Form>
-      {error && (
-        <>
-          {" "}
-          <p>
-            {error.message} {errorMessage}
-          </p>
-          <p>{errorMessage}</p>
-        </>
-      )}
+      {errorMessage && <p className="text-center">{errorMessage}</p>}
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-muted"></div>

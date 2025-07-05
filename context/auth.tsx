@@ -28,12 +28,17 @@ interface AuthUser extends User {
   tokenClaims?: ParsedToken | null;
 }
 
+type SignInResult = {
+  user: UserCredential; // or your actual user type
+  role: "admin" | "imam" | "user" | null;
+};
+
 // Define context types
 interface AuthContextType {
   user: AuthUser | null;
   loading: boolean;
   error: Error | null;
-  signIn: (email: string, password: string) => Promise<UserCredential>;
+  signIn: (email: string, password: string) => Promise<SignInResult>;
   signInWithGoogle: () => Promise<UserCredential>;
   signUp: (email: string, password: string) => Promise<UserCredential>;
   signOut: () => Promise<void>;
@@ -124,18 +129,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Login failed");
+        throw new Error(errorData.message);
       }
 
       const data = await response.json();
 
       await signInWithEmailAndPassword(auth, email, password);
 
-      return data.user;
+      return {
+        user: data.user,
+        role: data.role,
+      };
     } catch (error) {
-      console.error("Sign in error:", error);
-      setError(error instanceof Error ? error : new Error(String(error)));
-      throw error;
+      const message = error instanceof Error ? error.message : "Login failed.";
+      // console.error("Sign in error:", message);
+      throw new Error(message);
     } finally {
       setLoading(false);
     }

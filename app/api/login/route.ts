@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/client"; // Your Firebase client config
+import { FirebaseError } from "firebase/app";
+import { getFirebaseAuthErrorMessage } from "@/utils/firebaseErrorMassages";
 
 export async function POST(request: NextRequest) {
   try {
@@ -102,26 +104,8 @@ export async function POST(request: NextRequest) {
     // Handle specific Firebase auth errors
     let errorMessage = "Login failed. Please try again.";
 
-    if (error.code) {
-      switch (error.code) {
-        case "auth/user-not-found":
-          errorMessage = "No account found with this email address.";
-          break;
-        case "auth/wrong-password":
-          errorMessage = "Incorrect password.";
-          break;
-        case "auth/invalid-email":
-          errorMessage = "Invalid email address.";
-          break;
-        case "auth/user-disabled":
-          errorMessage = "This account has been disabled.";
-          break;
-        case "auth/too-many-requests":
-          errorMessage = "Too many failed attempts. Please try again later.";
-          break;
-        default:
-          errorMessage = error.message || errorMessage;
-      }
+    if (error instanceof FirebaseError) {
+      errorMessage = getFirebaseAuthErrorMessage(error.code);
     }
 
     return NextResponse.json({ message: errorMessage }, { status: 400 });
