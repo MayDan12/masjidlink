@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Metadata } from "next";
 import { RegistrationForm } from "@/components/auth/registration-form";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "Register - MasjidLink",
@@ -19,23 +20,13 @@ export default function RegisterPage() {
             </div>
             <div className="relative z-20 flex items-center text-lg font-medium">
               <Link href="/" className="flex items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-8 w-8 mr-2 text-primary"
-                >
-                  <path d="M8 19H5c-1.105 0-1.99-.895-1.99-2 0-1-.006-1.909 0-3.003.006-1.14.118-1.998 1.246-1.998 1-.002 2.995 0 3.744 0"></path>
-                  <path d="M19 19h-4c-1.105 0-2-.895-2-2 0-1 0-8 1.248-8 1 0 3.332 0 4.752 0 1 0 1-.001 1 1 0 1 0 7-.996 9Z"></path>
-                  <path d="M8 19c0-3.79.229-6.295 1.558-7.578"></path>
-                  <path d="M9.25 7.825A5.5 5.5 0 0 1 14.5 3a5.5 5.5 0 0 1 5.204 3.663c.72.058.14.118.209.177.773.65 1.08.978 1.084 1.374.004.397-.295.723-1.084 1.376-.01.007-.018.015-.027.022"></path>
-                </svg>
+                <Image
+                  src="/masjidlink.png"
+                  alt="MasjidLink Logo"
+                  width={40}
+                  height={40}
+                  className="mr-2"
+                />
                 <span className="text-2xl font-semibold text-primary">
                   MasjidLink
                 </span>

@@ -32,11 +32,13 @@ import {
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import EndCallButton from "./endcallButton";
 import CustomCallControls from "./custom-call-controls";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { getLiveEventById } from "@/app/(dashboards)/imam/events/action";
+import { Event } from "@/types/events";
 
 type CallLayoutType = "grid" | "speaker-left" | "speaker-right";
 
@@ -180,7 +182,7 @@ interface LiveStreamRoomProps {
 function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
   const searchParams = useSearchParams();
   const isPersonalRoom = !!searchParams.get("personal");
-  const [layout, setLayout] = useState<CallLayoutType>("speaker-left");
+  const [layout, setLayout] = useState<CallLayoutType>("top");
   const [showParticipants, setShowParticipants] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [showDonationModal, setShowDonationModal] = useState(false);
@@ -192,7 +194,32 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
   const { useCallCallingState } = useCallStateHooks();
   const callingState = useCallCallingState();
   const call = useCall();
+  const [event, setEvent] = useState<Event | null>(null);
+  const { id } = useParams();
 
+  console.log(id);
+
+  // Ensure call is available before proceeding
+  useEffect(() => {
+    if (!id) return;
+    const fetchEvent = async () => {
+      const res = await getLiveEventById({ eventId: id as string });
+
+      if (res.status === "error") {
+        console.error("Failed to load event:", res.message);
+        setEvent(null);
+        return;
+      }
+
+      setEvent(res.event); // ✅ store the event
+    };
+
+    fetchEvent();
+  }, [id]);
+
+  useEffect(() => {
+    if (event) console.log("Fetched event:", event);
+  }, [event]);
   // Ensure viewers can't enable their devices even if they try
   useEffect(() => {
     if (userRole === "viewer" && call) {
@@ -276,8 +303,10 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
         return <PaginatedGridLayout />;
       case "speaker-right":
         return <SpeakerLayout participantsBarPosition="left" />;
-      default:
+      case "speaker-left":
         return <SpeakerLayout participantsBarPosition="right" />;
+      default:
+        return <SpeakerLayout participantsBarPosition="top" />;
     }
   };
 
@@ -309,7 +338,11 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
       <div className="relative flex flex-col lg:flex-row size-full">
         {/* Main video area */}
         <div className="flex-1 flex items-center justify-center relative bg-gray-900 mb-16">
-          <div className="flex size-full items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold">{event?.title}</h1>
+            <p>{event?.description}</p>
+          </div>
+          <div className="flex py-6  size-full items-center justify-center">
             <CallLayout />
           </div>
 

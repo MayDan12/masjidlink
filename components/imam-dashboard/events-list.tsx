@@ -217,7 +217,7 @@ export function EventsList() {
                 <div className="flex justify-between items-start mb-2">
                   <div>
                     <h3 className="font-medium text-base">{event.title}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                    <p className="max-w-52 text-sm text-muted-foreground line-clamp-2 mt-1">
                       {event.description}
                     </p>
                   </div>
@@ -294,9 +294,9 @@ export function EventsList() {
               {filteredEvents.length > 0 ? (
                 filteredEvents.map((event) => (
                   <TableRow key={event.id}>
-                    <TableCell>
+                    <TableCell className="max-w-[300px]">
                       <div className="font-medium">{event.title}</div>
-                      <div className="text-sm text-muted-foreground line-clamp-1">
+                      <div className="text-sm text-muted-foreground line-clamp-4">
                         {event.description}
                       </div>
                     </TableCell>

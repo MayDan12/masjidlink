@@ -377,14 +377,14 @@ export function MasjidProfileForm() {
                 name="denomination"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Denomination</FormLabel>
+                    <FormLabel>Madhhab</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select denomination" />
+                          <SelectValue placeholder="Select Madhhab" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>

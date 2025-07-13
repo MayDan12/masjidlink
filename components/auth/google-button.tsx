@@ -4,8 +4,6 @@ import { useAuth } from "@/context/auth";
 import { useRouter } from "next/navigation";
 // import { LoaderCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { firestore } from "@/firebase/client";
 
 function GoogleButton() {
   const router = useRouter();
@@ -20,42 +18,28 @@ function GoogleButton() {
 
     try {
       const result = await signInWithGoogle();
-      const userDocRef = doc(firestore, "users", result.user.uid);
-      const userDoc = await getDoc(userDocRef);
 
-      if (!userDoc.exists()) {
-        // Create user document with default role "user"
-        await setDoc(userDocRef, {
-          uid: result.user.uid,
-          email: result.user.email,
-          name: result.user.displayName,
-          role: "user", // Default role
-          donorRank: "Muḥsin",
-          followingMasjids: [],
-          termsAccepted: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        });
+      const idToken = await result.user.getIdToken();
+
+      // Send token to backend
+      const res = await fetch("/api/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: idToken }),
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Google login failed");
       }
-      if (result && result.user) {
-        const response = await fetch("/api/auth/checkroles", {
-          method: "POST",
-          body: JSON.stringify({ uid: result.user.uid }),
-          headers: { "Content-Type": "application/json" },
-        });
 
-        const userRole = await response.json(); // Fetch user role from Firestore
-        console.log(userRole.role);
-        // Now you can perform actions based on the role/claims
-        if (userRole.role === "admin") {
-          // Redirect to admin dashboard
+      const data = await res.json();
+      if (res.ok) {
+        const { role } = data;
+        if (role === "admin") {
           router.push("/admin");
-        } else if (userRole.role === "imam") {
-          // console.log("This is an imam");
-          // Redirect to imam dashboard, etc.
+        } else if (role === "imam") {
           router.push("/imam");
-        } else if (userRole.role === "user") {
-          // Redirect to user dashboard
+        } else {
           router.push("/dashboard");
         }
       }

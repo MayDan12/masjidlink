@@ -151,7 +151,7 @@ export function MasjidDetails({
             Facilities
           </h3>
           <div className="flex flex-wrap gap-2">
-            {masjid.facilityTypes.map((type) => (
+            {(masjid?.facilityTypes || []).map((type) => (
               <Badge
                 key={type}
                 variant="secondary"

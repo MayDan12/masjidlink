@@ -4,6 +4,7 @@ import { firestore, serverAuth } from "@/firebase/server";
 import { Event } from "@/types/events";
 import { checkUserRole } from "@/utils/server/auth";
 import { Timestamp } from "firebase-admin/firestore";
+import { sanitizeData } from "@/lib/sanitize";
 
 type EventType = "lecture" | "janazah" | "iftar" | "class" | "other";
 type RecurringFrequency = "daily" | "weekly" | "monthly";
@@ -262,6 +263,39 @@ export const getEventById = async (data: {
   return {
     success: true,
     event: { id: doc.id, ...doc.data() },
+  };
+};
+
+type Eent = { id: string /* …other fields */ };
+
+type EventResponse =
+  | { status: "error"; message: string }
+  | { status: "success"; event: Eent };
+
+export const getLiveEventById = async (data: {
+  eventId: string;
+}): Promise<EventResponse> => {
+  const { eventId } = data;
+
+  // Fetch the specific event by ID
+  const eventRef = firestore.collection("events").doc(eventId);
+  const doc = await eventRef.get();
+
+  // Check if the document exists
+
+  if (!doc.exists) {
+    return {
+      status: "error",
+      message: "Event not found.",
+    };
+  }
+  // Return the event data
+  // Convert Firestore data to Event type
+  const eventData = { id: doc.id, ...sanitizeData(doc.data()) };
+
+  return {
+    status: "success",
+    event: eventData,
   };
 };
 

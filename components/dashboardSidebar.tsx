@@ -61,7 +61,8 @@ export function UnifiedSidebar({ role }: SidebarProps) {
     },
     {
       title: "Masjid Profile",
-      icon: Mosque,
+      icon: null,
+      imageIcon: "/ico.png",
       href: "/imam/profile",
     },
     {
@@ -178,7 +179,8 @@ export function UnifiedSidebar({ role }: SidebarProps) {
     {
       title: "Masjids",
       href: "/dashboard/masjids",
-      icon: Mosque,
+      icon: null,
+      imageIcon: "/icos.png",
     },
     {
       title: "Events",
@@ -330,7 +332,18 @@ export function UnifiedSidebar({ role }: SidebarProps) {
               asChild
             >
               <Link href={route.href}>
-                <route.icon className="h-5 w-5" />
+                {route.icon ? (
+                  <route.icon className="w-5 h-5" />
+                ) : (
+                  <Image
+                    src={route.imageIcon}
+                    alt={route.title}
+                    className="w-5 h-5"
+                    height={30}
+                    width={30}
+                    priority
+                  />
+                )}
                 {route.title}
               </Link>
             </Button>

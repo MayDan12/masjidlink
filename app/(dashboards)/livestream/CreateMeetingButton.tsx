@@ -56,7 +56,8 @@ const CreateMeetingButton = ({
 
     try {
       setLoading(true);
-      const id = crypto.randomUUID();
+      const id = eventId;
+      // const id = crypto.randomUUID();
       const call = client.call("default", id);
 
       await call.getOrCreate({

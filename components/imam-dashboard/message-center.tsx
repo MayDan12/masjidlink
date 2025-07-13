@@ -1,36 +1,58 @@
-"use client"
+"use client";
 
-import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-import { DropdownMenu } from "@/components/ui/dropdown-menu"
+import { DropdownMenu } from "@/components/ui/dropdown-menu";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Send, Mail, Clock, Search, Filter, Trash, Archive, Star } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Send,
+  Mail,
+  Clock,
+  Search,
+  Filter,
+  Trash,
+  Archive,
+  Star,
+} from "lucide-react";
 
 type Message = {
-  id: string
-  subject: string
-  content: string
-  recipients: string
-  date: string
-  status: "sent" | "draft" | "scheduled"
-  starred?: boolean
-}
+  id: string;
+  subject: string;
+  content: string;
+  recipients: string;
+  date: string;
+  status: "sent" | "draft" | "scheduled";
+  starred?: boolean;
+};
 
 export function MessageCenter() {
-  const [selectedTab, setSelectedTab] = useState("compose")
-  const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState<string | null>(null)
+  const [selectedTab, setSelectedTab] = useState("compose");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
 
   // Mock messages data
   const messages: Message[] = [
@@ -65,7 +87,8 @@ export function MessageCenter() {
     {
       id: "4",
       subject: "Donation Receipt",
-      content: "Thank you for your generous donation. Please find attached your receipt for tax purposes.",
+      content:
+        "Thank you for your generous donation. Please find attached your receipt for tax purposes.",
       recipients: "Donors",
       date: "2023-04-05",
       status: "sent",
@@ -73,7 +96,8 @@ export function MessageCenter() {
     {
       id: "5",
       subject: "Eid Announcement",
-      content: "Eid prayer will be held at the community center. First session at 7:30 AM, second session at 9:00 AM.",
+      content:
+        "Eid prayer will be held at the community center. First session at 7:30 AM, second session at 9:00 AM.",
       recipients: "All Members",
       date: "2023-04-25",
       status: "scheduled",
@@ -81,51 +105,57 @@ export function MessageCenter() {
     {
       id: "6",
       subject: "Committee Meeting",
-      content: "Reminder: Monthly committee meeting this Sunday after Asr prayer in the conference room.",
+      content:
+        "Reminder: Monthly committee meeting this Sunday after Asr prayer in the conference room.",
       recipients: "Committee Members",
       date: "2023-04-22",
       status: "draft",
     },
-  ]
+  ];
 
   // Filter messages based on search query and status filter
   const filteredMessages = messages.filter((message) => {
     const matchesSearch =
       message.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
       message.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      message.recipients.toLowerCase().includes(searchQuery.toLowerCase())
+      message.recipients.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesStatus = statusFilter ? message.status === statusFilter : true
+    const matchesStatus = statusFilter ? message.status === statusFilter : true;
 
-    return matchesSearch && matchesStatus
-  })
+    return matchesSearch && matchesStatus;
+  });
 
   // Get status badge color
   const getStatusColor = (status: string) => {
     switch (status) {
       case "sent":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "draft":
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
       case "scheduled":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   // Format date
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
+    const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
-    })
-  }
+    });
+  };
 
   return (
-    <Tabs defaultValue={selectedTab} value={selectedTab} onValueChange={setSelectedTab} className="space-y-4">
+    <Tabs
+      defaultValue={selectedTab}
+      value={selectedTab}
+      onValueChange={setSelectedTab}
+      className="space-y-4"
+    >
       <TabsList>
         <TabsTrigger value="compose">Compose</TabsTrigger>
         <TabsTrigger value="messages">Messages</TabsTrigger>
@@ -135,7 +165,9 @@ export function MessageCenter() {
         <Card>
           <CardHeader>
             <CardTitle>Compose Message</CardTitle>
-            <CardDescription>Create a new message to send to your community members.</CardDescription>
+            <CardDescription>
+              Create a new message to send to your community members.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -161,7 +193,11 @@ export function MessageCenter() {
 
             <div className="space-y-2">
               <Label htmlFor="content">Message</Label>
-              <Textarea id="content" placeholder="Enter your message" className="min-h-[200px]" />
+              <Textarea
+                id="content"
+                placeholder="Enter your message"
+                className="min-h-[200px]"
+              />
             </div>
 
             <div className="flex items-center space-x-2">
@@ -196,15 +232,17 @@ export function MessageCenter() {
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="gap-2">
                   <Filter className="h-4 w-4" />
-                  {statusFilter ? `Status: ${statusFilter}` : "Filter by Status"}
+                  {statusFilter
+                    ? `Status: ${statusFilter}`
+                    : "Filter by Status"}
                 </Button>
               </DropdownMenuTrigger>
-              <SelectContent>
+              {/* <SelectContent>
                 <SelectItem value="all">All</SelectItem>
                 <SelectItem value="sent">Sent</SelectItem>
                 <SelectItem value="draft">Draft</SelectItem>
                 <SelectItem value="scheduled">Scheduled</SelectItem>
-              </SelectContent>
+              </SelectContent> */}
             </DropdownMenu>
           </div>
         </div>
@@ -214,7 +252,10 @@ export function MessageCenter() {
             <ScrollArea className="h-[500px]">
               <div className="divide-y">
                 {filteredMessages.map((message) => (
-                  <div key={message.id} className="p-4 hover:bg-muted/50 cursor-pointer">
+                  <div
+                    key={message.id}
+                    className="p-4 hover:bg-muted/50 cursor-pointer"
+                  >
                     <div className="flex justify-between items-start mb-1">
                       <div className="flex items-center gap-2">
                         <div className="flex-shrink-0">
@@ -227,10 +268,13 @@ export function MessageCenter() {
                         <h4 className="font-medium">{message.subject}</h4>
                       </div>
                       <Badge className={getStatusColor(message.status)}>
-                        {message.status.charAt(0).toUpperCase() + message.status.slice(1)}
+                        {message.status.charAt(0).toUpperCase() +
+                          message.status.slice(1)}
                       </Badge>
                     </div>
-                    <div className="ml-6 text-sm text-muted-foreground mb-2 line-clamp-2">{message.content}</div>
+                    <div className="ml-6 text-sm text-muted-foreground mb-2 line-clamp-2">
+                      {message.content}
+                    </div>
                     <div className="ml-6 flex justify-between items-center text-xs text-muted-foreground">
                       <div className="flex items-center gap-2">
                         <span>To: {message.recipients}</span>
@@ -258,5 +302,5 @@ export function MessageCenter() {
         </Card>
       </TabsContent>
     </Tabs>
-  )
+  );
 }

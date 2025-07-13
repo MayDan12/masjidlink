@@ -1,6 +1,6 @@
 "use client";
-
-import { useState } from "react";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -16,6 +16,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
 
 const preferencesFormSchema = z.object({
   notifications: z.object({
@@ -48,6 +49,15 @@ type PreferencesFormValues = z.infer<typeof preferencesFormSchema>;
 
 export function ProfilePreferences() {
   const [isLoading, setIsLoading] = useState(false);
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    // This avoids mismatch during hydration
+    setMounted(true);
+  }, []);
+
+  // 🔄 Watch for theme changes and apply them
 
   // Mock default values
   const defaultValues: PreferencesFormValues = {
@@ -64,7 +74,7 @@ export function ProfilePreferences() {
       communityUpdates: true,
     },
     displayPreferences: {
-      theme: "system",
+      theme: (theme || "system") as "light" | "dark" | "system",
       language: "english",
       prayerTimeFormat: "12h",
       dateFormat: "both",
@@ -81,6 +91,17 @@ export function ProfilePreferences() {
     resolver: zodResolver(preferencesFormSchema),
     defaultValues,
   });
+
+  const themeValue = form.watch("displayPreferences.theme");
+
+  useEffect(() => {
+    if (mounted && themeValue) {
+      setTheme(themeValue);
+      toast.success(`Theme updated to ${themeValue}`);
+    }
+  }, [themeValue, mounted, setTheme]);
+
+  if (!mounted) return null;
 
   function onSubmit(data: PreferencesFormValues) {
     setIsLoading(true);

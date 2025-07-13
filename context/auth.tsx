@@ -18,6 +18,7 @@ import {
   getIdTokenResult,
   ParsedToken,
   signInWithEmailAndPassword,
+  sendEmailVerification,
 } from "firebase/auth";
 import { auth } from "@/firebase/client"; // Import from your firebase.ts file
 
@@ -134,7 +135,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       const data = await response.json();
 
-      await signInWithEmailAndPassword(auth, email, password);
+      const creden = await signInWithEmailAndPassword(auth, email, password);
+
+      if (!creden.user.emailVerified) {
+        await sendEmailVerification(auth.currentUser!);
+      }
 
       return {
         user: data.user,

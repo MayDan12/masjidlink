@@ -35,10 +35,10 @@ export default function MasjidsPage() {
             <MapPin className="h-4 w-4" />
             <span>Nearby</span>
           </TabsTrigger>
-          <TabsTrigger value="saved" className="flex items-center gap-1">
+          {/* <TabsTrigger value="saved" className="flex items-center gap-1">
             <Heart className="h-4 w-4" />
             <span>Saved</span>
-          </TabsTrigger>
+          </TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="discover" className="space-y-4">
@@ -69,7 +69,7 @@ export default function MasjidsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="saved" className="space-y-4">
+        {/* <TabsContent value="saved" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Saved Masjids</CardTitle>
@@ -81,7 +81,7 @@ export default function MasjidsPage() {
               <SavedMasjids />
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
     </div>
   );

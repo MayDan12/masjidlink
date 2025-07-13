@@ -69,6 +69,16 @@ export function EventsList() {
     fetchEvents();
   }, [fetchEvents]);
 
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    };
+    return new Date(dateString).toLocaleDateString("en-US", options);
+  };
+
   const toggleRegistration = useCallback((id: string) => {
     console.log(`Toggle registration for event ${id}`);
     // In a real app, this would update state and possibly save to a database
@@ -83,7 +93,7 @@ export function EventsList() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="h-4 w-4" />
-              <span className="font-medium">{event.date}</span>
+              <span className="font-medium">{formatDate(event.date)}</span>
             </div>
             <Badge variant="default">{event.type}</Badge>
           </div>
@@ -94,7 +104,7 @@ export function EventsList() {
           </h3>
 
           {/* Description */}
-          <p className="text-sm text-muted-foreground mb-4 line-clamp-3 flex-1">
+          <p className="max-w-52 text-sm text-muted-foreground mb-4 line-clamp-4 flex-1">
             {event.description}
           </p>
 
@@ -225,7 +235,13 @@ export function EventsList() {
         {filteredEvents.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredEvents.map((event) => (
-              <EventCard key={event.id} event={event} />
+              <Link
+                key={event.id}
+                href={`/dashboard/events/${event.id}`}
+                className="no-underline"
+              >
+                <EventCard event={event} />
+              </Link>
             ))}
           </div>
         ) : (

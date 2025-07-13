@@ -266,7 +266,7 @@ const EventCard = memo(({ event }: { event: Event }) => {
           asChild
           aria-label={`View details for ${event.title}`}
         >
-          <Link href={`/events/${event.id}`}>View Details</Link>
+          <Link href={`/dashboard/events/${event.id}`}>View Details</Link>
         </Button>
       </div>
     </div>
