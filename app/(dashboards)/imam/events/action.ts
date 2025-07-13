@@ -266,7 +266,25 @@ export const getEventById = async (data: {
   };
 };
 
-type Eent = { id: string /* …other fields */ };
+type Eent = {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  startTime: string;
+  endTime?: string;
+  location: string;
+  type: EventType;
+  isRecurring: boolean;
+  recurringFrequency?: RecurringFrequency;
+  isPublic: boolean;
+  maxAttendees?: string;
+  rsvps: string[];
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  meetingLink?: string /* …other fields */;
+};
 
 type EventResponse =
   | { status: "error"; message: string }

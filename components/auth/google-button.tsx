@@ -4,6 +4,7 @@ import { useAuth } from "@/context/auth";
 import { useRouter } from "next/navigation";
 // import { LoaderCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { sendEmailVerification } from "firebase/auth";
 
 function GoogleButton() {
   const router = useRouter();
@@ -20,6 +21,10 @@ function GoogleButton() {
       const result = await signInWithGoogle();
 
       const idToken = await result.user.getIdToken();
+
+      if (!result.user.emailVerified) {
+        await sendEmailVerification(result.user);
+      }
 
       // Send token to backend
       const res = await fetch("/api/google", {

@@ -27,6 +27,14 @@ import {
 } from "lucide-react";
 import Logout from "./auth/logout-button";
 import Image from "next/image";
+import type { LucideIcon } from "lucide-react";
+
+type Route = {
+  title: string;
+  icon: LucideIcon | null;
+  imageIcon?: string;
+  href: string;
+};
 
 type SidebarProps = {
   role: "imam" | "admin" | "user";
@@ -53,7 +61,7 @@ export function UnifiedSidebar({ role }: SidebarProps) {
     return () => window.removeEventListener("resize", checkIfMobile);
   }, []);
 
-  const imamRoutes = [
+  const imamRoutes: Route[] = [
     {
       title: "Dashboard",
       icon: LayoutDashboard,
@@ -112,7 +120,7 @@ export function UnifiedSidebar({ role }: SidebarProps) {
     // },
   ];
 
-  const adminRoutes = [
+  const adminRoutes: Route[] = [
     {
       title: "Dashboard",
       icon: LayoutDashboard,
@@ -160,7 +168,7 @@ export function UnifiedSidebar({ role }: SidebarProps) {
     },
   ];
 
-  const userRoutes = [
+  const userRoutes: Route[] = [
     {
       title: "Home",
       href: "/dashboard",
@@ -277,7 +285,18 @@ export function UnifiedSidebar({ role }: SidebarProps) {
                     onClick={() => setIsOpen(false)}
                   >
                     <Link href={route.href}>
-                      <route.icon className="h-5 w-5" />
+                      {route.icon ? (
+                        <route.icon className="w-5 h-5" />
+                      ) : (
+                        <Image
+                          src={route.imageIcon!}
+                          alt={route.title}
+                          className="w-5 h-5"
+                          height={30}
+                          width={30}
+                          priority
+                        />
+                      )}
                       {route.title}
                     </Link>
                   </Button>
@@ -336,7 +355,7 @@ export function UnifiedSidebar({ role }: SidebarProps) {
                   <route.icon className="w-5 h-5" />
                 ) : (
                   <Image
-                    src={route.imageIcon}
+                    src={route.imageIcon!}
                     alt={route.title}
                     className="w-5 h-5"
                     height={30}

@@ -40,7 +40,7 @@ import { Card } from "@/components/ui/card";
 import { getLiveEventById } from "@/app/(dashboards)/imam/events/action";
 import { Event } from "@/types/events";
 
-type CallLayoutType = "grid" | "speaker-left" | "speaker-right";
+type CallLayoutType = "grid" | "speaker-left" | "speaker-right" | "top";
 
 interface ChatMessage {
   id: string;
