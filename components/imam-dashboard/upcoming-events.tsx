@@ -131,7 +131,7 @@ export function UpcomingEventsAdmin() {
           <div className="flex justify-between items-start">
             <div>
               <h3 className="font-semibold">{event.title}</h3>
-              <p className="font-normal text-sm text-gray-400">
+              <p className="max-w-52 line-clamp-4 font-normal text-sm text-gray-400">
                 {event.description}
               </p>
             </div>

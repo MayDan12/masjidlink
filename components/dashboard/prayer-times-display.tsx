@@ -269,11 +269,11 @@ type PrayerTimesDisplayProps = {
 ----------------------------------------------------------------*/
 const audioFiles: Record<string, string> = {
   Fajr: "/audio/azan1.mp3",
-  Sunrise: "/audio/azan1.mp3",
-  Dhuhr: "/audio/azan1.mp3",
-  Asr: "/audio/azan1.mp3",
-  Maghrib: "/audio/azan1.mp3",
-  Isha: "/audio/azan1.mp3",
+  Sunrise: "/audio/azan2.mp3",
+  Dhuhr: "/audio/azan3.mp3",
+  Asr: "/audio/azan4.mp3",
+  Maghrib: "/audio/azan5.mp3",
+  Isha: "/audio/azan6.mp3",
 };
 
 /* Help: turn a "5:15 AM" string into today’s Date object */

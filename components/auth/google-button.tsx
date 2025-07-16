@@ -65,6 +65,7 @@ function GoogleButton() {
       variant="outline"
       className="bg-background"
       onClick={handleGoogleLogin}
+      disabled={isLoading}
     >
       <svg viewBox="0 0 24 24" className="mr-2 h-4 w-4">
         <path

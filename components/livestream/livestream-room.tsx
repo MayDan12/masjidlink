@@ -7,21 +7,20 @@ import {
   CallParticipantsList,
   CallStatsButton,
   CallingState,
-  PaginatedGridLayout,
-  SpeakerLayout,
   useCallStateHooks,
   useCall,
+  ParticipantView,
 } from "@stream-io/video-react-sdk";
 import { useState, useEffect, useRef } from "react";
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuSeparator,
+//   DropdownMenuTrigger,
+// } from "@/components/ui/dropdown-menu";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  LayoutList,
+  // LayoutList,
   Loader,
   MessageCircle,
   Send,
@@ -40,7 +39,7 @@ import { Card } from "@/components/ui/card";
 import { getLiveEventById } from "@/app/(dashboards)/imam/events/action";
 import { Event } from "@/types/events";
 
-type CallLayoutType = "grid" | "speaker-left" | "speaker-right" | "top";
+// type CallLayoutType = "grid" | "speaker-left" | "speaker-right" | "top";
 
 interface ChatMessage {
   id: string;
@@ -182,7 +181,7 @@ interface LiveStreamRoomProps {
 function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
   const searchParams = useSearchParams();
   const isPersonalRoom = !!searchParams.get("personal");
-  const [layout, setLayout] = useState<CallLayoutType>("top");
+  // const [layout, setLayout] = useState<CallLayoutType>("top");
   const [showParticipants, setShowParticipants] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [showDonationModal, setShowDonationModal] = useState(false);
@@ -297,19 +296,6 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
     );
   }
 
-  const CallLayout = () => {
-    switch (layout) {
-      case "grid":
-        return <PaginatedGridLayout />;
-      case "speaker-right":
-        return <SpeakerLayout participantsBarPosition="left" />;
-      case "speaker-left":
-        return <SpeakerLayout participantsBarPosition="right" />;
-      default:
-        return <SpeakerLayout participantsBarPosition="top" />;
-    }
-  };
-
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !call) return;
@@ -337,14 +323,18 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
     <section className="relative h-screen w-full overflow-hidden bg-gray-950">
       <div className="relative flex flex-col lg:flex-row size-full">
         {/* Main video area */}
-        <div className="flex-1 flex items-center justify-center relative bg-gray-900 mb-16">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold">{event?.title}</h1>
-            <p>{event?.description}</p>
-          </div>
-          <div className="flex py-6  size-full items-center justify-center">
-            <CallLayout />
-          </div>
+        <div className="flex-1 flex flex-col relative bg-gray-900 mb-16">
+          {/* Title or Event Metadata */}
+          {event && (
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-md px-4 py-2 rounded-lg z-10 text-center">
+              <h1 className="text-lg md:text-2xl font-bold text-white">
+                {event.title}
+              </h1>
+            </div>
+          )}
+
+          {/* Live Video Layout */}
+          <CallLayouts />
 
           {/* Mobile chat overlay */}
           <div
@@ -617,7 +607,7 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
           </div>
 
           {/* Layout dropdown - enhanced for mobile */}
-          <DropdownMenu>
+          {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
@@ -651,9 +641,9 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
                 </div>
               ))}
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
 
-          <CallStatsButton />
+          {/* <CallStatsButton /> */}
 
           <Button
             variant="ghost"
@@ -703,3 +693,42 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
 }
 
 export default LiveStreamRoom;
+
+const CallLayouts = () => {
+  const { useParticipants } = useCallStateHooks();
+  const call = useCall();
+  const participants = useParticipants();
+
+  const callCreatorId = call?.state.createdBy?.id;
+
+  const hostParticipant = participants.find((p) => p.userId === callCreatorId);
+
+  const otherParticipants = participants.filter(
+    (p) => p.sessionId !== hostParticipant?.sessionId
+  );
+
+  return (
+    <div className="flex flex-col lg:flex-row w-full h-full gap-4 p-2">
+      {/* Host's large video */}
+      <div className="flex-1 bg-black rounded-xl overflow-hidden flex items-center justify-center">
+        {hostParticipant ? (
+          <ParticipantView participant={hostParticipant} />
+        ) : (
+          <p className="text-white">Host not available</p>
+        )}
+      </div>
+
+      {/* Small participant thumbnails */}
+      <div className="flex lg:flex-col gap-2 overflow-auto max-h-full">
+        {otherParticipants.map((p) => (
+          <div
+            key={p.sessionId}
+            className="w-28 h-20 bg-gray-800 rounded-lg overflow-hidden"
+          >
+            <ParticipantView participant={p} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};

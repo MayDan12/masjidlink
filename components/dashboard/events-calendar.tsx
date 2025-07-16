@@ -547,7 +547,7 @@ export function EventsCalendar() {
 
             <div className="border-t pt-4">
               <h4 className="font-medium mb-2">Description</h4>
-              <p className="text-sm text-muted-foreground">
+              <p className="line-clamp-4 max-w-48 text-sm text-muted-foreground">
                 {selectedEvent?.description}
               </p>
             </div>

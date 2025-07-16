@@ -5,6 +5,7 @@ import { Event } from "@/types/events";
 import { checkUserRole } from "@/utils/server/auth";
 import { Timestamp } from "firebase-admin/firestore";
 import { sanitizeData } from "@/lib/sanitize";
+import { sendEmailToFollowers } from "@/utils/nodemailer";
 
 type EventType = "lecture" | "janazah" | "iftar" | "class" | "other";
 type RecurringFrequency = "daily" | "weekly" | "monthly";
@@ -51,6 +52,29 @@ export const createEvents = async (data: {
   // Use auto-generated ID for each new event
   const eventRef = firestore.collection("events").doc(); // 👈 New doc ID
   await eventRef.set(eventToStore);
+
+  // Fetch all followers from the masjid's subcollection
+  const followersSnap = await firestore
+    .collection("masjids")
+    .doc(uid)
+    .collection("followers")
+    .get();
+
+  if (followersSnap.empty) {
+    return {
+      success: true,
+      message: "Event created but no followers to notify.",
+      eventId: eventRef.id,
+    };
+  }
+
+  // Extract emails
+  const followerEmails = followersSnap.docs
+    .map((doc) => doc.data()?.email)
+    .filter(Boolean) as string[];
+
+  // ✅ Send emails
+  await sendEmailToFollowers(followerEmails, eventToStore);
 
   return {
     success: true,
