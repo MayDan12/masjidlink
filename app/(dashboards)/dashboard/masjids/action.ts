@@ -46,70 +46,6 @@ export const getMasjidById = async (masjidId: string) => {
   }
 };
 
-// This function allows a user to join a masjid by adding their user ID to the masjid's followers collection.
-// export const joinMasjid = async (data: { token: string; masjidId: string }) => {
-//   const { token, masjidId } = data;
-//   let displayName = "";
-//   let email = "";
-//   let photoURL = "";
-
-//   try {
-//     const verifiedToken = await serverAuth.verifyIdToken(token);
-//     const userId = verifiedToken.uid;
-
-//     // Optionally: fetch more user info from another users collection if needed
-//     const userDoc = await firestore.collection("users").doc(userId).get();
-//     if (userDoc.exists) {
-//       const userData = userDoc.data();
-//       displayName = userData?.displayName || "";
-//       email = userData?.email || "";
-//       photoURL = userData?.photoURL || "";
-//     }
-
-//     const userRef = firestore.collection("users").doc(userId);
-
-//     const followerRef = firestore
-//       .collection("masjids")
-//       .doc(masjidId)
-//       .collection("followers")
-//       .doc(userId);
-
-//     const followerDoc = await followerRef.get();
-
-//     if (followerDoc.exists) {
-//       return {
-//         success: true,
-//         message: "You have already joined this masjid.",
-//       };
-//     }
-
-//     await firestore
-//       .collection("masjids")
-//       .doc(masjidId)
-//       .collection("followers")
-//       .doc(userId)
-//       .set({
-//         userId,
-//         joinedAt: new Date().toISOString(),
-//         displayName,
-//         email,
-//         photoURL, // optionally include displayName, email, etc.
-//       });
-
-//     await userRef.update();
-
-//     return {
-//       success: true,
-//       message: "Successfully joined masjid.",
-//     };
-//   } catch (error) {
-//     return {
-//       error: true,
-//       message: (error as Error).message || "Failed to join masjid.",
-//     };
-//   }
-// };
-
 export const joinMasjid = async (data: { token: string; masjidId: string }) => {
   const { token, masjidId } = data;
   let displayName = "";
@@ -180,3 +116,66 @@ export const joinMasjid = async (data: { token: string; masjidId: string }) => {
     };
   }
 };
+// This function allows a user to join a masjid by adding their user ID to the masjid's followers collection.
+// export const joinMasjid = async (data: { token: string; masjidId: string }) => {
+//   const { token, masjidId } = data;
+//   let displayName = "";
+//   let email = "";
+//   let photoURL = "";
+
+//   try {
+//     const verifiedToken = await serverAuth.verifyIdToken(token);
+//     const userId = verifiedToken.uid;
+
+//     // Optionally: fetch more user info from another users collection if needed
+//     const userDoc = await firestore.collection("users").doc(userId).get();
+//     if (userDoc.exists) {
+//       const userData = userDoc.data();
+//       displayName = userData?.displayName || "";
+//       email = userData?.email || "";
+//       photoURL = userData?.photoURL || "";
+//     }
+
+//     const userRef = firestore.collection("users").doc(userId);
+
+//     const followerRef = firestore
+//       .collection("masjids")
+//       .doc(masjidId)
+//       .collection("followers")
+//       .doc(userId);
+
+//     const followerDoc = await followerRef.get();
+
+//     if (followerDoc.exists) {
+//       return {
+//         success: true,
+//         message: "You have already joined this masjid.",
+//       };
+//     }
+
+//     await firestore
+//       .collection("masjids")
+//       .doc(masjidId)
+//       .collection("followers")
+//       .doc(userId)
+//       .set({
+//         userId,
+//         joinedAt: new Date().toISOString(),
+//         displayName,
+//         email,
+//         photoURL, // optionally include displayName, email, etc.
+//       });
+
+//     await userRef.update();
+
+//     return {
+//       success: true,
+//       message: "Successfully joined masjid.",
+//     };
+//   } catch (error) {
+//     return {
+//       error: true,
+//       message: (error as Error).message || "Failed to join masjid.",
+//     };
+//   }
+// };

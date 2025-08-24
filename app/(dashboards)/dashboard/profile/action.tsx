@@ -5,68 +5,6 @@ import { sanitizeData } from "@/lib/sanitize";
 import { checkUserRole } from "@/utils/server/auth";
 import { Timestamp } from "firebase-admin/firestore";
 
-// export const uploadImage = async (formData: FormData, token: string) => {
-//   const verifiedToken = await serverAuth.verifyIdToken(token);
-//   const userRole = await checkUserRole(verifiedToken.uid);
-
-//   if (userRole !== "user" && userRole !== "imam") {
-//     return {
-//       error: true,
-//       message: "Unauthorized: Only users can update their profile.",
-//     };
-//   }
-
-//   const file = formData.get("image") as File;
-//   if (!file) {
-//     return {
-//       error: true,
-//       message: "No image file provided.",
-//     };
-//   }
-
-//   try {
-//     const arrayBuffer = await file.arrayBuffer();
-//     const buffer = Buffer.from(arrayBuffer);
-//     const blob = new Blob([buffer], { type: file.type });
-
-//     const cloudinaryForm = new FormData();
-//     cloudinaryForm.append("file", blob, file.name);
-//     cloudinaryForm.append(
-//       "upload_preset",
-//       process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!
-//     );
-
-//     const uploadResponse = await fetch(
-//       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-//       {
-//         method: "POST",
-//         body: cloudinaryForm,
-//       }
-//     );
-
-//     const result = await uploadResponse.json();
-
-//     if (result.error) {
-//       throw new Error(result.error.message);
-//     }
-
-//     return {
-//       success: true,
-//       message: "Image uploaded successfully.",
-//       imageUrl: result.secure_url,
-//       publicId: result.public_id,
-//     };
-//   } catch (error) {
-//     console.error("Cloudinary upload failed:", error);
-//     return {
-//       error: true,
-//       message: "Failed to upload image to Cloudinary.",
-//     };
-//   }
-// };
-
-// Update your existing updateProfile function to handle the image URL
-
 export const uploadImage = async (formData: FormData, token: string) => {
   const verifiedToken = await serverAuth.verifyIdToken(token);
   const userRole = await checkUserRole(verifiedToken.uid);
@@ -230,3 +168,65 @@ export const getUsersProfile = async (token: string) => {
     };
   }
 };
+
+// export const uploadImage = async (formData: FormData, token: string) => {
+//   const verifiedToken = await serverAuth.verifyIdToken(token);
+//   const userRole = await checkUserRole(verifiedToken.uid);
+
+//   if (userRole !== "user" && userRole !== "imam") {
+//     return {
+//       error: true,
+//       message: "Unauthorized: Only users can update their profile.",
+//     };
+//   }
+
+//   const file = formData.get("image") as File;
+//   if (!file) {
+//     return {
+//       error: true,
+//       message: "No image file provided.",
+//     };
+//   }
+
+//   try {
+//     const arrayBuffer = await file.arrayBuffer();
+//     const buffer = Buffer.from(arrayBuffer);
+//     const blob = new Blob([buffer], { type: file.type });
+
+//     const cloudinaryForm = new FormData();
+//     cloudinaryForm.append("file", blob, file.name);
+//     cloudinaryForm.append(
+//       "upload_preset",
+//       process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!
+//     );
+
+//     const uploadResponse = await fetch(
+//       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+//       {
+//         method: "POST",
+//         body: cloudinaryForm,
+//       }
+//     );
+
+//     const result = await uploadResponse.json();
+
+//     if (result.error) {
+//       throw new Error(result.error.message);
+//     }
+
+//     return {
+//       success: true,
+//       message: "Image uploaded successfully.",
+//       imageUrl: result.secure_url,
+//       publicId: result.public_id,
+//     };
+//   } catch (error) {
+//     console.error("Cloudinary upload failed:", error);
+//     return {
+//       error: true,
+//       message: "Failed to upload image to Cloudinary.",
+//     };
+//   }
+// };
+
+// Update your existing updateProfile function to handle the image URL
