@@ -9,7 +9,7 @@ import {
 import { DonationStats } from "@/components/imam-dashboard/donation-stats";
 import { DonationCampaigns } from "@/components/imam-dashboard/donation-campaigns";
 import { DonorsList } from "@/components/imam-dashboard/donors-list";
-import { DonationReports } from "@/components/imam-dashboard/donation-reports";
+// import { DonationReports } from "@/components/imam-dashboard/donation-reports";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { CreateCampaignDialog } from "@/components/imam-dashboard/create-campaign-dialog";
@@ -41,7 +41,7 @@ export default function DonationsPage() {
         <TabsList>
           <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
           <TabsTrigger value="donors">Donors</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
+          {/* <TabsTrigger value="reports">Reports</TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="campaigns" className="space-y-4">
@@ -73,7 +73,7 @@ export default function DonationsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="reports" className="space-y-4">
+        {/* <TabsContent value="reports" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Financial Reports</CardTitle>
@@ -85,7 +85,7 @@ export default function DonationsPage() {
               <DonationReports />
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
     </div>
   );

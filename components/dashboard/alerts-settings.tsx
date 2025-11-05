@@ -360,7 +360,7 @@ export function AlertsSettings() {
 
         <Separator />
 
-        <div className="space-y-4">
+        {/* <div className="space-y-4">
           <h3 className="text-lg font-medium">Alert Preferences</h3>
           <p className="text-sm text-muted-foreground">
             Customize how and when you receive alerts.
@@ -540,7 +540,7 @@ export function AlertsSettings() {
               )}
             />
           </div>
-        </div>
+        </div> */}
 
         <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
           {isLoading ? (

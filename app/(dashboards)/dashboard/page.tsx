@@ -7,13 +7,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { PrayerTimesWidget } from "@/components/prayer-times-widget";
+// import { PrayerTimesWidget } from "@/components/prayer-times-widget";
 import { MasjidDiscovery } from "@/components/masjid-discovery";
 import { UpcomingEvents } from "@/components/upcoming-events";
 import { ChurchIcon as Mosque, Calendar, Bell, Heart } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/auth";
 import { CarouselDemo } from "@/components/carousel";
+import PrayerTimesWidget from "@/components/prayer-times-widget";
 
 const dashboardCards = [
   {

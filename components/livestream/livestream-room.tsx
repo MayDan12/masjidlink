@@ -38,6 +38,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { getLiveEventById } from "@/app/(dashboards)/imam/events/action";
 import { Event } from "@/types/events";
+import { Checkbox } from "../ui/checkbox";
 
 // type CallLayoutType = "grid" | "speaker-left" | "speaker-right" | "top";
 
@@ -53,12 +54,13 @@ interface ChatMessage {
 interface DonationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onDonate: (amount: number, message: string) => void;
+  onDonate: (amount: number, message: string, isAnonymous: boolean) => void;
 }
 
 function DonationModal({ isOpen, onClose, onDonate }: DonationModalProps) {
   const [amount, setAmount] = useState("");
   const [message, setMessage] = useState("");
+  const [isAnonymous, setIsAnonymous] = useState(false);
 
   if (!isOpen) return null;
 
@@ -66,7 +68,7 @@ function DonationModal({ isOpen, onClose, onDonate }: DonationModalProps) {
     e.preventDefault();
     const donationAmount = Number.parseFloat(amount);
     if (donationAmount > 0) {
-      onDonate(donationAmount, message);
+      onDonate(donationAmount, message, isAnonymous);
       setAmount("");
       setMessage("");
       onClose();
@@ -147,6 +149,16 @@ function DonationModal({ isOpen, onClose, onDonate }: DonationModalProps) {
               <p className="text-xs text-gray-500 mt-1">
                 {message.length}/100 characters
               </p>
+            </div>
+
+            <div>
+              <label className="flex items-center gap-2">
+                <Checkbox
+                  checked={isAnonymous}
+                  onCheckedChange={(checked) => setIsAnonymous(!!checked)}
+                />
+                <span className="text-sm">Donate Anonymously</span>
+              </label>
             </div>
 
             <div className="flex flex-col-reverse sm:flex-row gap-3 pt-2">
@@ -308,7 +320,11 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
     setNewMessage("");
   };
 
-  const sendDonation = async (amount: number, message: string) => {
+  const sendDonation = async (
+    amount: number,
+    message: string,
+    isAnonymous: boolean
+  ) => {
     if (!call) return;
 
     // Here you would integrate with your payment processor

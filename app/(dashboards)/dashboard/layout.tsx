@@ -2,7 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import UserIcon from "@/components/user-icon";
 import { UnifiedSidebar } from "@/components/dashboardSidebar";
-import PlanPopup from "@/components/popup";
+// import PlanPopup from "@/components/popup";
 
 export const metadata: Metadata = {
   title: "MasjidLink - Muslim Lifestyle App",
@@ -24,7 +24,7 @@ export default function UserDashboardLayout({
 
       {/* Main Content */}
       <div className="flex-1">
-        <PlanPopup />
+        {/* <PlanPopup /> */}
         <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
           <div className="md:hidden">
             <UnifiedSidebar role="user" />

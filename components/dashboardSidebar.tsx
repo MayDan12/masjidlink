@@ -28,6 +28,7 @@ import {
 import Logout from "./auth/logout-button";
 import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
+import { MosqueIcon } from "./icons/MosqueIcon";
 
 type Route = {
   title: string;
@@ -69,8 +70,7 @@ export function UnifiedSidebar({ role }: SidebarProps) {
     },
     {
       title: "Masjid Profile",
-      icon: null,
-      imageIcon: "/ico.png",
+      icon: MosqueIcon,
       href: "/imam/profile",
     },
     {
@@ -187,8 +187,7 @@ export function UnifiedSidebar({ role }: SidebarProps) {
     {
       title: "Masjids",
       href: "/dashboard/masjids",
-      icon: null,
-      imageIcon: "/icos.png",
+      icon: MosqueIcon,
     },
     {
       title: "Events",

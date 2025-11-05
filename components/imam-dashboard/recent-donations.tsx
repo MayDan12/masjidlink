@@ -17,74 +17,155 @@ interface RecentDonationsProps {
   showAll?: boolean;
 }
 
+type Donation = {
+  id: string;
+  donor: {
+    name: string;
+    email: string;
+    image: string;
+  };
+  amount: string;
+  date: string;
+  status: string;
+  type: string;
+  rank: string;
+};
+
 export function RecentDonations({ showAll = false }: RecentDonationsProps) {
   // Mock data - in a real app, this would come from an API
-  const donations = [
-    {
-      id: "1",
-      donor: {
-        name: "Ahmed Khan",
-        email: "ahmed@example.com",
-        image: "/placeholder.svg?height=32&width=32",
-      },
-      amount: "$100.00",
-      date: "2023-04-21",
-      status: "completed",
-      type: "General",
-      rank: "Muḥsin",
-    },
-    {
-      id: "2",
-      donor: {
-        name: "Fatima Ali",
-        email: "fatima@example.com",
-        image: "/placeholder.svg?height=32&width=32",
-      },
-      amount: "$250.00",
-      date: "2023-04-20",
-      status: "completed",
-      type: "Friday Khutbah",
-      rank: "Ṣādiq",
-    },
-    {
-      id: "3",
-      donor: {
-        name: "Omar Rahman",
-        email: "omar@example.com",
-        image: "/placeholder.svg?height=32&width=32",
-      },
-      amount: "$50.00",
-      date: "2023-04-19",
-      status: "completed",
-      type: "General",
-      rank: "Muḥsin",
-    },
-    {
-      id: "4",
-      donor: {
-        name: "Aisha Malik",
-        email: "aisha@example.com",
-        image: "/placeholder.svg?height=32&width=32",
-      },
-      amount: "$500.00",
-      date: "2023-04-18",
-      status: "completed",
-      type: "General",
-      rank: "Käfil",
-    },
-    {
-      id: "5",
-      donor: {
-        name: "Yusuf Ibrahim",
-        email: "yusuf@example.com",
-        image: "/placeholder.svg?height=32&width=32",
-      },
-      amount: "$75.00",
-      date: "2023-04-17",
-      status: "completed",
-      type: "Friday Khutbah",
-      rank: "Muḥsin",
-    },
+  // const donations = [
+  //   {
+  //     id: "1",
+  //     donor: {
+  //       name: "Ahmed Khan",
+  //       email: "ahmed@example.com",
+  //       image: "/placeholder.svg?height=32&width=32",
+  //     },
+  //     amount: "$100.00",
+  //     date: "2023-04-21",
+  //     status: "completed",
+  //     type: "General",
+  //     rank: "Muḥsin",
+  //   },
+  //   {
+  //     id: "2",
+  //     donor: {
+  //       name: "Fatima Ali",
+  //       email: "fatima@example.com",
+  //       image: "/placeholder.svg?height=32&width=32",
+  //     },
+  //     amount: "$250.00",
+  //     date: "2023-04-20",
+  //     status: "completed",
+  //     type: "Friday Khutbah",
+  //     rank: "Ṣādiq",
+  //   },
+  //   {
+  //     id: "3",
+  //     donor: {
+  //       name: "Omar Rahman",
+  //       email: "omar@example.com",
+  //       image: "/placeholder.svg?height=32&width=32",
+  //     },
+  //     amount: "$50.00",
+  //     date: "2023-04-19",
+  //     status: "completed",
+  //     type: "General",
+  //     rank: "Muḥsin",
+  //   },
+  //   {
+  //     id: "4",
+  //     donor: {
+  //       name: "Aisha Malik",
+  //       email: "aisha@example.com",
+  //       image: "/placeholder.svg?height=32&width=32",
+  //     },
+  //     amount: "$500.00",
+  //     date: "2023-04-18",
+  //     status: "completed",
+  //     type: "General",
+  //     rank: "Käfil",
+  //   },
+  //   {
+  //     id: "5",
+  //     donor: {
+  //       name: "Yusuf Ibrahim",
+  //       email: "yusuf@example.com",
+  //       image: "/placeholder.svg?height=32&width=32",
+  //     },
+  //     amount: "$75.00",
+  //     date: "2023-04-17",
+  //     status: "completed",
+  //     type: "Friday Khutbah",
+  //     rank: "Muḥsin",
+  //   },
+  // ];
+  const donations: Donation[] = [
+    // {
+    //   id: "1",
+    //   donor: {
+    //     name: "Ahmed Khan",
+    //     email: "ahmed@example.com",
+    //     image: "/placeholder.svg?height=32&width=32",
+    //   },
+    //   amount: "$100.00",
+    //   date: "2023-04-21",
+    //   status: "completed",
+    //   type: "General",
+    //   rank: "Muḥsin",
+    // },
+    // {
+    //   id: "2",
+    //   donor: {
+    //     name: "Fatima Ali",
+    //     email: "fatima@example.com",
+    //     image: "/placeholder.svg?height=32&width=32",
+    //   },
+    //   amount: "$250.00",
+    //   date: "2023-04-20",
+    //   status: "completed",
+    //   type: "Friday Khutbah",
+    //   rank: "Ṣādiq",
+    // },
+    // {
+    //   id: "3",
+    //   donor: {
+    //     name: "Omar Rahman",
+    //     email: "omar@example.com",
+    //     image: "/placeholder.svg?height=32&width=32",
+    //   },
+    //   amount: "$50.00",
+    //   date: "2023-04-19",
+    //   status: "completed",
+    //   type: "General",
+    //   rank: "Muḥsin",
+    // },
+    // {
+    //   id: "4",
+    //   donor: {
+    //     name: "Aisha Malik",
+    //     email: "aisha@example.com",
+    //     image: "/placeholder.svg?height=32&width=32",
+    //   },
+    //   amount: "$500.00",
+    //   date: "2023-04-18",
+    //   status: "completed",
+    //   type: "General",
+    //   rank: "Käfil",
+    // },
+    // {
+    //   id: "5",
+    //   donor: {
+    //     name: "Yusuf Ibrahim",
+    //     email: "yusuf@example.com",
+    //     image: "/placeholder.svg?height=32&width=32",
+    //   },
+    //   amount: "$75.00",
+    //   date: "2023-04-17",
+    //   status: "completed",
+    //   type: "Friday Khutbah",
+    //   rank: "Muḥsin",
+    // },
   ];
 
   const displayDonations = showAll ? donations : donations.slice(0, 3);
@@ -118,6 +199,10 @@ export function RecentDonations({ showAll = false }: RecentDonationsProps) {
         return "bg-gray-100 text-gray-800";
     }
   };
+
+  if (donations.length === 0) {
+    return <div className="p-4 text-center">No donations found.</div>;
+  }
 
   return (
     <div className="space-y-4">

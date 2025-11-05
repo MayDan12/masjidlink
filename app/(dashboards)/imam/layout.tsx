@@ -2,6 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import { UnifiedSidebar } from "@/components/dashboardSidebar";
 import UserIcon from "@/components/user-icon";
+import CompleteProfilePopup from "@/components/completeProfilePopup";
 
 export const metadata: Metadata = {
   title: "Imam Dashboard - MasjidLink",
@@ -22,6 +23,7 @@ export default function ImamDashboardLayout({
 
       {/* Main Content */}
       <div className="flex-1">
+        <CompleteProfilePopup />
         <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
           <div className="md:hidden">
             <UnifiedSidebar role="imam" />

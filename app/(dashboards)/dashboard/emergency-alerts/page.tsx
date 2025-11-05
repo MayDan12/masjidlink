@@ -8,9 +8,9 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertsHistory } from "@/components/dashboard/alerts-history";
-import { AlertsSettings } from "@/components/dashboard/alerts-settings";
-import { AlertsSubscriptions } from "@/components/dashboard/alerts-subscriptions";
-import { AlertTriangle, Settings, Bell, ListFilter } from "lucide-react";
+// import { AlertsSettings } from "@/components/dashboard/alerts-settings";
+// import { AlertsSubscriptions } from "@/components/dashboard/alerts-subscriptions";
+import { AlertTriangle, ListFilter } from "lucide-react";
 
 export default function EmergencyAlertsPage() {
   return (
@@ -41,17 +41,17 @@ export default function EmergencyAlertsPage() {
             <ListFilter className="h-4 w-4" />
             <span>History</span>
           </TabsTrigger>
-          <TabsTrigger
+          {/* <TabsTrigger
             value="subscriptions"
             className="flex items-center gap-1"
           >
             <Bell className="h-4 w-4" />
             <span>Subscriptions</span>
-          </TabsTrigger>
-          <TabsTrigger value="settings" className="flex items-center gap-1">
+          </TabsTrigger> */}
+          {/* <TabsTrigger value="settings" className="flex items-center gap-1">
             <Settings className="h-4 w-4" />
             <span>Settings</span>
-          </TabsTrigger>
+          </TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="alerts" className="space-y-4">
@@ -90,7 +90,7 @@ export default function EmergencyAlertsPage() {
             </CardContent>
           </Card>
         </TabsContent>
-
+        {/* 
         <TabsContent value="subscriptions" className="space-y-4">
           <Card>
             <CardHeader>
@@ -103,8 +103,8 @@ export default function EmergencyAlertsPage() {
               <AlertsSubscriptions />
             </CardContent>
           </Card>
-        </TabsContent>
-
+        </TabsContent> */}
+        {/* 
         <TabsContent value="settings" className="space-y-4">
           <Card>
             <CardHeader>
@@ -117,7 +117,7 @@ export default function EmergencyAlertsPage() {
               <AlertsSettings />
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
     </div>
   );

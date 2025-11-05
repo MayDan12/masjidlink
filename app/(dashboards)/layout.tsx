@@ -1,7 +1,7 @@
 import type React from "react";
 import type { Metadata } from "next";
 import StreamVideoProvider from "@/providers/StreamClientProvider";
-import PlanPopup from "@/components/popup";
+// import PlanPopup from "@/components/popup";
 
 export const metadata: Metadata = {
   title: "MasjidLink - Muslim Lifestyle App",
@@ -18,7 +18,7 @@ export default function AllDashboardLayout({
     <div>
       <StreamVideoProvider>
         <main>
-          <PlanPopup />
+          {/* <PlanPopup /> */}
           {children}
         </main>
       </StreamVideoProvider>

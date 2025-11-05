@@ -58,8 +58,8 @@ const passwordFormSchema = z
 
 const securityFormSchema = z.object({
   twoFactorEnabled: z.boolean(),
-  loginNotifications: z.boolean(),
-  sessionsManagement: z.boolean(),
+  // loginNotifications: z.boolean(),
+  // sessionsManagement: z.boolean(),
 });
 
 type PasswordFormValues = z.infer<typeof passwordFormSchema>;
@@ -72,8 +72,8 @@ export function ProfileSecurity() {
   // Mock security settings
   const defaultSecurityValues: SecurityFormValues = {
     twoFactorEnabled: false,
-    loginNotifications: true,
-    sessionsManagement: false,
+    // loginNotifications: true,
+    // sessionsManagement: false,
   };
 
   const passwordForm = useForm<PasswordFormValues>({
@@ -283,7 +283,7 @@ export function ProfileSecurity() {
                 </Card>
               )}
 
-              <FormField
+              {/* <FormField
                 control={securityForm.control}
                 name="loginNotifications"
                 render={({ field }) => (
@@ -327,7 +327,7 @@ export function ProfileSecurity() {
                     </FormControl>
                   </FormItem>
                 )}
-              />
+              /> */}
 
               <Button type="submit" disabled={isLoading} className="mt-2">
                 {isLoading ? (

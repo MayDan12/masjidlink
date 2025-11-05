@@ -32,16 +32,27 @@ import { useAuth } from "@/context/auth";
 
 const profileFormSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  phone: z.string().optional(),
-  profilePicture: z.string().optional(),
-  location: z.string().optional(),
+  phone: z
+    .string()
+    .min(10, { message: "Phone number must be at least 10 digits." }),
+  profilePicture: z
+    .string()
+    .min(2, { message: "Profile picture must be uploaded." }),
+  location: z
+    .string()
+    .min(2, { message: "Location must be at least 2 characters." }),
   bio: z
     .string()
-    .max(500, { message: "Bio must not be longer than 500 characters." })
-    .optional(),
-  skills: z.string().optional(),
-  occupation: z.string().optional(),
-  languages: z.string().optional(),
+    .max(500, { message: "Bio must not be longer than 500 characters." }),
+  skills: z
+    .string()
+    .min(2, { message: "Skills must be at least 2 characters." }),
+  occupation: z
+    .string()
+    .min(2, { message: "Occupation must be at least 2 characters." }),
+  languages: z
+    .string()
+    .min(2, { message: "Languages must be at least 2 characters." }),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;

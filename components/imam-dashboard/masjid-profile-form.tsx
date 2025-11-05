@@ -77,9 +77,13 @@ const formSchema = z.object({
     .max(500, {
       message: "Description must not exceed 500 characters.",
     }),
-  establishedYear: z.string().optional(),
-  capacity: z.string().optional(),
-  denomination: z.string().optional(),
+  establishedYear: z
+    .string()
+    .min(4, { message: "Established year must be at least 4 characters." }),
+  capacity: z.string().min(1, { message: "Capacity is required." }),
+  denomination: z
+    .string()
+    .min(2, { message: "Denomination must be at least 2 characters." }),
   facilityTypes: z.array(z.string()).min(3, {
     message: "Select at least one facility type.",
   }),

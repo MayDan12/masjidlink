@@ -9,8 +9,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EventsCalendar } from "@/components/dashboard/events-calendar";
 import { EventsList } from "@/components/dashboard/events-list";
-import { MyEvents } from "@/components/dashboard/my-events";
-import { Calendar, ListFilter, User, Bell } from "lucide-react";
+// import { MyEvents } from "@/components/dashboard/my-events";
+import { Calendar, ListFilter, Bell } from "lucide-react";
 
 // const fetchEvents = async () => {
 //   setIsLoading(true);
@@ -69,10 +69,10 @@ export default function EventsPage() {
             <ListFilter className="h-4 w-4" />
             <span>List View</span>
           </TabsTrigger>
-          <TabsTrigger value="my-events" className="flex items-center gap-1">
+          {/* <TabsTrigger value="my-events" className="flex items-center gap-1">
             <User className="h-4 w-4" />
             <span>My Events</span>
-          </TabsTrigger>
+          </TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="calendar" className="space-y-4">
@@ -103,7 +103,7 @@ export default function EventsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="my-events" className="space-y-4">
+        {/* <TabsContent value="my-events" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>My Events</CardTitle>
@@ -115,7 +115,7 @@ export default function EventsPage() {
               <MyEvents />
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
     </div>
   );
