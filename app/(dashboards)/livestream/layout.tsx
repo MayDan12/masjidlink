@@ -1,13 +1,13 @@
+"use client";
 import type React from "react";
-import type { Metadata } from "next";
+
 import StreamVideoProvider from "@/providers/StreamClientProvider";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 
-export const metadata: Metadata = {
-  title: "MasjidLink - Muslim Lifestyle App",
-  description:
-    "Connect with your local masjid, track prayer times, and strengthen bonds within the Ummah",
-};
-
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+);
 export default function AllDashboardLayout({
   children,
 }: Readonly<{
@@ -16,7 +16,9 @@ export default function AllDashboardLayout({
   return (
     <div>
       <StreamVideoProvider>
-        <main>{children}</main>
+        <Elements stripe={stripePromise}>
+          <main>{children}</main>
+        </Elements>
       </StreamVideoProvider>
     </div>
   );

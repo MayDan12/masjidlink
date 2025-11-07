@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -19,82 +19,155 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Edit, MoreHorizontal, Trash, Eye, BarChart } from "lucide-react";
+import {
+  Edit,
+  MoreHorizontal,
+  Trash,
+  Eye,
+  BarChart,
+  PlusCircle,
+  Loader,
+} from "lucide-react";
+import { CreateCampaignDialog } from "./create-campaign-dialog";
+import {
+  deleteDonationCampaign,
+  getDonationCampaigns,
+} from "@/app/(dashboards)/imam/donations/action";
+import { auth } from "@/firebase/client";
 
 type Campaign = {
   id: string;
   title: string;
   description: string;
-  goal: number;
-  raised: number;
+  goal_amount: number;
+  amountRaised: number;
   startDate: string;
   endDate: string;
   status: "active" | "completed" | "upcoming" | "archived";
   category: "general" | "construction" | "education" | "charity" | "emergency";
+  createdAt?: any;
+  updatedAt?: any;
 };
 
 export function DonationCampaigns() {
   const [activeTab, setActiveTab] = useState("active");
+  const [loading, setLoading] = useState(false);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
 
-  // Mock campaigns data
-  const campaigns: Campaign[] = [
-    // {
-    //   id: "1",
-    //   title: "Masjid Expansion Project",
-    //   description: "Help us expand our prayer hall to accommodate our growing community.",
-    //   goal: 250000,
-    //   raised: 175000,
-    //   startDate: "2023-01-15",
-    //   endDate: "2023-12-31",
-    //   status: "active",
-    //   category: "construction",
-    // },
-    // {
-    //   id: "2",
-    //   title: "Ramadan Food Drive",
-    //   description: "Provide iftar meals for families in need during the holy month of Ramadan.",
-    //   goal: 15000,
-    //   raised: 12500,
-    //   startDate: "2023-03-01",
-    //   endDate: "2023-04-30",
-    //   status: "active",
-    //   category: "charity",
-    // },
-    // {
-    //   id: "3",
-    //   title: "Islamic School Scholarships",
-    //   description: "Support education by providing scholarships for students at our Islamic school.",
-    //   goal: 50000,
-    //   raised: 35000,
-    //   startDate: "2023-02-01",
-    //   endDate: "2023-08-31",
-    //   status: "active",
-    //   category: "education",
-    // },
-    // {
-    //   id: "4",
-    //   title: "Winter Heating Assistance",
-    //   description: "Help provide heating assistance to families in need during the winter months.",
-    //   goal: 10000,
-    //   raised: 10000,
-    //   startDate: "2022-11-01",
-    //   endDate: "2023-02-28",
-    //   status: "completed",
-    //   category: "charity",
-    // },
-    // {
-    //   id: "5",
-    //   title: "Eid Festival",
-    //   description: "Support our upcoming Eid festival celebration for the community.",
-    //   goal: 5000,
-    //   raised: 0,
-    //   startDate: "2023-06-01",
-    //   endDate: "2023-06-30",
-    //   status: "upcoming",
-    //   category: "general",
-    // },
-  ];
+  // Fetch campaigns from the server
+  const fetchCampaigns = async () => {
+    setLoading(true);
+    try {
+      const token = await auth?.currentUser?.getIdToken();
+      if (!token) {
+        throw new Error("User not authenticated");
+      }
 
+      const response = await getDonationCampaigns(token);
+
+      if (response.success && response.campaigns) {
+        // Convert Firestore Timestamps to ISO strings
+        const sanitizedCampaigns = response.campaigns.map((c: Campaign) => ({
+          ...c,
+          createdAt: c.createdAt?._seconds
+            ? new Date(c.createdAt._seconds * 1000).toISOString()
+            : c.createdAt,
+          updatedAt: c.updatedAt?._seconds
+            ? new Date(c.updatedAt._seconds * 1000).toISOString()
+            : c.updatedAt,
+        }));
+        setCampaigns(sanitizedCampaigns);
+      } else {
+        throw new Error(response.message || "Failed to fetch campaigns");
+        setCampaigns([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch campaigns:", (error as Error).message);
+      setCampaigns([]); // optional: clear campaigns on error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCampaigns();
+  }, []);
+
+  // // Mock campaigns data
+  // const campaigns: Campaign[] = [
+  //   // {
+  //   //   id: "1",
+  //   //   title: "Masjid Expansion Project",
+  //   //   description: "Help us expand our prayer hall to accommodate our growing community.",
+  //   //   goal: 250000,
+  //   //   raised: 175000,
+  //   //   startDate: "2023-01-15",
+  //   //   endDate: "2023-12-31",
+  //   //   status: "active",
+  //   //   category: "construction",
+  //   // },
+  //   // {
+  //   //   id: "2",
+  //   //   title: "Ramadan Food Drive",
+  //   //   description: "Provide iftar meals for families in need during the holy month of Ramadan.",
+  //   //   goal: 15000,
+  //   //   raised: 12500,
+  //   //   startDate: "2023-03-01",
+  //   //   endDate: "2023-04-30",
+  //   //   status: "active",
+  //   //   category: "charity",
+  //   // },
+  //   // {
+  //   //   id: "3",
+  //   //   title: "Islamic School Scholarships",
+  //   //   description: "Support education by providing scholarships for students at our Islamic school.",
+  //   //   goal: 50000,
+  //   //   raised: 35000,
+  //   //   startDate: "2023-02-01",
+  //   //   endDate: "2023-08-31",
+  //   //   status: "active",
+  //   //   category: "education",
+  //   // },
+  //   // {
+  //   //   id: "4",
+  //   //   title: "Winter Heating Assistance",
+  //   //   description: "Help provide heating assistance to families in need during the winter months.",
+  //   //   goal: 10000,
+  //   //   raised: 10000,
+  //   //   startDate: "2022-11-01",
+  //   //   endDate: "2023-02-28",
+  //   //   status: "completed",
+  //   //   category: "charity",
+  //   // },
+  //   // {
+  //   //   id: "5",
+  //   //   title: "Eid Festival",
+  //   //   description: "Support our upcoming Eid festival celebration for the community.",
+  //   //   goal: 5000,
+  //   //   raised: 0,
+  //   //   startDate: "2023-06-01",
+  //   //   endDate: "2023-06-30",
+  //   //   status: "upcoming",
+  //   //   category: "general",
+  //   // },
+  // ];
+
+  // Handle campaign deletion
+  const handleDelete = async (id: string) => {
+    // Implement deletion logic here
+    try {
+      setLoading(true);
+      // Call server action to delete campaign
+      await deleteDonationCampaign(id);
+
+      // Refresh campaigns list
+      await fetchCampaigns();
+    } catch (error) {
+      console.error("Failed to delete campaign:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   // Filter campaigns based on active tab
   const filteredCampaigns = campaigns.filter(
     (campaign) => campaign.status === activeTab
@@ -145,7 +218,11 @@ export function DonationCampaigns() {
         </TabsList>
 
         <TabsContent value={activeTab} className="mt-6">
-          {filteredCampaigns.length > 0 ? (
+          {loading ? (
+            <div className="text-center py-12">
+              <Loader size={28} className="animate-spin" />
+            </div>
+          ) : filteredCampaigns.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2">
               {filteredCampaigns.map((campaign) => (
                 <Card key={campaign.id}>
@@ -187,7 +264,10 @@ export function DonationCampaigns() {
                               <BarChart className="mr-2 h-4 w-4" />
                               View Analytics
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="flex items-center text-destructive">
+                            <DropdownMenuItem
+                              onClick={() => handleDelete(campaign.id)}
+                              className="flex items-center text-destructive"
+                            >
                               <Trash className="mr-2 h-4 w-4" />
                               Delete Campaign
                             </DropdownMenuItem>
@@ -205,26 +285,29 @@ export function DonationCampaigns() {
                         <span>
                           Raised:{" "}
                           <span className="font-medium">
-                            {formatCurrency(campaign.raised)}
+                            {formatCurrency(campaign.amountRaised)}
                           </span>
                         </span>
                         <span>
                           Goal:{" "}
                           <span className="font-medium">
-                            {formatCurrency(campaign.goal)}
+                            {formatCurrency(campaign.goal_amount)}
                           </span>
                         </span>
                       </div>
                       <Progress
                         value={getProgressPercentage(
-                          campaign.raised,
-                          campaign.goal
+                          campaign.amountRaised,
+                          campaign.goal_amount
                         )}
                         className="h-2"
                       />
                       <div className="text-xs text-right text-muted-foreground">
-                        {getProgressPercentage(campaign.raised, campaign.goal)}%
-                        Complete
+                        {getProgressPercentage(
+                          campaign.amountRaised,
+                          campaign.goal_amount
+                        )}
+                        % Complete
                       </div>
                     </div>
                   </CardContent>
@@ -252,7 +335,12 @@ export function DonationCampaigns() {
                   ? "You don't have any completed campaigns yet."
                   : "You don't have any archived campaigns."}
               </p>
-              <Button>Create a New Campaign</Button>
+              <CreateCampaignDialog>
+                <Button>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Create Campaign
+                </Button>
+              </CreateCampaignDialog>
             </div>
           )}
         </TabsContent>

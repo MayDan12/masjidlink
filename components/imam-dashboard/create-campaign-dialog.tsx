@@ -34,9 +34,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+// import { Switch } from "@/components/ui/switch";
 import { Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { createDonations } from "@/app/(dashboards)/imam/donations/action";
+import { auth } from "@/firebase/client";
 
 const formSchema = z.object({
   title: z.string().min(2, {
@@ -45,7 +47,7 @@ const formSchema = z.object({
   description: z.string().min(10, {
     message: "Description must be at least 10 characters.",
   }),
-  goal: z.string().min(1, {
+  goal_amount: z.string().min(1, {
     message: "Fundraising goal is required.",
   }),
   startDate: z.string().min(1, {
@@ -57,9 +59,9 @@ const formSchema = z.object({
   category: z.string().min(1, {
     message: "Category is required.",
   }),
-  isPublic: z.boolean(),
-  allowAnonymous: z.boolean(),
-  showProgress: z.boolean(),
+  // isPublic: z.boolean(),
+  // allowAnonymous: z.boolean(),
+  // showProgress: z.boolean(),
 });
 
 export function CreateCampaignDialog({
@@ -76,30 +78,50 @@ export function CreateCampaignDialog({
     defaultValues: {
       title: "",
       description: "",
-      goal: "",
+      goal_amount: "",
       startDate: "",
       endDate: "",
       category: "",
-      isPublic: true,
-      allowAnonymous: true,
-      showProgress: true,
+      // isPublic: true,
+      // allowAnonymous: true,
+      // showProgress: true,
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log(values);
+    try {
+      const token = await auth?.currentUser?.getIdToken();
+      if (!token) {
+        throw new Error("User not authenticated");
+      }
+
+      const response = await createDonations({
+        ...values,
+        goal_amount: parseFloat(values.goal_amount),
+        token,
+      });
+
+      if (!response.success) {
+        throw new Error(response.message);
+      }
+
       setIsLoading(false);
-      setOpen(false);
       form.reset();
       toast({
         title: "Campaign created",
         description: "Your donation campaign has been successfully created.",
       });
-    }, 1500);
+      setOpen(false);
+    } catch (error) {
+      toast({
+        title: "Error creating campaign",
+        description: (error as Error).message,
+      });
+    }
+
+    // Call the API to create the donation campaign
   }
 
   return (
@@ -153,7 +175,7 @@ export function CreateCampaignDialog({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
-                name="goal"
+                name="goal_amount"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Fundraising Goal ($)</FormLabel>
@@ -222,7 +244,7 @@ export function CreateCampaignDialog({
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="isPublic"
@@ -281,7 +303,7 @@ export function CreateCampaignDialog({
                   </FormItem>
                 )}
               />
-            </div>
+            </div> */}
 
             <DialogFooter>
               <Button

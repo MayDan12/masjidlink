@@ -5,7 +5,6 @@ import type React from "react";
 import { cn } from "@/lib/utils";
 import {
   CallParticipantsList,
-  CallStatsButton,
   CallingState,
   useCallStateHooks,
   useCall,
@@ -35,10 +34,12 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import EndCallButton from "./endcallButton";
 import CustomCallControls from "./custom-call-controls";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
+// import { Card } from "@/components/ui/card";
 import { getLiveEventById } from "@/app/(dashboards)/imam/events/action";
 import { Event } from "@/types/events";
-import { Checkbox } from "../ui/checkbox";
+// import { Checkbox } from "../ui/checkbox";
+
+import DonationModal from "./donationModal";
 
 // type CallLayoutType = "grid" | "speaker-left" | "speaker-right" | "top";
 
@@ -51,141 +52,6 @@ interface ChatMessage {
   amount?: number;
 }
 
-interface DonationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onDonate: (amount: number, message: string, isAnonymous: boolean) => void;
-}
-
-function DonationModal({ isOpen, onClose, onDonate }: DonationModalProps) {
-  const [amount, setAmount] = useState("");
-  const [message, setMessage] = useState("");
-  const [isAnonymous, setIsAnonymous] = useState(false);
-
-  if (!isOpen) return null;
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const donationAmount = Number.parseFloat(amount);
-    if (donationAmount > 0) {
-      onDonate(donationAmount, message, isAnonymous);
-      setAmount("");
-      setMessage("");
-      onClose();
-    }
-  };
-
-  const quickAmounts = [5, 10, 25, 50];
-
-  return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 shadow-2xl">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2">
-              <Gift className="w-5 h-5 text-yellow-500" />
-              <h3 className="text-xl font-semibold">Send Donation</h3>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium mb-3">
-                Quick Amount
-              </label>
-              <div className="grid grid-cols-4 gap-2 mb-4">
-                {quickAmounts.map((quickAmount) => (
-                  <Button
-                    key={quickAmount}
-                    type="button"
-                    variant={
-                      amount === quickAmount.toString() ? "default" : "outline"
-                    }
-                    size="sm"
-                    onClick={() => setAmount(quickAmount.toString())}
-                    className="text-sm"
-                  >
-                    ${quickAmount}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Custom Amount ($)
-              </label>
-              <Input
-                type="number"
-                min="1"
-                step="0.01"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="Enter amount"
-                className="text-base h-11"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Message (Optional)
-              </label>
-              <Input
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Add a message..."
-                className="text-base h-11"
-                maxLength={100}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                {message.length}/100 characters
-              </p>
-            </div>
-
-            <div>
-              <label className="flex items-center gap-2">
-                <Checkbox
-                  checked={isAnonymous}
-                  onCheckedChange={(checked) => setIsAnonymous(!!checked)}
-                />
-                <span className="text-sm">Donate Anonymously</span>
-              </label>
-            </div>
-
-            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                className="flex-1 h-11"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="flex-1 h-11 bg-yellow-500 hover:bg-yellow-600 text-black font-medium"
-                disabled={!amount || Number.parseFloat(amount) <= 0}
-              >
-                <Gift className="w-4 h-4 mr-2" />
-                Donate ${amount || "0"}
-              </Button>
-            </div>
-          </form>
-        </div>
-      </Card>
-    </div>
-  );
-}
-
 interface LiveStreamRoomProps {
   userRole?: "host" | "viewer";
 }
@@ -196,10 +62,12 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
   // const [layout, setLayout] = useState<CallLayoutType>("top");
   const [showParticipants, setShowParticipants] = useState(false);
   const [showChat, setShowChat] = useState(false);
-  const [showDonationModal, setShowDonationModal] = useState(false);
+  const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
-  const chatContainerRef = useRef<HTMLDivElement>(null);
+  // const chatContainerRef = useRef<HTMLDivElement>(null);
+  const chatRefMobile = useRef<HTMLDivElement>(null);
+  const chatRefDesktop = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   const { useCallCallingState } = useCallStateHooks();
@@ -208,7 +76,7 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
   const [event, setEvent] = useState<Event | null>(null);
   const { id } = useParams();
 
-  console.log(id);
+  // console.log(id);
 
   // Ensure call is available before proceeding
   useEffect(() => {
@@ -234,6 +102,13 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
   // Ensure viewers can't enable their devices even if they try
   useEffect(() => {
     if (userRole === "viewer" && call) {
+      call.camera.disable();
+      call.microphone.disable();
+
+      // const unsubCam = call.camera.on("changed", () => call.camera.disable());
+      // const unsubMic = call.microphone.on("changed", () =>
+      //   call.microphone.disable()
+      // );
       const enforceViewerRestrictions = async () => {
         await call.camera.disable();
         await call.microphone.disable();
@@ -248,10 +123,10 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
 
   // Auto-scroll chat to bottom
   useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
-    }
+    const refs = [chatRefMobile.current, chatRefDesktop.current];
+    refs.forEach((ref) => {
+      if (ref) ref.scrollTop = ref.scrollHeight;
+    });
   }, [chatMessages]);
 
   // Listen for custom events (donations, messages)
@@ -320,21 +195,6 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
     setNewMessage("");
   };
 
-  const sendDonation = async (
-    amount: number,
-    message: string,
-    isAnonymous: boolean
-  ) => {
-    if (!call) return;
-
-    // Here you would integrate with your payment processor
-    // For demo purposes, we'll just send the event
-    await call.sendCustomEvent({
-      type: "donation",
-      custom: { amount, message },
-    });
-  };
-
   return (
     <section className="relative h-screen w-full overflow-hidden bg-gray-950">
       <div className="relative flex flex-col lg:flex-row size-full">
@@ -388,7 +248,7 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
 
               {/* Mobile chat messages */}
               <div
-                ref={chatContainerRef}
+                ref={chatRefMobile}
                 className="flex-1 overflow-y-auto p-4 space-y-3 min-h-[200px] max-h-[45vh] scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800"
               >
                 {chatMessages.length === 0 ? (
@@ -459,7 +319,7 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
                 {userRole === "viewer" && (
                   <Button
                     onClick={() => {
-                      setShowDonationModal(true);
+                      setIsDonationModalOpen(true);
                       setShowChat(false);
                     }}
                     className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-medium h-11"
@@ -506,7 +366,7 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
 
           {/* Desktop chat messages */}
           <div
-            ref={chatContainerRef}
+            ref={chatRefDesktop}
             className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800"
             style={{ maxHeight: "calc(100vh - 190px)" }} // Account for header, input area and controls
           >
@@ -576,7 +436,7 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
             {userRole === "viewer" && (
               <Button
                 onClick={() => {
-                  setShowDonationModal(true);
+                  setIsDonationModalOpen(true);
                   setShowChat(false);
                 }}
                 className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-medium h-11"
@@ -700,9 +560,9 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
 
       {/* Enhanced Donation Modal */}
       <DonationModal
-        isOpen={showDonationModal}
-        onClose={() => setShowDonationModal(false)}
-        onDonate={sendDonation}
+        isOpen={isDonationModalOpen}
+        onClose={() => setIsDonationModalOpen(false)}
+        imamId={call?.state.createdBy?.id}
       />
     </section>
   );
