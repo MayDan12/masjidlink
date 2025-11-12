@@ -113,7 +113,7 @@ function DonationModal({ isOpen, onClose, imamId }: DonationModalProps) {
           <div className="p-2 border rounded">
             <CardElement
               options={{ hidePostalCode: true }}
-              className="text-white"
+              className="text-white "
             />
           </div>
 
