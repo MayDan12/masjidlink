@@ -136,7 +136,7 @@ export async function confirmCampaignDonation(
     }
 
     const newAmountRaised =
-      (campaignData.amountRaised || 0) + donationData.amount;
+      (campaignData?.amountRaised || 0) + donationData.amount;
 
     await campaignRef.update({
       amountRaised: newAmountRaised,

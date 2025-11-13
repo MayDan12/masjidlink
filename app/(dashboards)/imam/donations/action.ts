@@ -4,6 +4,7 @@ import { firestore, serverAuth } from "@/firebase/server";
 // import { sanitizeData } from "@/lib/sanitize";
 import { checkUserRole } from "@/utils/server/auth";
 import { Timestamp } from "firebase-admin/firestore";
+import { getMasjidById } from "../../dashboard/masjids/action";
 
 /** -----------------------------
  *  Helper Functions
@@ -46,9 +47,15 @@ export async function createDonations(data: {
     const uid = await verifyImamToken(token);
     const timestamp = Timestamp.now();
 
+    const masjidData = await getMasjidById(uid);
+    if (!masjidData) {
+      throw new Error("Masjid not found for the given Imam.");
+    }
+
     const donationToStore = {
       ...donationData,
       imamId: uid,
+      masjidName: masjidData.data?.name,
       createdBy: uid,
       createdAt: timestamp,
       updatedAt: timestamp,
