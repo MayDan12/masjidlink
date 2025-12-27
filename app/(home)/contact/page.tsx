@@ -46,15 +46,25 @@ export default function ContactPage() {
 
   const onSubmit = async (values: z.infer<typeof schema>) => {
     setSubmitting(true);
+    const ACCESS_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY;
     try {
-      const res = await fetch("/api/contact", {
+      const res = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: ACCESS_KEY,
+          name: values.name,
+          email: values.email,
+          subject: values.subject,
+          message: values.message,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data?.error || "Failed to send message");
+        throw new Error(data?.message || "Failed to send message");
       }
       toast.success("Message sent successfully");
       form.reset();
