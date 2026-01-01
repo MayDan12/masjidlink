@@ -6,7 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, Save } from "lucide-react";
+import { Bell, Loader, Save } from "lucide-react";
+import { saveMasjidPrayerTime } from "@/app/(dashboards)/imam/action";
+import { toast } from "sonner";
+import { auth } from "@/firebase/client";
 
 export function PrayerTimesEditor() {
   // Mock data - in a real app, this would come from an API
@@ -18,6 +21,7 @@ export function PrayerTimesEditor() {
     maghrib: { time: "18:15", notification: true, bellReminder: true },
     isha: { time: "19:45", notification: true, bellReminder: true },
   });
+  const [loading, setLoading] = useState(false);
 
   const handleTimeChange = (prayer: string, time: string) => {
     setPrayerTimes((prev) => ({
@@ -40,10 +44,28 @@ export function PrayerTimesEditor() {
     }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    setLoading(true);
+    const token = await auth?.currentUser?.getIdToken();
     // In a real app, this would save to an API
     console.log("Saving prayer times:", prayerTimes);
+    if (!token) {
+      toast.error("User not authenticated. Please log in.");
+      setLoading(false);
+      return;
+    }
+
     // Show success message
+    const result = await saveMasjidPrayerTime({
+      prayerTimes,
+      token,
+    });
+
+    if (result.success) {
+      toast.success(result.message || "Prayer times saved successfully.");
+    } else {
+      toast.error(result.message || "Failed to save prayer times.");
+    }
   };
 
   return (
@@ -109,9 +131,13 @@ export function PrayerTimesEditor() {
         </div>
 
         <div className="flex justify-end">
-          <Button onClick={handleSave}>
+          <Button onClick={handleSave} disabled={loading}>
             <Save className="mr-2 h-4 w-4" />
-            Save Prayer Times
+            {loading ? (
+              <Loader className="h-4 w-4 animate-spin" />
+            ) : (
+              "Save Prayer Times"
+            )}
           </Button>
         </div>
       </TabsContent>
