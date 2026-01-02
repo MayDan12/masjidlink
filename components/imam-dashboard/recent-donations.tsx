@@ -146,10 +146,6 @@ export function RecentDonations({ showAll = false }: RecentDonationsProps) {
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage
-                          src={campaign.image || "/placeholder.svg"}
-                          alt={campaign.title}
-                        />
                         <AvatarFallback>
                           {campaign.title.substring(0, 2)}
                         </AvatarFallback>
