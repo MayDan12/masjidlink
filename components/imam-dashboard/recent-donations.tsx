@@ -12,163 +12,77 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useEffect, useMemo, useState } from "react";
+import { getDonationCampaigns } from "@/app/(dashboards)/imam/donations/action";
+import { auth } from "@/firebase/client";
+import { useRouter } from "next/navigation";
+import { Loader } from "lucide-react";
 
 interface RecentDonationsProps {
   showAll?: boolean;
 }
 
-type Donation = {
+type Campaign = {
   id: string;
-  donor: {
-    name: string;
-    email: string;
-    image: string;
-  };
-  amount: string;
-  date: string;
-  status: string;
-  type: string;
-  rank: string;
+  title: string;
+  description: string;
+  goal_amount: number;
+  amountRaised: number;
+  startDate: string;
+  endDate: string;
+  status: "active" | "completed" | "upcoming" | "archived";
+  category: "general" | "construction" | "education" | "charity" | "emergency";
+  createdAt?: any;
+  updatedAt?: any;
 };
 
 export function RecentDonations({ showAll = false }: RecentDonationsProps) {
-  // Mock data - in a real app, this would come from an API
-  // const donations = [
-  //   {
-  //     id: "1",
-  //     donor: {
-  //       name: "Ahmed Khan",
-  //       email: "ahmed@example.com",
-  //       image: "/placeholder.svg?height=32&width=32",
-  //     },
-  //     amount: "$100.00",
-  //     date: "2023-04-21",
-  //     status: "completed",
-  //     type: "General",
-  //     rank: "Muḥsin",
-  //   },
-  //   {
-  //     id: "2",
-  //     donor: {
-  //       name: "Fatima Ali",
-  //       email: "fatima@example.com",
-  //       image: "/placeholder.svg?height=32&width=32",
-  //     },
-  //     amount: "$250.00",
-  //     date: "2023-04-20",
-  //     status: "completed",
-  //     type: "Friday Khutbah",
-  //     rank: "Ṣādiq",
-  //   },
-  //   {
-  //     id: "3",
-  //     donor: {
-  //       name: "Omar Rahman",
-  //       email: "omar@example.com",
-  //       image: "/placeholder.svg?height=32&width=32",
-  //     },
-  //     amount: "$50.00",
-  //     date: "2023-04-19",
-  //     status: "completed",
-  //     type: "General",
-  //     rank: "Muḥsin",
-  //   },
-  //   {
-  //     id: "4",
-  //     donor: {
-  //       name: "Aisha Malik",
-  //       email: "aisha@example.com",
-  //       image: "/placeholder.svg?height=32&width=32",
-  //     },
-  //     amount: "$500.00",
-  //     date: "2023-04-18",
-  //     status: "completed",
-  //     type: "General",
-  //     rank: "Käfil",
-  //   },
-  //   {
-  //     id: "5",
-  //     donor: {
-  //       name: "Yusuf Ibrahim",
-  //       email: "yusuf@example.com",
-  //       image: "/placeholder.svg?height=32&width=32",
-  //     },
-  //     amount: "$75.00",
-  //     date: "2023-04-17",
-  //     status: "completed",
-  //     type: "Friday Khutbah",
-  //     rank: "Muḥsin",
-  //   },
-  // ];
-  const donations: Donation[] = [
-    // {
-    //   id: "1",
-    //   donor: {
-    //     name: "Ahmed Khan",
-    //     email: "ahmed@example.com",
-    //     image: "/placeholder.svg?height=32&width=32",
-    //   },
-    //   amount: "$100.00",
-    //   date: "2023-04-21",
-    //   status: "completed",
-    //   type: "General",
-    //   rank: "Muḥsin",
-    // },
-    // {
-    //   id: "2",
-    //   donor: {
-    //     name: "Fatima Ali",
-    //     email: "fatima@example.com",
-    //     image: "/placeholder.svg?height=32&width=32",
-    //   },
-    //   amount: "$250.00",
-    //   date: "2023-04-20",
-    //   status: "completed",
-    //   type: "Friday Khutbah",
-    //   rank: "Ṣādiq",
-    // },
-    // {
-    //   id: "3",
-    //   donor: {
-    //     name: "Omar Rahman",
-    //     email: "omar@example.com",
-    //     image: "/placeholder.svg?height=32&width=32",
-    //   },
-    //   amount: "$50.00",
-    //   date: "2023-04-19",
-    //   status: "completed",
-    //   type: "General",
-    //   rank: "Muḥsin",
-    // },
-    // {
-    //   id: "4",
-    //   donor: {
-    //     name: "Aisha Malik",
-    //     email: "aisha@example.com",
-    //     image: "/placeholder.svg?height=32&width=32",
-    //   },
-    //   amount: "$500.00",
-    //   date: "2023-04-18",
-    //   status: "completed",
-    //   type: "General",
-    //   rank: "Käfil",
-    // },
-    // {
-    //   id: "5",
-    //   donor: {
-    //     name: "Yusuf Ibrahim",
-    //     email: "yusuf@example.com",
-    //     image: "/placeholder.svg?height=32&width=32",
-    //   },
-    //   amount: "$75.00",
-    //   date: "2023-04-17",
-    //   status: "completed",
-    //   type: "Friday Khutbah",
-    //   rank: "Muḥsin",
-    // },
-  ];
+  const [loading, setLoading] = useState(false);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const router = useRouter();
 
-  const displayDonations = showAll ? donations : donations.slice(0, 3);
+  const fetchCampaigns = async () => {
+    setLoading(true);
+    try {
+      const token = await auth?.currentUser?.getIdToken();
+      if (!token) {
+        throw new Error("User not authenticated");
+      }
+
+      const response = await getDonationCampaigns(token);
+
+      if (response.success && response.campaigns) {
+        // Convert Firestore Timestamps to ISO strings
+        const sanitizedCampaigns = response.campaigns.map((c: Campaign) => ({
+          ...c,
+          createdAt: c.createdAt?._seconds
+            ? new Date(c.createdAt._seconds * 1000).toISOString()
+            : c.createdAt,
+          updatedAt: c.updatedAt?._seconds
+            ? new Date(c.updatedAt._seconds * 1000).toISOString()
+            : c.updatedAt,
+        }));
+        setCampaigns(sanitizedCampaigns);
+      } else {
+        throw new Error(response.message || "Failed to fetch campaigns");
+        setCampaigns([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch campaigns:", (error as Error).message);
+      setCampaigns([]); // optional: clear campaigns on error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCampaigns();
+  }, []);
+
+  const displayCampaigns = useMemo(
+    () => (showAll ? campaigns : campaigns.slice(0, 3)),
+    [showAll, campaigns]
+  );
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -200,10 +114,16 @@ export function RecentDonations({ showAll = false }: RecentDonationsProps) {
     }
   };
 
-  if (donations.length === 0) {
-    return <div className="p-4 text-center">No donations found.</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center">
+        <Loader className="h-6 w-6 animate-spin" />
+      </div>
+    );
   }
-
+  if (campaigns.length === 0) {
+    return <div className="p-4 text-center">No campaigns found.</div>;
+  }
   return (
     <div className="space-y-4">
       <div className="rounded-md border">
@@ -211,56 +131,56 @@ export function RecentDonations({ showAll = false }: RecentDonationsProps) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Donor</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead className="hidden md:table-cell">Date</TableHead>
-                <TableHead className="hidden md:table-cell">Type</TableHead>
-                <TableHead>Rank</TableHead>
+                <TableHead>Campaign</TableHead>
+                <TableHead>Goal Amount</TableHead>
+                <TableHead className="hidden md:table-cell">
+                  Start Date
+                </TableHead>
+                <TableHead className="hidden md:table-cell">Category</TableHead>
+                <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {displayDonations.map((donation) => (
-                <TableRow key={donation.id}>
+              {displayCampaigns.map((campaign) => (
+                <TableRow key={campaign.id}>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
                         <AvatarImage
-                          src={donation.donor.image || "/placeholder.svg"}
-                          alt={donation.donor.name}
+                          src={campaign.image || "/placeholder.svg"}
+                          alt={campaign.title}
                         />
                         <AvatarFallback>
-                          {donation.donor.name.substring(0, 2)}
+                          {campaign.title.substring(0, 2)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col">
-                        <span className="font-medium">
-                          {donation.donor.name}
-                        </span>
+                        <span className="font-medium">{campaign.title}</span>
                         <span className="text-xs text-muted-foreground">
-                          {donation.donor.email}
+                          {campaign.description}
                         </span>
                         <div className="md:hidden text-xs text-muted-foreground">
-                          <div>{formatDate(donation.date)}</div>
-                          <div>{donation.type}</div>
+                          <div>{formatDate(campaign.startDate)}</div>
+                          <div>{campaign.category}</div>
                         </div>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell className="font-medium">
-                    {donation.amount}
+                    {campaign.goal_amount}
                   </TableCell>
                   <TableCell className="hidden md:table-cell">
-                    {formatDate(donation.date)}
+                    {formatDate(campaign.startDate)}
                   </TableCell>
                   <TableCell className="hidden md:table-cell">
-                    {donation.type}
+                    {campaign.category}
                   </TableCell>
                   <TableCell>
                     <Badge
                       variant="outline"
-                      className={`${getRankColor(donation.rank)}`}
+                      className={`${getRankColor(campaign.status)}`}
                     >
-                      {donation.rank}
+                      {campaign.status}
                     </Badge>
                   </TableCell>
                 </TableRow>
@@ -272,7 +192,11 @@ export function RecentDonations({ showAll = false }: RecentDonationsProps) {
 
       {!showAll && (
         <div className="flex justify-center">
-          <Button variant="link" size="sm">
+          <Button
+            variant="link"
+            onClick={() => router.push("/imam/donations")}
+            size="sm"
+          >
             View All Donations
           </Button>
         </div>

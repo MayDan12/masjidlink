@@ -93,65 +93,6 @@ export function DonationCampaigns() {
     fetchCampaigns();
   }, []);
 
-  // // Mock campaigns data
-  // const campaigns: Campaign[] = [
-  //   // {
-  //   //   id: "1",
-  //   //   title: "Masjid Expansion Project",
-  //   //   description: "Help us expand our prayer hall to accommodate our growing community.",
-  //   //   goal: 250000,
-  //   //   raised: 175000,
-  //   //   startDate: "2023-01-15",
-  //   //   endDate: "2023-12-31",
-  //   //   status: "active",
-  //   //   category: "construction",
-  //   // },
-  //   // {
-  //   //   id: "2",
-  //   //   title: "Ramadan Food Drive",
-  //   //   description: "Provide iftar meals for families in need during the holy month of Ramadan.",
-  //   //   goal: 15000,
-  //   //   raised: 12500,
-  //   //   startDate: "2023-03-01",
-  //   //   endDate: "2023-04-30",
-  //   //   status: "active",
-  //   //   category: "charity",
-  //   // },
-  //   // {
-  //   //   id: "3",
-  //   //   title: "Islamic School Scholarships",
-  //   //   description: "Support education by providing scholarships for students at our Islamic school.",
-  //   //   goal: 50000,
-  //   //   raised: 35000,
-  //   //   startDate: "2023-02-01",
-  //   //   endDate: "2023-08-31",
-  //   //   status: "active",
-  //   //   category: "education",
-  //   // },
-  //   // {
-  //   //   id: "4",
-  //   //   title: "Winter Heating Assistance",
-  //   //   description: "Help provide heating assistance to families in need during the winter months.",
-  //   //   goal: 10000,
-  //   //   raised: 10000,
-  //   //   startDate: "2022-11-01",
-  //   //   endDate: "2023-02-28",
-  //   //   status: "completed",
-  //   //   category: "charity",
-  //   // },
-  //   // {
-  //   //   id: "5",
-  //   //   title: "Eid Festival",
-  //   //   description: "Support our upcoming Eid festival celebration for the community.",
-  //   //   goal: 5000,
-  //   //   raised: 0,
-  //   //   startDate: "2023-06-01",
-  //   //   endDate: "2023-06-30",
-  //   //   status: "upcoming",
-  //   //   category: "general",
-  //   // },
-  // ];
-
   // Handle campaign deletion
   const handleDelete = async (id: string) => {
     // Implement deletion logic here
