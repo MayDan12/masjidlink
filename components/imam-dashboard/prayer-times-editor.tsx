@@ -10,6 +10,7 @@ import { Bell, Loader, Save } from "lucide-react";
 import { saveMasjidPrayerTime } from "@/app/(dashboards)/imam/action";
 import { toast } from "sonner";
 import { auth } from "@/firebase/client";
+import { PrayerTime } from "@/types/masjid";
 
 export function PrayerTimesEditor() {
   // Mock data - in a real app, this would come from an API
@@ -55,9 +56,16 @@ export function PrayerTimesEditor() {
       return;
     }
 
+    const prayerTimesArray = Object.entries(prayerTimes).map(
+      ([name, settings]) => ({
+        name: name as PrayerTime["name"],
+        time: settings.time,
+      })
+    );
+
     // Show success message
     const result = await saveMasjidPrayerTime({
-      prayerTimes,
+      prayerTimes: prayerTimesArray,
       token,
     });
 

@@ -1,3 +1,7 @@
+export type PrayerTime = {
+  name: "Fajr" | "Dhuhr" | "Asr" | "Maghrib" | "Isha" | "Jummah" | "Sunrise";
+  time: string; // "05:10"
+};
 export type Masjid = {
   id: string;
   name: string;
@@ -14,4 +18,5 @@ export type Masjid = {
   description?: string;
   capacity?: string;
   email?: string;
+  prayerTimes?: PrayerTime[];
 };

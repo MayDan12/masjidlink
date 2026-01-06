@@ -1,18 +1,11 @@
 "use server";
 import { firestore, serverAuth } from "@/firebase/server";
+import { PrayerTime } from "@/types/masjid";
 import { checkUserRole } from "@/utils/server/auth";
 import { Timestamp } from "firebase-admin/firestore";
 
-type PrayerTimes = {
-  fajr: { time: string; notification: boolean; bellReminder: boolean };
-  dhuhr: { time: string; notification: boolean; bellReminder: boolean };
-  asr: { time: string; notification: boolean; bellReminder: boolean };
-  maghrib: { time: string; notification: boolean; bellReminder: boolean };
-  isha: { time: string; notification: boolean; bellReminder: boolean };
-};
-
 export const saveMasjidPrayerTime = async function (data: {
-  prayerTimes: PrayerTimes;
+  prayerTimes: PrayerTime[];
   token: string;
 }) {
   try {
@@ -28,15 +21,13 @@ export const saveMasjidPrayerTime = async function (data: {
       };
     }
 
-    await firestore
-      .collection("masjids")
-      .doc(uid)
-      .collection("prayerTimes")
-      .doc("current")
-      .set({
-        ...prayerTimes,
-        timestamp: Timestamp.now(),
-      });
+    await firestore.collection("masjids").doc(uid).set(
+      {
+        prayerTimes,
+        updatedAt: Timestamp.now(),
+      },
+      { merge: true }
+    );
   } catch (error: any) {
     return {
       error: true,
