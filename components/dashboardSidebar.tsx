@@ -24,6 +24,7 @@ import {
   Home,
   User2,
   User,
+  Heart,
 } from "lucide-react";
 import Logout from "./auth/logout-button";
 import Image from "next/image";
@@ -199,11 +200,11 @@ export function UnifiedSidebar({ role }: SidebarProps) {
       href: "/dashboard/azan-settings",
       icon: Bell,
     },
-    // {
-    //   title: "Donate",
-    //   href: "/dashboard/donate",
-    //   icon: Heart,
-    // },
+    {
+      title: "Donate",
+      href: "/dashboard/donate",
+      icon: Heart,
+    },
     // {
     //   title: "Community",
     //   href: "/dashboard/community",
@@ -278,7 +279,7 @@ export function UnifiedSidebar({ role }: SidebarProps) {
                     className={cn(
                       "justify-start gap-2",
                       pathname === route.href &&
-                        "bg-primary text-primary-foreground"
+                        "bg-primary text-primary-foreground",
                     )}
                     asChild
                     onClick={() => setIsOpen(false)}
@@ -345,7 +346,7 @@ export function UnifiedSidebar({ role }: SidebarProps) {
               variant={pathname === route.href ? "default" : "ghost"}
               className={cn(
                 "justify-start gap-2",
-                pathname === route.href && "bg-primary text-primary-foreground"
+                pathname === route.href && "bg-primary text-primary-foreground",
               )}
               asChild
             >

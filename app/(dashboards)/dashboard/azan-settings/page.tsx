@@ -8,8 +8,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AzanNotificationSettings } from "@/components/dashboard/azan-notification-settings";
 import { AzanSoundSettings } from "@/components/dashboard/azan-sound-settings";
-import { AzanScheduleSettings } from "@/components/dashboard/azan-schedule-settings";
-import { Bell, Volume2, Clock } from "lucide-react";
+// import { AzanScheduleSettings } from "@/components/dashboard/azan-schedule-settings";
+import { Bell, Volume2 } from "lucide-react";
 
 export default function AzanSettingsPage() {
   return (
@@ -21,8 +21,12 @@ export default function AzanSettingsPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="notifications" className="space-y-4">
+      <Tabs defaultValue="sounds" className="space-y-4">
         <TabsList>
+          <TabsTrigger value="sounds" className="flex items-center gap-1">
+            <Volume2 className="h-4 w-4" />
+            <span>Sounds</span>
+          </TabsTrigger>
           <TabsTrigger
             value="notifications"
             className="flex items-center gap-1"
@@ -30,14 +34,11 @@ export default function AzanSettingsPage() {
             <Bell className="h-4 w-4" />
             <span>Notifications</span>
           </TabsTrigger>
-          <TabsTrigger value="sounds" className="flex items-center gap-1">
-            <Volume2 className="h-4 w-4" />
-            <span>Sounds</span>
-          </TabsTrigger>
-          <TabsTrigger value="schedule" className="flex items-center gap-1">
+
+          {/* <TabsTrigger value="schedule" className="flex items-center gap-1">
             <Clock className="h-4 w-4" />
             <span>Schedule</span>
-          </TabsTrigger>
+          </TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="notifications" className="space-y-4">
@@ -68,7 +69,7 @@ export default function AzanSettingsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="schedule" className="space-y-4">
+        {/* <TabsContent value="schedule" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Schedule Settings</CardTitle>
@@ -80,7 +81,7 @@ export default function AzanSettingsPage() {
               <AzanScheduleSettings />
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
     </div>
   );
