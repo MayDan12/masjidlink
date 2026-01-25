@@ -38,7 +38,7 @@ export default function UserDashboardLayout({
                     title: "Profile",
                   },
                   {
-                    link: "/dashboard/settings",
+                    link: "/dashboard/profile",
                     title: "Settings",
                   },
                 ]}

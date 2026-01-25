@@ -10,15 +10,16 @@ import {
 // import { PrayerTimesWidget } from "@/components/prayer-times-widget";
 import { MasjidDiscovery } from "@/components/masjid-discovery";
 import { UpcomingEvents } from "@/components/upcoming-events";
-import { ChurchIcon as Mosque, Calendar, Bell, Heart } from "lucide-react";
+import { Calendar, Bell, Heart } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/auth";
 import { CarouselDemo } from "@/components/carousel";
 import PrayerTimesWidget from "@/components/prayer-times-widget";
+import { MosqueIcon } from "@/components/icons/MosqueIcon";
 
 const dashboardCards = [
   {
-    icon: <Mosque size={24} />,
+    icon: <MosqueIcon size={24} />,
     title: "Masjid Profiles",
     description: "Discover and connect with masjids in your area",
     link: "/dashboard/masjids",
