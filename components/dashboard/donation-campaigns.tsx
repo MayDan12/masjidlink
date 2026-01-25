@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,112 +10,90 @@ import {
   Heart,
   Calendar,
   Users,
-  ChurchIcon as Mosque,
   GraduationCap,
   Utensils,
   Home,
 } from "lucide-react";
+import { auth } from "@/firebase/client";
+import { getDonationsCampaigns } from "@/app/(dashboards)/imam/donations/action";
+import { MosqueIcon } from "../icons/MosqueIcon";
 
 type Campaign = {
   id: string;
   title: string;
-  masjid: string;
   description: string;
-  goal: number;
-  raised: number;
-  daysLeft: number;
-  donors: number;
-  category: "construction" | "education" | "charity" | "ramadan" | "other";
-  featured: boolean;
+  goal_amount: number;
+  amountRaised: number;
+  startDate: string;
+  endDate: string;
+  status: "active" | "completed" | "upcoming" | "archived";
+  category: "general" | "construction" | "education" | "charity" | "emergency";
+  createdAt?: any;
+  updatedAt?: any;
 };
 
 export function DonationCampaigns() {
   const [activeTab, setActiveTab] = useState("all");
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  const fetchCampaigns = async () => {
+    setLoading(true);
+    try {
+      const token = await auth?.currentUser?.getIdToken();
+      if (!token) {
+        throw new Error("User not authenticated");
+      }
+
+      const response = await getDonationsCampaigns();
+
+      if (response.success && response.campaigns) {
+        // Convert Firestore Timestamps to ISO strings
+        const sanitizedCampaigns = response.campaigns.map((c: Campaign) => ({
+          ...c,
+          createdAt: c.createdAt?._seconds
+            ? new Date(c.createdAt._seconds * 1000).toISOString()
+            : c.createdAt,
+          updatedAt: c.updatedAt?._seconds
+            ? new Date(c.updatedAt._seconds * 1000).toISOString()
+            : c.updatedAt,
+        }));
+        setCampaigns(sanitizedCampaigns);
+      } else {
+        throw new Error(response.message || "Failed to fetch campaigns");
+        setCampaigns([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch campaigns:", (error as Error).message);
+      setCampaigns([]); // optional: clear campaigns on error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCampaigns();
+  }, []);
   // Mock campaigns data
-  const campaigns: Campaign[] = [
-    {
-      id: "1",
-      title: "Masjid Expansion Project",
-      masjid: "Masjid Al-Noor",
-      description:
-        "Help us expand our masjid to accommodate our growing community.",
-      goal: 250000,
-      raised: 175000,
-      daysLeft: 45,
-      donors: 320,
-      category: "construction",
-      featured: true,
-    },
-    {
-      id: "2",
-      title: "Weekend Islamic School",
-      masjid: "Islamic Center",
-      description:
-        "Support our weekend school program for children in the community.",
-      goal: 50000,
-      raised: 32500,
-      daysLeft: 60,
-      donors: 145,
-      category: "education",
-      featured: false,
-    },
-    {
-      id: "3",
-      title: "Ramadan Food Drive",
-      masjid: "Masjid Al-Rahman",
-      description: "Help provide iftar meals for those in need during Ramadan.",
-      goal: 15000,
-      raised: 9800,
-      daysLeft: 15,
-      donors: 210,
-      category: "ramadan",
-      featured: true,
-    },
-    {
-      id: "4",
-      title: "Community Support Fund",
-      masjid: "Islamic Center",
-      description:
-        "Emergency assistance for families facing financial hardship.",
-      goal: 30000,
-      raised: 12500,
-      daysLeft: 90,
-      donors: 85,
-      category: "charity",
-      featured: false,
-    },
-    {
-      id: "5",
-      title: "New Carpet for Prayer Hall",
-      masjid: "Masjid Al-Taqwa",
-      description: "Help us replace the worn carpets in our main prayer hall.",
-      goal: 8000,
-      raised: 3200,
-      daysLeft: 30,
-      donors: 45,
-      category: "construction",
-      featured: false,
-    },
-  ];
+  console.log(campaigns);
 
   // Filter campaigns based on active tab
   const filteredCampaigns =
     activeTab === "all"
       ? campaigns
       : activeTab === "featured"
-      ? campaigns.filter((campaign) => campaign.featured)
-      : campaigns.filter((campaign) => campaign.category === activeTab);
+        ? campaigns.filter((campaign) => campaign.status === "active")
+        : campaigns.filter((campaign) => campaign.category === activeTab);
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case "construction":
-        return <Mosque className="h-4 w-4" />;
+        return <MosqueIcon className="h-4 w-4" />;
       case "education":
         return <GraduationCap className="h-4 w-4" />;
       case "charity":
         return <Heart className="h-4 w-4" />;
-      case "ramadan":
+      case "emergency":
         return <Utensils className="h-4 w-4" />;
       default:
         return <Home className="h-4 w-4" />;
@@ -131,7 +109,7 @@ export function DonationCampaigns() {
           <TabsTrigger value="construction">Construction</TabsTrigger>
           <TabsTrigger value="education">Education</TabsTrigger>
           <TabsTrigger value="charity">Charity</TabsTrigger>
-          <TabsTrigger value="ramadan">Ramadan</TabsTrigger>
+          <TabsTrigger value="emergency">Emergency</TabsTrigger>
         </TabsList>
       </Tabs>
 
@@ -139,7 +117,7 @@ export function DonationCampaigns() {
         {filteredCampaigns.map((campaign) => (
           <Card
             key={campaign.id}
-            className={campaign.featured ? "border-primary/50" : ""}
+            className={campaign.status === "active" ? "border-primary/50" : ""}
           >
             <CardContent className="p-4">
               <div className="flex items-start justify-between">
@@ -150,7 +128,7 @@ export function DonationCampaigns() {
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                {campaign.masjid}
+                {campaign.status === "active" ? "Active" : "Completed"}
               </p>
               <p className="text-sm mt-2 line-clamp-2">
                 {campaign.description}
@@ -159,17 +137,17 @@ export function DonationCampaigns() {
               <div className="mt-4 space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="font-medium">
-                    ${campaign.raised.toLocaleString()}
+                    ${campaign.amountRaised.toLocaleString()}
                   </span>
                   <span className="text-muted-foreground">
-                    ${campaign.goal.toLocaleString()} goal
+                    ${campaign.goal_amount.toLocaleString()} goal
                   </span>
                 </div>
                 <Progress
-                  value={(campaign.raised / campaign.goal) * 100}
+                  value={(campaign.amountRaised / campaign.goal_amount) * 100}
                   className="h-2"
                 />
-                <div className="flex justify-between text-xs text-muted-foreground">
+                {/* <div className="flex justify-between text-xs text-muted-foreground">
                   <span className="flex items-center">
                     <Users className="h-3 w-3 mr-1" />
                     {campaign.donors} donors
@@ -178,7 +156,7 @@ export function DonationCampaigns() {
                     <Calendar className="h-3 w-3 mr-1" />
                     {campaign.daysLeft} days left
                   </span>
-                </div>
+                </div> */}
               </div>
 
               <div className="mt-4 flex gap-2">

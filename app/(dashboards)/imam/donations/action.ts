@@ -114,8 +114,37 @@ export async function getDonationCampaigns(token: string) {
           JSON.stringify(data, (_, value) =>
             value?._seconds
               ? new Date(value._seconds * 1000).toISOString()
-              : value
-          )
+              : value,
+          ),
+        ),
+      };
+    });
+
+    return { success: true, campaigns };
+  } catch (error) {
+    console.error("Error fetching campaigns:", (error as Error).message);
+    return { success: false, message: (error as Error).message };
+  }
+}
+
+export async function getDonationsCampaigns() {
+  try {
+    // console.log("Verified UID:", uid);
+
+    const snapshot = await firestore.collection("campaigns").get();
+
+    // ✅ Convert Firestore Timestamps to plain ISO strings
+    const campaigns = snapshot.docs.map((doc) => {
+      const data = doc.data();
+
+      return {
+        id: doc.id,
+        ...JSON.parse(
+          JSON.stringify(data, (_, value) =>
+            value?._seconds
+              ? new Date(value._seconds * 1000).toISOString()
+              : value,
+          ),
         ),
       };
     });
