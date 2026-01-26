@@ -6,14 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Heart,
-  Calendar,
-  Users,
-  GraduationCap,
-  Utensils,
-  Home,
-} from "lucide-react";
+import { Heart, GraduationCap, Utensils, Home } from "lucide-react";
 import { auth } from "@/firebase/client";
 import { getDonationsCampaigns } from "@/app/(dashboards)/imam/donations/action";
 import { MosqueIcon } from "../icons/MosqueIcon";
@@ -74,8 +67,6 @@ export function DonationCampaigns() {
   useEffect(() => {
     fetchCampaigns();
   }, []);
-  // Mock campaigns data
-  console.log(campaigns);
 
   // Filter campaigns based on active tab
   const filteredCampaigns =
@@ -112,6 +103,14 @@ export function DonationCampaigns() {
           <TabsTrigger value="emergency">Emergency</TabsTrigger>
         </TabsList>
       </Tabs>
+
+      {loading ? (
+        <div className="flex mt-20 justify-center items-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      ) : (
+        ""
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filteredCampaigns.map((campaign) => (
@@ -171,7 +170,7 @@ export function DonationCampaigns() {
         ))}
       </div>
 
-      {filteredCampaigns.length === 0 && (
+      {/* {filteredCampaigns.length === 0 && (
         <div className="text-center py-12">
           <Heart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
           <h3 className="text-lg font-medium mb-2">No Campaigns Found</h3>
@@ -179,7 +178,7 @@ export function DonationCampaigns() {
             There are no active campaigns in this category at the moment.
           </p>
         </div>
-      )}
+      )} */}
 
       {filteredCampaigns.length > 0 && (
         <div className="text-center">
