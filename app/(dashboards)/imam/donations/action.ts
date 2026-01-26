@@ -10,6 +10,36 @@ import { getMasjidById } from "../../dashboard/masjids/action";
  *  Helper Functions
  * ----------------------------- */
 
+// Donation Stats
+export async function getDonationStats(imamId: string) {
+  try {
+    const snapshot = await firestore
+      .collection("campaigns")
+      .where("imamId", "==", imamId)
+      .get();
+
+    let totalDonations = 0;
+    let activeCampaigns = 0;
+    let completedCampaigns = 0;
+
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      totalDonations += data.amountRaised || 0;
+      if (data.status === "active") activeCampaigns++;
+      else if (data.status === "completed") completedCampaigns++;
+    });
+
+    return {
+      totalDonations,
+      activeCampaigns,
+      completedCampaigns,
+    };
+  } catch (error) {
+    console.error("Error fetching donation stats:", (error as Error).message);
+    throw new Error("Internal Server Error");
+  }
+}
+
 async function verifyImamToken(token: string) {
   try {
     const decoded = await serverAuth.verifyIdToken(token);
@@ -76,12 +106,55 @@ export async function createDonations(data: {
 }
 
 /**
+ * edit an existing donation campaign by ID.
+ */
+export async function editDonationCampaign(
+  campaignId: string,
+  data: {
+    title?: string;
+    description?: string;
+    goal_amount?: number;
+    startDate?: string;
+    endDate?: string;
+    category?: string;
+    token: string;
+  },
+) {
+  try {
+    const { token, ...updateData } = data;
+    const uid = await verifyImamToken(token);
+    const timestamp = Timestamp.now();
+    const campaignRef = firestore.collection("campaigns").doc(campaignId);
+    const campaignDoc = await campaignRef.get();
+    if (!campaignDoc.exists) {
+      throw new Error("Campaign not found.");
+    }
+    const campaignData = campaignDoc.data();
+    if (campaignData?.imamId !== uid) {
+      throw new Error("Unauthorized: You can only edit your own campaigns.");
+    }
+    const updatedData = {
+      ...campaignData,
+      ...updateData,
+      updatedAt: timestamp,
+    };
+    await campaignRef.update(updatedData);
+    return { success: true };
+  } catch (error) {
+    console.error("Error editing campaign:", (error as Error).message);
+    return {
+      success: false,
+      message: (error as Error).message || "Internal Server Error",
+    };
+  }
+}
+
+/**
  * Delete an existing donation campaign by ID.
  */
 export async function deleteDonationCampaign(campaignId: string) {
   try {
     if (!campaignId) throw new Error("Campaign ID is required.");
-
     await firestore.collection("campaigns").doc(campaignId).delete();
 
     return { success: true };

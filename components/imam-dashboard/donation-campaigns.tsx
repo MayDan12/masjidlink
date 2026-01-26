@@ -111,7 +111,7 @@ export function DonationCampaigns() {
   };
   // Filter campaigns based on active tab
   const filteredCampaigns = campaigns.filter(
-    (campaign) => campaign.status === activeTab
+    (campaign) => campaign.status === activeTab,
   );
 
   // Calculate progress percentage
@@ -197,6 +197,7 @@ export function DonationCampaigns() {
                               <Eye className="mr-2 h-4 w-4" />
                               View Details
                             </DropdownMenuItem>
+                            {/* I want edit to open a dialog to edit campaign details */}
                             <DropdownMenuItem className="flex items-center">
                               <Edit className="mr-2 h-4 w-4" />
                               Edit Campaign
@@ -239,14 +240,14 @@ export function DonationCampaigns() {
                       <Progress
                         value={getProgressPercentage(
                           campaign.amountRaised,
-                          campaign.goal_amount
+                          campaign.goal_amount,
                         )}
                         className="h-2"
                       />
                       <div className="text-xs text-right text-muted-foreground">
                         {getProgressPercentage(
                           campaign.amountRaised,
-                          campaign.goal_amount
+                          campaign.goal_amount,
                         )}
                         % Complete
                       </div>
@@ -271,10 +272,10 @@ export function DonationCampaigns() {
                 {activeTab === "active"
                   ? "You don't have any active campaigns at the moment."
                   : activeTab === "upcoming"
-                  ? "You don't have any upcoming campaigns scheduled."
-                  : activeTab === "completed"
-                  ? "You don't have any completed campaigns yet."
-                  : "You don't have any archived campaigns."}
+                    ? "You don't have any upcoming campaigns scheduled."
+                    : activeTab === "completed"
+                      ? "You don't have any completed campaigns yet."
+                      : "You don't have any archived campaigns."}
               </p>
               <CreateCampaignDialog>
                 <Button>
