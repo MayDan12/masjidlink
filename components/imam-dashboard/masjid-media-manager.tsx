@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,41 +13,36 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trash2 } from "lucide-react";
 import UploadForm from "./image-upload";
+import Image from "next/image";
+import { auth } from "@/firebase/client";
+import { getMasjidImages } from "@/app/(dashboards)/imam/profile/action";
 
 type ImageType = {
   id: string;
-  url: string;
+  imageUrl: string;
   name: string;
-  type: "exterior" | "interior" | "events" | "other";
+  type: "Exterior" | "Interior" | "Events" | "Other";
 };
 
 export function MasjidMediaManager() {
-  const [images, setImages] = useState<ImageType[]>([
-    {
-      id: "1",
-      url: "/placeholder.svg?height=200&width=300",
-      name: "Masjid Exterior",
-      type: "exterior",
-    },
-    {
-      id: "2",
-      url: "/placeholder.svg?height=200&width=300",
-      name: "Prayer Hall",
-      type: "interior",
-    },
-    {
-      id: "3",
-      url: "/placeholder.svg?height=200&width=300",
-      name: "Community Iftar",
-      type: "events",
-    },
-    {
-      id: "4",
-      url: "/placeholder.svg?height=200&width=300",
-      name: "Classroom",
-      type: "interior",
-    },
-  ]);
+  const [images, setImages] = useState<ImageType[]>([]);
+
+  // Get images array
+  const getImages = async () => {
+    const token = await auth?.currentUser?.getIdToken();
+    if (!token) {
+      throw new Error("User not authenticated");
+    }
+    const response = await getMasjidImages(token);
+    if (response.error) {
+      throw new Error(response.message);
+    }
+    setImages(response.data || []);
+  };
+
+  useEffect(() => {
+    getImages();
+  }, []);
 
   const [selectedTab, setSelectedTab] = useState<string>("all");
 
@@ -92,10 +87,12 @@ export function MasjidMediaManager() {
                   key={image.id}
                   className="group relative border rounded-lg overflow-hidden"
                 >
-                  <img
-                    src={image.url || "/placeholder.svg"}
+                  <Image
+                    src={image.imageUrl || "/placeholder.svg"}
                     alt={image.name}
                     className="w-full h-48 object-cover"
+                    width={300}
+                    height={200}
                   />
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <Button
