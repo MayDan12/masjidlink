@@ -85,12 +85,20 @@ export function EditCampaignDialog({
   children,
   campaign,
   onSuccess,
+  open,
+  onOpenChange,
 }: {
   children: React.ReactNode;
   campaign: Campaign;
   onSuccess: () => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = typeof open !== "undefined";
+  const dialogOpen = isControlled ? open : internalOpen;
+  const handleOpenChange =
+    onOpenChange ?? ((value: boolean) => setInternalOpen(value));
   const [isLoading, setIsLoading] = useState(false);
 
   // Initialize form
@@ -171,7 +179,7 @@ export function EditCampaignDialog({
         title: "Campaign updated",
         description: "Your donation campaign has been successfully updated.",
       });
-      setOpen(false);
+      handleOpenChange(false);
       onSuccess();
     } catch (error) {
       toast({
@@ -182,8 +190,8 @@ export function EditCampaignDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+    <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
+      {!isControlled && <DialogTrigger asChild>{children}</DialogTrigger>}
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Donation Campaign</DialogTitle>
@@ -366,7 +374,7 @@ export function EditCampaignDialog({
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setOpen(false)}
+                onClick={() => handleOpenChange(false)}
               >
                 Cancel
               </Button>

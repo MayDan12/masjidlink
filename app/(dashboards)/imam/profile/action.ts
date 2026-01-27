@@ -1,6 +1,7 @@
 "use server";
 
 import { firestore, serverAuth } from "@/firebase/server";
+import { sanitizeData } from "@/lib/sanitize";
 import { checkUserRole } from "@/utils/server/auth";
 import { randomInt } from "crypto";
 
@@ -103,10 +104,10 @@ export const getMasjidProfile = async (token: string) => {
       message: "Masjid profile not found.",
     };
   }
+  const sanitizedData = sanitizeData(doc.data());
 
-  const data = doc.data();
   return {
     success: true,
-    data: data,
+    data: sanitizedData,
   };
 };

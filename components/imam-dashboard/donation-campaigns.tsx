@@ -20,6 +20,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Edit,
   MoreHorizontal,
   Trash,
@@ -58,6 +65,12 @@ export function DonationCampaigns() {
   const [activeTab, setActiveTab] = useState("active");
   const [loading, setLoading] = useState(false);
   const [campaigns, setCampaigns] = useState<CampaignUI[]>([]);
+  const [editOpen, setEditOpen] = useState(false);
+  const [selectedCampaign, setSelectedCampaign] = useState<CampaignUI | null>(
+    null,
+  );
+  const [viewOpen, setViewOpen] = useState(false);
+  const [viewCampaign, setViewCampaign] = useState<CampaignUI | null>(null);
 
   // Fetch campaigns from the server
   const fetchCampaigns = async () => {
@@ -216,20 +229,26 @@ export function DonationCampaigns() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem className="flex items-center">
+                            <DropdownMenuItem
+                              className="flex items-center"
+                              onClick={() => {
+                                setViewCampaign(campaign);
+                                setViewOpen(true);
+                              }}
+                            >
                               <Eye className="mr-2 h-4 w-4" />
                               View Details
                             </DropdownMenuItem>
-                            {/* Edit opens a dialog to edit campaign details */}
-                            <EditCampaignDialog
-                              campaign={campaign}
-                              onSuccess={fetchCampaigns}
+                            <DropdownMenuItem
+                              className="flex items-center"
+                              onClick={() => {
+                                setSelectedCampaign(campaign);
+                                setEditOpen(true);
+                              }}
                             >
-                              <DropdownMenuItem className="flex items-center">
-                                <Edit className="mr-2 h-4 w-4" />
-                                Edit Campaign
-                              </DropdownMenuItem>
-                            </EditCampaignDialog>
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit Campaign
+                            </DropdownMenuItem>
                             <DropdownMenuItem className="flex items-center">
                               <BarChart className="mr-2 h-4 w-4" />
                               View Analytics
@@ -315,6 +334,88 @@ export function DonationCampaigns() {
           )}
         </TabsContent>
       </Tabs>
+      {viewCampaign && (
+        <Dialog open={viewOpen} onOpenChange={setViewOpen}>
+          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{viewCampaign.title}</DialogTitle>
+              <DialogDescription>
+                Detailed information about this donation campaign.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Badge className={getCategoryColor(viewCampaign.category)}>
+                  {viewCampaign.category.charAt(0).toUpperCase() +
+                    viewCampaign.category.slice(1)}
+                </Badge>
+                <span className="text-sm text-muted-foreground">
+                  {viewCampaign.status.charAt(0).toUpperCase() +
+                    viewCampaign.status.slice(1)}
+                </span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {new Date(viewCampaign.startDate).toLocaleDateString()} -{" "}
+                {new Date(viewCampaign.endDate).toLocaleDateString()}
+              </p>
+              <p className="text-sm">{viewCampaign.description}</p>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>
+                    Raised:{" "}
+                    <span className="font-medium">
+                      {formatCurrency(viewCampaign.amountRaised)}
+                    </span>
+                  </span>
+                  <span>
+                    Goal:{" "}
+                    <span className="font-medium">
+                      {formatCurrency(viewCampaign.goal_amount)}
+                    </span>
+                  </span>
+                </div>
+                <Progress
+                  value={getProgressPercentage(
+                    viewCampaign.amountRaised,
+                    viewCampaign.goal_amount,
+                  )}
+                  className="h-2"
+                />
+                <div className="text-xs text-right text-muted-foreground">
+                  {getProgressPercentage(
+                    viewCampaign.amountRaised,
+                    viewCampaign.goal_amount,
+                  )}
+                  % Complete
+                </div>
+              </div>
+              {viewCampaign.createdAt && (
+                <p className="text-xs text-muted-foreground">
+                  Created: {new Date(viewCampaign.createdAt).toLocaleString()}
+                </p>
+              )}
+              {viewCampaign.updatedAt && (
+                <p className="text-xs text-muted-foreground">
+                  Updated: {new Date(viewCampaign.updatedAt).toLocaleString()}
+                </p>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+      {selectedCampaign && (
+        <EditCampaignDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          campaign={selectedCampaign}
+          onSuccess={async () => {
+            await fetchCampaigns();
+            setEditOpen(false);
+          }}
+        >
+          <span />
+        </EditCampaignDialog>
+      )}
     </div>
   );
 }
