@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -38,6 +38,10 @@ import {
 import { Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { auth } from "@/firebase/client";
+import {
+  getDonationById,
+  editDonationCampaign,
+} from "@/app/(dashboards)/imam/donations/action";
 
 type Campaign = {
   id: string;
@@ -49,8 +53,8 @@ type Campaign = {
   endDate: string;
   status: "active" | "completed" | "upcoming" | "archived";
   category: "general" | "construction" | "education" | "charity" | "emergency";
-  createdAt?: any;
-  updatedAt?: any;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 const formSchema = z.object({
@@ -105,6 +109,39 @@ export function EditCampaignDialog({
     },
   });
 
+  useEffect(() => {
+    const fetchCampaignById = async () => {
+      try {
+        const response = await getDonationById(campaign.id);
+        if (!response.success || !response.campaign) {
+          throw new Error("Campaign not found");
+        }
+
+        if (response.success) {
+          form.reset({
+            title: response.campaign.title || "",
+            description: response.campaign.description || "",
+            goal_amount: response.campaign.goal_amount.toString(),
+            startDate: response.campaign.startDate || "",
+            endDate: response.campaign.endDate || "",
+            category: response.campaign.category || "",
+          });
+        } else {
+          toast({
+            title: "Error fetching campaign",
+            description: response.message,
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error fetching campaign",
+          description: (error as Error).message,
+        });
+      }
+    };
+    fetchCampaignById();
+  }, [campaign.id, form]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
 
@@ -114,10 +151,13 @@ export function EditCampaignDialog({
         throw new Error("User not authenticated");
       }
 
-      const response = await editDonationCampaign({
-        campaignId: campaign.id,
-        ...values,
+      const response = await editDonationCampaign(campaign.id, {
+        title: values.title,
+        description: values.description,
         goal_amount: parseFloat(values.goal_amount),
+        startDate: values.startDate,
+        endDate: values.endDate,
+        category: values.category,
         token,
       });
 
@@ -139,8 +179,6 @@ export function EditCampaignDialog({
         description: (error as Error).message,
       });
     }
-
-    // Call the API to update the donation campaign
   }
 
   return (

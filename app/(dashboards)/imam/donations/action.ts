@@ -200,6 +200,35 @@ export async function getDonationCampaigns(token: string) {
   }
 }
 
+// Get donations by id
+export async function getDonationById(campaignId: string) {
+  try {
+    if (!campaignId) throw new Error("Campaign ID is required.");
+    const campaignRef = firestore.collection("campaigns").doc(campaignId);
+    const campaignDoc = await campaignRef.get();
+    if (!campaignDoc.exists) {
+      throw new Error("Campaign not found.");
+    }
+    const campaignData = campaignDoc.data();
+    // Ensure we only return plain JSON-serializable data (no Firestore Timestamp objects)
+    const sanitized = {
+      id: campaignDoc.id,
+      ...JSON.parse(
+        JSON.stringify(campaignData, (_, value) =>
+          value?._seconds
+            ? new Date(value._seconds * 1000).toISOString()
+            : value,
+        ),
+      ),
+    };
+    return { success: true, campaign: sanitized };
+  } catch (error) {
+    console.error("Error fetching campaign:", (error as Error).message);
+    return { success: false, message: (error as Error).message };
+  }
+}
+
+// Get all donation campaigns for all Imams.
 export async function getDonationsCampaigns() {
   try {
     // console.log("Verified UID:", uid);

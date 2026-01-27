@@ -29,6 +29,7 @@ import {
   Loader,
 } from "lucide-react";
 import { CreateCampaignDialog } from "./create-campaign-dialog";
+import { EditCampaignDialog } from "./edit-campaign-dialog";
 import {
   deleteDonationCampaign,
   getDonationCampaigns,
@@ -45,14 +46,18 @@ type Campaign = {
   endDate: string;
   status: "active" | "completed" | "upcoming" | "archived";
   category: "general" | "construction" | "education" | "charity" | "emergency";
-  createdAt?: any;
-  updatedAt?: any;
+  createdAt?: { _seconds: number } | string;
+  updatedAt?: { _seconds: number } | string;
 };
 
+type CampaignUI = Omit<Campaign, "createdAt" | "updatedAt"> & {
+  createdAt?: string;
+  updatedAt?: string;
+};
 export function DonationCampaigns() {
   const [activeTab, setActiveTab] = useState("active");
   const [loading, setLoading] = useState(false);
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [campaigns, setCampaigns] = useState<CampaignUI[]>([]);
 
   // Fetch campaigns from the server
   const fetchCampaigns = async () => {
@@ -66,20 +71,38 @@ export function DonationCampaigns() {
       const response = await getDonationCampaigns(token);
 
       if (response.success && response.campaigns) {
-        // Convert Firestore Timestamps to ISO strings
-        const sanitizedCampaigns = response.campaigns.map((c: Campaign) => ({
-          ...c,
-          createdAt: c.createdAt?._seconds
-            ? new Date(c.createdAt._seconds * 1000).toISOString()
-            : c.createdAt,
-          updatedAt: c.updatedAt?._seconds
-            ? new Date(c.updatedAt._seconds * 1000).toISOString()
-            : c.updatedAt,
-        }));
+        const sanitizedCampaigns: CampaignUI[] = response.campaigns.map(
+          (c: Campaign) => {
+            const created =
+              typeof c.createdAt === "object" &&
+              c.createdAt &&
+              "_seconds" in c.createdAt
+                ? new Date(c.createdAt._seconds * 1000).toISOString()
+                : (c.createdAt as string | undefined);
+            const updated =
+              typeof c.updatedAt === "object" &&
+              c.updatedAt &&
+              "_seconds" in c.updatedAt
+                ? new Date(c.updatedAt._seconds * 1000).toISOString()
+                : (c.updatedAt as string | undefined);
+            return {
+              id: c.id,
+              title: c.title,
+              description: c.description,
+              goal_amount: c.goal_amount,
+              amountRaised: c.amountRaised,
+              startDate: c.startDate,
+              endDate: c.endDate,
+              status: c.status,
+              category: c.category,
+              createdAt: created,
+              updatedAt: updated,
+            };
+          },
+        );
         setCampaigns(sanitizedCampaigns);
       } else {
         throw new Error(response.message || "Failed to fetch campaigns");
-        setCampaigns([]);
       }
     } catch (error) {
       console.error("Failed to fetch campaigns:", (error as Error).message);
@@ -197,11 +220,16 @@ export function DonationCampaigns() {
                               <Eye className="mr-2 h-4 w-4" />
                               View Details
                             </DropdownMenuItem>
-                            {/* I want edit to open a dialog to edit campaign details */}
-                            <DropdownMenuItem className="flex items-center">
-                              <Edit className="mr-2 h-4 w-4" />
-                              Edit Campaign
-                            </DropdownMenuItem>
+                            {/* Edit opens a dialog to edit campaign details */}
+                            <EditCampaignDialog
+                              campaign={campaign}
+                              onSuccess={fetchCampaigns}
+                            >
+                              <DropdownMenuItem className="flex items-center">
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit Campaign
+                              </DropdownMenuItem>
+                            </EditCampaignDialog>
                             <DropdownMenuItem className="flex items-center">
                               <BarChart className="mr-2 h-4 w-4" />
                               View Analytics
