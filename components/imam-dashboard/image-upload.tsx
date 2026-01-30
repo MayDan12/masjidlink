@@ -129,7 +129,6 @@ export default function UploadForm() {
                   <option value="other">Other</option>
                 </select>
               </div>
-              {/* Whgat a day it is */}
 
               <Button type="submit" className="w-full">
                 {loading ? <Loader2 className="animate-spin" /> : "Submit"}
