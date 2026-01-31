@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Metadata } from "next";
 import { LoginForm } from "@/components/auth/login-form";
 import Image from "next/image";
+import { Suspense } from "react";
+import { Loader2 } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Login - MasjidLink",
@@ -56,7 +58,9 @@ export default function LoginPage() {
                   Sign in to your account to continue your journey
                 </p>
               </div>
-              <LoginForm />
+              <Suspense fallback={<Loader2 className="animate-spin" />}>
+                <LoginForm />
+              </Suspense>
               <div className="flex justify-center">
                 <p className="text-center text-sm text-muted-foreground">
                   Don&apos;t have an account?{" "}

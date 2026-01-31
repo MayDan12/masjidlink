@@ -19,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import GoogleButton from "./google-button";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/auth";
 import { toast } from "sonner";
 
@@ -36,7 +36,9 @@ type FormValues = z.infer<typeof formSchema>;
 
 export function LoginForm() {
   const router = useRouter();
-  // const searchParams = useSearchParams();
+  const searchParams = useSearchParams(); // Changed from useParams() to useSearchParams()
+  const redirect = searchParams.get("from") || searchParams.get("redirect"); // Get the redirect parameter
+
   const [showPassword, setShowPassword] = useState(false);
   const { signIn } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -73,6 +75,13 @@ export function LoginForm() {
         duration: 2000,
       });
 
+      if (redirect) {
+        // Decode the redirect URL if it's encoded
+        const decodedRedirect = decodeURIComponent(redirect);
+        router.push(decodedRedirect);
+        return;
+      }
+
       // Redirect based on role
       const roleRoutes: Record<string, string> = {
         admin: "/admin",
@@ -81,6 +90,7 @@ export function LoginForm() {
       };
 
       const redirectTo = roleRoutes[userRole] ?? "/login";
+
       router.push(redirectTo);
     } catch (error) {
       // console.error("Login error:", error);
