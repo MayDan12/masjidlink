@@ -62,7 +62,6 @@ import {
   AlertCircle,
   DollarSign,
   Tag,
-  ChevronRight,
   Share2,
   Heart,
 } from "lucide-react";

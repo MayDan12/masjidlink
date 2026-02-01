@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json(
         { success: false, error: "Missing or invalid authorization header" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -178,13 +178,13 @@ export async function POST(request: NextRequest) {
     if (!campaignId || typeof campaignId !== "string") {
       return NextResponse.json(
         { success: false, error: "Invalid campaign ID" },
-        { status: 400 }
+        { status: 400 },
       );
     }
     if (!amount || typeof amount !== "number" || amount <= 0) {
       return NextResponse.json(
         { success: false, error: "Invalid donation amount" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -195,14 +195,14 @@ export async function POST(request: NextRequest) {
     if (!campaignDoc.exists) {
       return NextResponse.json(
         { success: false, error: "Campaign not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
     const campaign = campaignDoc.data();
     if (!campaign) {
       return NextResponse.json(
         { success: false, error: "Campaign data not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
     if (campaign.status !== "active") {
@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
           success: false,
           error: "This campaign is not currently accepting donations",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -226,6 +226,12 @@ export async function POST(request: NextRequest) {
     });
 
     const amountInCents = Math.round(amount * 100);
+    console.log("Checkout request", {
+      campaignId,
+      amount,
+      amountInCents,
+      userId,
+    });
     const successUrl = `masjidlink://stripe-redirect?status=success&donationId=${donationRef.id}`;
     const cancelUrl = `masjidlink://stripe-redirect?status=cancel&donationId=${donationRef.id}`;
 
@@ -281,7 +287,7 @@ export async function POST(request: NextRequest) {
             ? error.message
             : "Failed to create checkout session",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

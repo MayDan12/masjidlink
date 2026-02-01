@@ -1,55 +1,3 @@
-// "use client";
-// import { getDonationById } from "@/app/(dashboards)/imam/donations/action";
-// import { useEffect, useState } from "react";
-
-// type Campaign = {
-//   id: string;
-//   title: string;
-//   description: string;
-//   goal_amount: number;
-//   amountRaised: number;
-//   startDate: string;
-//   endDate: string;
-//   status: "active" | "completed" | "upcoming" | "archived";
-//   category: "general" | "construction" | "education" | "charity" | "emergency";
-//   createdAt?: any;
-//   updatedAt?: any;
-// };
-
-// export default function CampaignDetailsDonations({
-//   params,
-// }: {
-//   params: { id: string };
-// }) {
-//   const { id } = params;
-//   const [campaign, setCampaign] = useState<Campaign | null>(null);
-
-//   useEffect(() => {
-//     const fetchCampaignDetails = async () => {
-//       const res = await getDonationById(id);
-//       if (!res.success) {
-//         throw new Error(res.message || "Failed to fetch campaign details");
-//       }
-//       return res.campaign;
-//     };
-//     fetchCampaignDetails().then((campaign) => setCampaign(campaign));
-//   }, [id]);
-//   return (
-//     <div className="container mx-auto px-4">
-//       <h1 className="text-3xl font-bold mb-4">
-//         Campaign Details Donations {campaign?.title}
-//       </h1>
-//       <p className="text-lg mb-4">{campaign?.description}</p>
-//       <p className="text-lg mb-4">Goal Amount: ${campaign?.goal_amount}</p>
-//       <p className="text-lg mb-4">Amount Raised: ${campaign?.amountRaised}</p>
-//       <p className="text-lg mb-4">Start Date: {campaign?.startDate}</p>
-//       <p className="text-lg mb-4">End Date: {campaign?.endDate}</p>
-//       <p className="text-lg mb-4">Status: {campaign?.status}</p>
-//       <p className="text-lg mb-4">Category: {campaign?.category}</p>
-//     </div>
-//   );
-// }
-
 "use client";
 import { getDonationById } from "@/app/(dashboards)/imam/donations/action";
 import { useEffect, useState } from "react";
@@ -62,7 +10,6 @@ import {
   AlertCircle,
   DollarSign,
   Tag,
-  ChevronRight,
   Share2,
   Heart,
 } from "lucide-react";
@@ -71,6 +18,7 @@ import { Badge } from "@/components/ui/badge"; // Assuming you have shadcn/ui
 import { Button } from "@/components/ui/button"; // Assuming you have shadcn/ui
 import { Card, CardContent } from "@/components/ui/card"; // Assuming you have shadcn/ui
 import { Skeleton } from "@/components/ui/skeleton"; // Assuming you have shadcn/ui
+import { useCampaignDonation } from "@/hooks/useCampaignDonation";
 
 type Campaign = {
   id: string;
@@ -82,8 +30,8 @@ type Campaign = {
   endDate: string;
   status: "active" | "completed" | "upcoming" | "archived";
   category: "general" | "construction" | "education" | "charity" | "emergency";
-  createdAt?: any;
-  updatedAt?: any;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 const categoryColors = {
@@ -116,6 +64,9 @@ export default function CampaignDetailsDonations({
   const { id } = params;
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [loading, setLoading] = useState(true);
+  const { createDonationCheckoutSession, loading: donationLoading } =
+    useCampaignDonation();
+  const [selectedAmount, setSelectedAmount] = useState<number>(0);
 
   useEffect(() => {
     const fetchCampaignDetails = async () => {
@@ -182,7 +133,8 @@ export default function CampaignDetailsDonations({
             Campaign Not Found
           </h2>
           <p className="text-gray-500">
-            The campaign you're looking for doesn't exist or has been removed.
+            The campaign you&apos;re looking for doesn&apos;t exist or has been
+            removed.
           </p>
         </div>
       </div>
@@ -356,23 +308,57 @@ export default function CampaignDetailsDonations({
                   <div className="space-y-4">
                     <Button
                       size="lg"
-                      className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                      className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-60"
+                      disabled={donationLoading || selectedAmount <= 0}
+                      onClick={async () => {
+                        const result = await createDonationCheckoutSession(
+                          id,
+                          selectedAmount,
+                        );
+                        if (result?.url) {
+                          window.location.href = result.url as string;
+                        }
+                      }}
                     >
                       <DollarSign className="w-5 h-5 mr-2" />
-                      Donate Now
+                      {donationLoading ? "Processing..." : "Donate Now"}
                     </Button>
 
                     <div className="grid grid-cols-2 gap-3">
-                      <Button variant="outline" size="lg" className="w-full">
+                      <Button
+                        variant={selectedAmount === 25 ? "default" : "outline"}
+                        size="lg"
+                        className="w-full"
+                        onClick={() => setSelectedAmount(25)}
+                        disabled={donationLoading}
+                      >
                         $25
                       </Button>
-                      <Button variant="outline" size="lg" className="w-full">
+                      <Button
+                        variant={selectedAmount === 50 ? "default" : "outline"}
+                        size="lg"
+                        className="w-full"
+                        onClick={() => setSelectedAmount(50)}
+                        disabled={donationLoading}
+                      >
                         $50
                       </Button>
-                      <Button variant="outline" size="lg" className="w-full">
+                      <Button
+                        variant={selectedAmount === 100 ? "default" : "outline"}
+                        size="lg"
+                        className="w-full"
+                        onClick={() => setSelectedAmount(100)}
+                        disabled={donationLoading}
+                      >
                         $100
                       </Button>
-                      <Button variant="outline" size="lg" className="w-full">
+                      <Button
+                        variant={selectedAmount === 250 ? "default" : "outline"}
+                        size="lg"
+                        className="w-full"
+                        onClick={() => setSelectedAmount(250)}
+                        disabled={donationLoading}
+                      >
                         $250
                       </Button>
                     </div>

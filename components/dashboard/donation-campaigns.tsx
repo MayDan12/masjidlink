@@ -10,6 +10,7 @@ import { Heart, GraduationCap, Utensils, Home } from "lucide-react";
 import { auth } from "@/firebase/client";
 import { getDonationsCampaigns } from "@/app/(dashboards)/imam/donations/action";
 import { MosqueIcon } from "../icons/MosqueIcon";
+import { useRouter } from "next/navigation";
 
 type Campaign = {
   id: string;
@@ -29,6 +30,7 @@ export function DonationCampaigns() {
   const [activeTab, setActiveTab] = useState("all");
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   const fetchCampaigns = async () => {
     setLoading(true);
@@ -159,7 +161,14 @@ export function DonationCampaigns() {
               </div>
 
               <div className="mt-4 flex gap-2">
-                <Button className="w-full">Donate Now</Button>
+                <Button
+                  onClick={() =>
+                    router.push(`/dashboard/donate/${campaign.id}`)
+                  }
+                  className="w-full"
+                >
+                  View Donation
+                </Button>
                 <Button variant="outline" size="icon">
                   <Heart className="h-4 w-4" />
                   <span className="sr-only">Save Campaign</span>
