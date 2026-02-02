@@ -27,7 +27,7 @@ async function verifyUserToken(token: string) {
 export async function createCampaignDonationIntent(
   campaignId: string,
   amount: number,
-  token: string
+  token: string,
 ) {
   try {
     // Verify the user token and get user ID
@@ -93,7 +93,7 @@ export async function createCampaignDonationIntent(
 
 export async function confirmCampaignDonation(
   paymentIntentId: string,
-  token: string
+  token: string,
 ) {
   try {
     const userId = await verifyUserToken(token);
@@ -119,27 +119,20 @@ export async function confirmCampaignDonation(
     const donationDoc = donationsSnapshot.docs[0];
     const donationData = donationDoc.data();
 
+    if (
+      donationData.status === "succeeded" ||
+      donationData.status === "completed"
+    ) {
+      return {
+        success: true,
+        donationId: donationDoc.id,
+        amount: donationData.amount,
+      };
+    }
+
     // Update donation status
     await donationDoc.ref.update({
       status: "completed",
-      updatedAt: Timestamp.now(),
-    });
-
-    // Update campaign amount raised
-    const campaignRef = firestore
-      .collection("campaigns")
-      .doc(donationData.campaignId);
-    const campaignDoc = await campaignRef.get();
-    const campaignData = campaignDoc.data();
-
-    if (!campaignData) {
-    }
-
-    const newAmountRaised =
-      (campaignData?.amountRaised || 0) + donationData.amount;
-
-    await campaignRef.update({
-      amountRaised: newAmountRaised,
       updatedAt: Timestamp.now(),
     });
 

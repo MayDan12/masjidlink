@@ -315,8 +315,10 @@ export default function CampaignDetailsDonations({
                           id,
                           selectedAmount,
                         );
+
+                        // open in new tab
                         if (result?.url) {
-                          window.location.href = result.url as string;
+                          window.open(result.url as string, "_blank");
                         }
                       }}
                     >
