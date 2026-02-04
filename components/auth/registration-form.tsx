@@ -63,7 +63,7 @@ const formSchema = z
     {
       message: "Masjid information is required for Imam accounts.",
       path: ["masjidName"],
-    }
+    },
   );
 
 type FormValues = z.infer<typeof formSchema>;
@@ -108,6 +108,8 @@ export function RegistrationForm() {
         const errorData = await response.json();
         throw new Error(errorData.error || "Registration failed");
       }
+
+      console.log(response);
 
       setRegistered(true);
     } catch (err) {
