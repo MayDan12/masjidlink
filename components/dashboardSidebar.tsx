@@ -86,8 +86,13 @@ export function UnifiedSidebar({ role }: SidebarProps) {
     },
     {
       title: "Donations",
-      icon: DollarSign,
+      icon: Heart,
       href: "/imam/donations",
+    },
+    {
+      title: "Payment",
+      icon: DollarSign,
+      href: "/imam/payment",
     },
     {
       title: "Announcements",

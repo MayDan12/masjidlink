@@ -72,7 +72,6 @@ export function RegistrationForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
   const [registered, setRegistered] = useState(false);
 
@@ -108,8 +107,6 @@ export function RegistrationForm() {
         const errorData = await response.json();
         throw new Error(errorData.error || "Registration failed");
       }
-
-      console.log(response);
 
       setRegistered(true);
     } catch (err) {

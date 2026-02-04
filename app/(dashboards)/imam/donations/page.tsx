@@ -40,7 +40,7 @@ export default function DonationsPage() {
       <Tabs defaultValue="campaigns" className="space-y-4">
         <TabsList>
           <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
-          <TabsTrigger value="donors">Donors</TabsTrigger>
+          {/* <TabsTrigger value="donors">Donors</TabsTrigger> */}
           {/* <TabsTrigger value="reports">Reports</TabsTrigger> */}
         </TabsList>
 

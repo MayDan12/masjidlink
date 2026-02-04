@@ -301,11 +301,19 @@ export function DonationCampaigns() {
                     </div>
                   </CardContent>
                   <CardFooter className="flex justify-between">
-                    <Button variant="outline" size="sm">
+                    {/* <Button variant="outline" size="sm">
                       <Eye className="mr-2 h-4 w-4" />
                       View Donors
+                    </Button> */}
+                    <Button
+                      onClick={() => {
+                        setSelectedCampaign(campaign);
+                        setEditOpen(true);
+                      }}
+                      size="sm"
+                    >
+                      Manage Campaign
                     </Button>
-                    <Button size="sm">Manage Campaign</Button>
                   </CardFooter>
                 </Card>
               ))}

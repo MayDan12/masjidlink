@@ -1,7 +1,7 @@
 "use server";
 
 import { firestore, serverAuth } from "@/firebase/server";
-// import { sanitizeData } from "@/lib/sanitize";
+import { sanitizeData } from "@/lib/sanitize";
 import { checkUserRole } from "@/utils/server/auth";
 import { Timestamp } from "firebase-admin/firestore";
 import { getMasjidById } from "../../dashboard/masjids/action";
@@ -254,6 +254,65 @@ export async function getDonationsCampaigns() {
     return { success: true, campaigns };
   } catch (error) {
     console.error("Error fetching campaigns:", (error as Error).message);
+    return { success: false, message: (error as Error).message };
+  }
+}
+
+/**
+ * Get all donations targeting the current Imam (campaign and direct checkout).
+ */
+export async function getImamDonations(token: string) {
+  try {
+    const uid = await verifyImamToken(token);
+
+    const snapshot = await firestore
+      .collection("donations")
+      .where("imamId", "==", uid)
+      .orderBy("createdAt", "desc")
+      .get();
+
+    const donations = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...sanitizeData(data),
+      };
+    });
+
+    return { success: true, donations };
+  } catch (error) {
+    console.error("Error fetching imam donations:", (error as Error).message);
+    return { success: false, message: (error as Error).message };
+  }
+}
+
+/**
+ * Get all livestream donations targeting the current Imam.
+ */
+export async function getImamLiveDonations(token: string) {
+  try {
+    const uid = await verifyImamToken(token);
+
+    const snapshot = await firestore
+      .collection("live_donations")
+      .where("imamId", "==", uid)
+      .orderBy("createdAt", "desc")
+      .get();
+
+    const donations = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...sanitizeData(data),
+      };
+    });
+
+    return { success: true, donations };
+  } catch (error) {
+    console.error(
+      "Error fetching imam live donations:",
+      (error as Error).message,
+    );
     return { success: false, message: (error as Error).message };
   }
 }

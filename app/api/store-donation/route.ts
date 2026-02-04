@@ -16,12 +16,20 @@ async function verifyUserToken(token: string) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { imamId, token, amount, message, anonymous, paymentIntentId } = body;
+    const {
+      imamId,
+      token,
+      amount,
+      message,
+      anonymous,
+      paymentIntentId,
+      status,
+    } = body;
 
-    if (!imamId || !token || !amount || !paymentIntentId) {
+    if (!imamId || !token || !amount || !paymentIntentId || !status) {
       return Response.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -31,6 +39,7 @@ export async function POST(req: Request) {
       imamId,
       userId,
       amount,
+      status,
       message: message || "",
       anonymous: !!anonymous,
       paymentIntentId,
@@ -44,7 +53,7 @@ export async function POST(req: Request) {
     console.error("Error storing donation:", err);
     return Response.json(
       { success: false, error: err.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

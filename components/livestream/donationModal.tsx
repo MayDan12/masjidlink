@@ -66,6 +66,7 @@ function DonationModal({ isOpen, onClose, imamId }: DonationModalProps) {
             message,
             anonymous: isAnonymous,
             paymentIntentId: result.paymentIntent.id,
+            status: "succeeded",
           }),
         });
         onClose();

@@ -84,7 +84,7 @@ export function MasjidMediaManager() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredImages.map((image) => (
                 <div
-                  key={image.id}
+                  key={image.name}
                   className="group relative border rounded-lg overflow-hidden"
                 >
                   <Image
