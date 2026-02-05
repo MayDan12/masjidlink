@@ -116,6 +116,57 @@ export function RegistrationForm() {
     }
   };
 
+  //  const onSubmit = async (values: FormValues) => {
+  //   setIsLoading(true);
+  //   setError(null);
+
+  //   try {
+  //     const userCredential = await createUserWithEmailAndPassword(
+  //       auth,
+  //       values.email,
+  //       values.password,
+  //     );
+  //     const token = await userCredential.user.getIdToken();
+  //     if (!token) {
+  //       throw new Error("Failed to get ID token");
+  //     }
+
+  //     const response = await fetch("/api/auth/register", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //       body: JSON.stringify(values),
+  //     });
+
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       throw new Error(errorData.error || "Registration failed");
+  //     }
+
+  //     const data = await response.json();
+  //     if (data.role === "imam") {
+  //       // Create Stripe account for Imam
+  //       const stripeAccountId = await fetch("/api/stripe/account-creation", {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //         body: JSON.stringify({ imamId: data.masjidId }),
+  //       });
+  //       const stripeAccountIdData = await stripeAccountId.json();
+  //     }
+
+  //     setRegistered(true);
+  //   } catch (err) {
+  //     setError(err instanceof Error ? err.message : "Registration failed");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
   if (registered) {
     return (
       <div className="flex flex-col items-center justify-center space-y-4 py-6">

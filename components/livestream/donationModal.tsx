@@ -73,7 +73,7 @@ function DonationModal({ isOpen, onClose, imamId }: DonationModalProps) {
       }
     } catch (err: any) {
       console.error(err);
-      alert(err.message);
+      alert(err.message || "An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }

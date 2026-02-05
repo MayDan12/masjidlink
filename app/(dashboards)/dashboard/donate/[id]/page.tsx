@@ -62,6 +62,7 @@ export default function CampaignDetailsDonations({
   params: { id: string };
 }) {
   const { id } = params;
+
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [loading, setLoading] = useState(true);
   const { createDonationCheckoutSession, loading: donationLoading } =

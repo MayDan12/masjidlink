@@ -88,9 +88,10 @@ export async function POST(request: NextRequest) {
       amountInCents,
       userId,
     });
-    const successUrl = `masjidlink://stripe-redirect?status=success&donationId=${donationRef.id}`;
-    const cancelUrl = `masjidlink://stripe-redirect?status=cancel&donationId=${donationRef.id}`;
-
+    // const successUrl = `masjidlink://stripe-redirect?status=success&donationId=${donationRef.id}`;
+    // const cancelUrl = `masjidlink://stripe-redirect?status=cancel&donationId=${donationRef.id}`;
+    const successUrl = `${process.env.NEXT_PUBLIC_API_URL}/donate/${campaignId}?status=success&donationId=${donationRef.id}`;
+    const cancelUrl = `${process.env.NEXT_PUBLIC_API_URL}/donate/${campaignId}?status=cancel&donationId=${donationRef.id}`;
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       success_url: successUrl,
@@ -106,6 +107,10 @@ export async function POST(request: NextRequest) {
         },
       ],
       payment_intent_data: {
+        // transfer_data: {
+        //   destination: campaign.imamId,
+        // },
+        application_fee_amount: Math.round(amountInCents * 0.05),
         metadata: {
           campaignId,
           userId,
@@ -115,6 +120,7 @@ export async function POST(request: NextRequest) {
           source: "checkout",
         },
       },
+
       metadata: {
         campaignId,
         userId,
