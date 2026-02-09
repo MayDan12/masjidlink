@@ -34,6 +34,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { EventEditForm } from "./event-edit-form";
 import CreateMeetingButton from "@/app/(dashboards)/livestream/CreateMeetingButton";
 import Link from "next/link";
+import { Skeleton } from "../ui/skeleton";
 
 export function EventsList() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -121,7 +122,7 @@ export function EventsList() {
     (event) =>
       event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.description.toLowerCase().includes(searchQuery.toLowerCase())
+      event.description.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const getEventTypeColor = (type: EventType) => {
@@ -146,7 +147,13 @@ export function EventsList() {
   };
 
   if (isLoading) {
-    return <div>Loading events...</div>;
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-8 w-full" />
+      </div>
+    );
   }
 
   const EventActions = ({ event }: { event: Event }) => (

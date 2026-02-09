@@ -42,6 +42,7 @@ import {
   getDonationCampaigns,
 } from "@/app/(dashboards)/imam/donations/action";
 import { auth } from "@/firebase/client";
+import { Skeleton } from "../ui/skeleton";
 
 type Campaign = {
   id: string;
@@ -196,8 +197,15 @@ export function DonationCampaigns() {
 
         <TabsContent value={activeTab} className="mt-6">
           {loading ? (
-            <div className="text-center py-12">
-              <Loader size={28} className="animate-spin" />
+            <div className="grid gap-6 md:grid-cols-2">
+              {[1, 2, 3, 4].map((i) => (
+                <Card key={i}>
+                  <CardContent className="p-4">
+                    <Skeleton className="h-8 w-full" />
+                    <Skeleton className="h-8 w-full" />
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           ) : filteredCampaigns.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2">
