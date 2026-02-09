@@ -3,6 +3,8 @@
 // import { firestore } from "@/firebase/server";
 // import { serverAuth } from "@/firebase/server";
 
+import { NextResponse } from "next/server";
+
 // const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 // export async function POST(req: Request) {
@@ -59,3 +61,7 @@
 //     return NextResponse.json({ error: error.message }, { status: 500 });
 //   }
 // }
+// Create an api that return's i am fine
+export async function GET(req: Request) {
+  return NextResponse.json({ message: "I am fine" });
+}
