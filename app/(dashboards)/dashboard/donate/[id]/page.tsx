@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button"; // Assuming you have shadcn/ui
 import { Card, CardContent } from "@/components/ui/card"; // Assuming you have shadcn/ui
 import { Skeleton } from "@/components/ui/skeleton"; // Assuming you have shadcn/ui
 import { useCampaignDonation } from "@/hooks/useCampaignDonation";
+import { Input } from "@/components/ui/input";
 
 type Campaign = {
   id: string;
@@ -364,6 +365,18 @@ export default function CampaignDetailsDonations({
                       >
                         $250
                       </Button>
+                    </div>
+
+                    {/* A text input to put desires amount */}
+                    <div className="flex items-center justify-center">
+                      <Input
+                        type="number"
+                        placeholder="Enter custom amount"
+                        className="w-full"
+                        onChange={(e) =>
+                          setSelectedAmount(Number(e.target.value))
+                        }
+                      />
                     </div>
 
                     <Button variant="ghost" size="lg" className="w-full gap-2">

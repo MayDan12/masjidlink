@@ -14,6 +14,8 @@ import { Card, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Progress } from "../ui/progress";
+import { Masjid } from "@/types/masjid";
+import { getAllMasjids } from "@/app/(dashboards)/dashboard/masjids/action";
 
 type PrayerTimesDisplayProps = {
   view?: "daily" | "weekly" | "monthly";
@@ -51,11 +53,38 @@ export function PrayerTimesDisplay({
   view = "daily",
 }: PrayerTimesDisplayProps) {
   /* -------------------- 2️⃣  STATE --------------------------- */
-  const [selectedMasjid, setSelectedMasjid] = useState("masjid-al-noor");
+  const [selectedMasjid, setSelectedMasjid] = useState("");
   const [currentPrayer, setCurrentPrayer] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const nextTimeout = useRef<NodeJS.Timeout | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [masjids, setMasjids] = useState<Masjid[]>([]);
+
+  useEffect(() => {
+    const fetchAllMasjids = async () => {
+      setLoading(true);
+      try {
+        const response = await getAllMasjids();
+        if (response.success) {
+          setMasjids(response.data);
+        } else {
+          console.error("Failed to fetch masjids:", response.message);
+        }
+      } catch (error) {
+        console.error("Error fetching masjids:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllMasjids();
+  }, []);
+
+  // using the details of the seected masjid to get the prayer times
+  const selectedMasjidDetails = useMemo(() => {
+    return masjids.find((masjid) => masjid.id === selectedMasjid);
+  }, [masjids, selectedMasjid]);
 
   /* -------------------- 3️⃣  DAILY DATA (mock) --------------- */
   const prayerTimes = useMemo<PrayerTime[]>(
@@ -145,9 +174,11 @@ export function PrayerTimesDisplay({
               <SelectValue placeholder="Select a masjid" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="masjid-al-noor">Masjid Al-Noor</SelectItem>
-              <SelectItem value="islamic-center">Islamic Center</SelectItem>
-              <SelectItem value="masjid-al-rahman">Masjid Al-Rahman</SelectItem>
+              {masjids.map((masjid) => (
+                <SelectItem key={masjid.id} value={masjid.id}>
+                  {masjid.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
@@ -218,15 +249,27 @@ export function PrayerTimesDisplay({
             <SelectValue placeholder="Select a masjid" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="masjid-al-noor">Masjid Al‑Noor</SelectItem>
-            <SelectItem value="islamic-center">Islamic Center</SelectItem>
-            <SelectItem value="masjid-al-rahman">Masjid Al‑Rahman</SelectItem>
+            {/* There should be a default one */}
+
+            {masjids.map((masjid) => (
+              <SelectItem
+                onSelect={() => setSelectedMasjid(masjid.id)}
+                key={masjid.id}
+                value={masjid.id}
+              >
+                {masjid.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
         <div className="flex items-center text-sm text-muted-foreground">
           <MapPin className="h-4 w-4 mr-1" />
-          Chicago, IL
+          {!selectedMasjidDetails ? (
+            <span className="text-muted-foreground">No location available</span>
+          ) : (
+            selectedMasjidDetails.address
+          )}
           <span className="mx-2">•</span>
           <Calendar className="h-4 w-4 mr-1" />
           {new Date().toLocaleDateString("en-US", {

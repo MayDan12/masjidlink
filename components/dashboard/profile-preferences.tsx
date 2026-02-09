@@ -22,7 +22,6 @@ const preferencesFormSchema = z.object({
   notifications: z.object({
     email: z.boolean(),
     push: z.boolean(),
-    sms: z.boolean(),
   }),
   emailPreferences: z.object({
     announcements: z.boolean(),
@@ -64,7 +63,6 @@ export function ProfilePreferences() {
     notifications: {
       email: true,
       push: true,
-      sms: false,
     },
     emailPreferences: {
       announcements: true,
@@ -156,28 +154,6 @@ export function ProfilePreferences() {
                     </FormLabel>
                     <FormDescription>
                       Receive notifications on your device
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="notifications.sms"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">
-                      SMS Notifications
-                    </FormLabel>
-                    <FormDescription>
-                      Receive notifications via text message
                     </FormDescription>
                   </div>
                   <FormControl>

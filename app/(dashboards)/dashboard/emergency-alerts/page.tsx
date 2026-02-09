@@ -7,10 +7,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertsHistory } from "@/components/dashboard/alerts-history";
+// import { AlertsHistory } from "@/components/dashboard/alerts-history";
 // import { AlertsSettings } from "@/components/dashboard/alerts-settings";
 // import { AlertsSubscriptions } from "@/components/dashboard/alerts-subscriptions";
-import { AlertTriangle, ListFilter } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 
 export default function EmergencyAlertsPage() {
   return (
@@ -37,10 +37,10 @@ export default function EmergencyAlertsPage() {
             <AlertTriangle className="h-4 w-4" />
             <span>Active Alerts</span>
           </TabsTrigger>
-          <TabsTrigger value="history" className="flex items-center gap-1">
+          {/* <TabsTrigger value="history" className="flex items-center gap-1">
             <ListFilter className="h-4 w-4" />
             <span>History</span>
-          </TabsTrigger>
+          </TabsTrigger> */}
           {/* <TabsTrigger
             value="subscriptions"
             className="flex items-center gap-1"
@@ -77,7 +77,7 @@ export default function EmergencyAlertsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="history" className="space-y-4">
+        {/* <TabsContent value="history" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Alert History</CardTitle>
@@ -89,7 +89,7 @@ export default function EmergencyAlertsPage() {
               <AlertsHistory />
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent> */}
         {/* 
         <TabsContent value="subscriptions" className="space-y-4">
           <Card>

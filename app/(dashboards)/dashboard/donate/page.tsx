@@ -32,14 +32,14 @@ export default function DonatePage() {
             <Heart className="h-4 w-4" />
             <span>Campaigns</span>
           </TabsTrigger>
-          <TabsTrigger value="history" className="flex items-center gap-1">
+          {/* <TabsTrigger value="history" className="flex items-center gap-1">
             <History className="h-4 w-4" />
             <span>History</span>
-          </TabsTrigger>
-          <TabsTrigger value="recurring" className="flex items-center gap-1">
+          </TabsTrigger> */}
+          {/* <TabsTrigger value="recurring" className="flex items-center gap-1">
             <RefreshCw className="h-4 w-4" />
             <span>Recurring</span>
-          </TabsTrigger>
+          </TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="campaigns" className="space-y-4">
@@ -57,7 +57,7 @@ export default function DonatePage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="history" className="space-y-4">
+        {/* <TabsContent value="history" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Donation History</CardTitle>
@@ -69,9 +69,9 @@ export default function DonatePage() {
               <DonationHistory />
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent> */}
 
-        <TabsContent value="recurring" className="space-y-4">
+        {/* <TabsContent value="recurring" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Recurring Donations</CardTitle>
@@ -83,7 +83,7 @@ export default function DonatePage() {
               <RecurringDonations />
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
     </div>
   );

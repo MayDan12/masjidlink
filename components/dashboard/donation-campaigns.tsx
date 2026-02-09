@@ -11,6 +11,7 @@ import { auth } from "@/firebase/client";
 import { getDonationsCampaigns } from "@/app/(dashboards)/imam/donations/action";
 import { MosqueIcon } from "../icons/MosqueIcon";
 import { useRouter } from "next/navigation";
+import { Skeleton } from "../ui/skeleton";
 
 type Campaign = {
   id: string;
@@ -107,48 +108,57 @@ export function DonationCampaigns() {
       </Tabs>
 
       {loading ? (
-        <div className="flex mt-20 justify-center items-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <Card key={index} className="border-primary/50">
+              <CardContent className="p-4">
+                <Skeleton className="animate-pulse flex items-center justify-center h-48 bg-muted"></Skeleton>
+                <Skeleton className="flex justify-between items-center mt-4">
+                  <Skeleton className="h-4 w-24 bg-muted"></Skeleton>
+                  <Skeleton className="h-4 w-12 bg-muted"></Skeleton>
+                </Skeleton>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       ) : (
-        ""
-      )}
-
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredCampaigns.map((campaign) => (
-          <Card
-            key={campaign.id}
-            className={campaign.status === "active" ? "border-primary/50" : ""}
-          >
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between">
-                <h3 className="font-medium">{campaign.title}</h3>
-                <Badge className="flex items-center gap-1">
-                  {getCategoryIcon(campaign.category)}
-                  <span className="capitalize">{campaign.category}</span>
-                </Badge>
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                {campaign.status === "active" ? "Active" : "Completed"}
-              </p>
-              <p className="text-sm mt-2 line-clamp-2">
-                {campaign.description}
-              </p>
-
-              <div className="mt-4 space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="font-medium">
-                    ${campaign.amountRaised.toLocaleString()}
-                  </span>
-                  <span className="text-muted-foreground">
-                    ${campaign.goal_amount.toLocaleString()} goal
-                  </span>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {filteredCampaigns.map((campaign) => (
+            <Card
+              key={campaign.id}
+              className={
+                campaign.status === "active" ? "border-primary/50" : ""
+              }
+            >
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between">
+                  <h3 className="font-medium">{campaign.title}</h3>
+                  <Badge className="flex items-center gap-1">
+                    {getCategoryIcon(campaign.category)}
+                    <span className="capitalize">{campaign.category}</span>
+                  </Badge>
                 </div>
-                <Progress
-                  value={(campaign.amountRaised / campaign.goal_amount) * 100}
-                  className="h-2"
-                />
-                {/* <div className="flex justify-between text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground mt-1">
+                  {campaign.status === "active" ? "Active" : "Completed"}
+                </p>
+                <p className="text-sm mt-2 line-clamp-2">
+                  {campaign.description}
+                </p>
+
+                <div className="mt-4 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="font-medium">
+                      ${campaign.amountRaised.toLocaleString()}
+                    </span>
+                    <span className="text-muted-foreground">
+                      ${campaign.goal_amount.toLocaleString()} goal
+                    </span>
+                  </div>
+                  <Progress
+                    value={(campaign.amountRaised / campaign.goal_amount) * 100}
+                    className="h-2"
+                  />
+                  {/* <div className="flex justify-between text-xs text-muted-foreground">
                   <span className="flex items-center">
                     <Users className="h-3 w-3 mr-1" />
                     {campaign.donors} donors
@@ -158,26 +168,27 @@ export function DonationCampaigns() {
                     {campaign.daysLeft} days left
                   </span>
                 </div> */}
-              </div>
+                </div>
 
-              <div className="mt-4 flex gap-2">
-                <Button
-                  onClick={() =>
-                    router.push(`/dashboard/donate/${campaign.id}`)
-                  }
-                  className="w-full"
-                >
-                  View Donation
-                </Button>
-                <Button variant="outline" size="icon">
-                  <Heart className="h-4 w-4" />
-                  <span className="sr-only">Save Campaign</span>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                <div className="mt-4 flex gap-2">
+                  <Button
+                    onClick={() =>
+                      router.push(`/dashboard/donate/${campaign.id}`)
+                    }
+                    className="w-full"
+                  >
+                    View Donation
+                  </Button>
+                  <Button variant="outline" size="icon">
+                    <Heart className="h-4 w-4" />
+                    <span className="sr-only">Save Campaign</span>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {/* {filteredCampaigns.length === 0 && (
         <div className="text-center py-12">

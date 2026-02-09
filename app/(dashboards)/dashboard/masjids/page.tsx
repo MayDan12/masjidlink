@@ -8,9 +8,9 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MasjidsList } from "@/components/dashboard/masjids-list";
 import { MasjidMap } from "@/components/dashboard/masjid-map";
-import { SavedMasjids } from "@/components/dashboard/saved-masjids";
+// import { SavedMasjids } from "@/components/dashboard/saved-masjids";
 // import { MasjidSearch } from "@/components/dashboard/masjid-search";
-import { MapPin, Heart, Search } from "lucide-react";
+import { MapPin, Search } from "lucide-react";
 
 export default function MasjidsPage() {
   return (
