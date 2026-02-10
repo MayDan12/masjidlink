@@ -242,7 +242,7 @@ export function UnifiedSidebar({ role }: SidebarProps) {
     default:
       routes = userRoutes;
       dashboardTitle = "Dashboard";
-      dashboardPath = "/";
+      dashboardPath = "/dashboard";
       break;
   }
 

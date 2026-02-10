@@ -60,11 +60,8 @@ export function MasjidsList() {
   };
 
   const filteredMasjids = useMemo(() => {
-    return masjids.filter(
-      (masjid) =>
-        masjid.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        masjid.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        masjid.city.toLowerCase().includes(searchQuery.toLowerCase()),
+    return masjids.filter((masjid) =>
+      masjid.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   }, [masjids, searchQuery]);
 

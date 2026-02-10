@@ -107,10 +107,6 @@ export async function POST(request: NextRequest) {
         },
       ],
       payment_intent_data: {
-        // transfer_data: {
-        //   destination: campaign.imamId,
-        // },
-        application_fee_amount: Math.round(amountInCents * 0.05),
         metadata: {
           campaignId,
           userId,

@@ -31,7 +31,15 @@ import {
   getImamDonations,
   getImamLiveDonations,
 } from "@/app/(dashboards)/imam/donations/action";
-import { DollarSign, History, Wallet, Loader } from "lucide-react";
+import {
+  DollarSign,
+  History,
+  Wallet,
+  Loader,
+  ExternalLink,
+} from "lucide-react";
+import { getImamStripeStatus, createStripeLoginLink } from "./action";
+import { toast } from "sonner";
 
 type DonationRecord = {
   id: string;
@@ -63,6 +71,76 @@ export default function Payments() {
   const [donations, setDonations] = useState<DonationRecord[]>([]);
   const [liveDonations, setLiveDonations] = useState<LiveDonationRecord[]>([]);
   const [withdrawOpen, setWithdrawOpen] = useState<boolean>(false);
+  const [stripeStatus, setStripeStatus] = useState<{
+    connected: boolean;
+    accountId?: string;
+    detailsSubmitted?: boolean;
+  } | null>(null);
+  const [stripeLoading, setStripeLoading] = useState(false);
+
+  const fetchStripeStatus = useCallback(async () => {
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) return;
+      const res = await getImamStripeStatus(token);
+      if (res && !res.error) {
+        setStripeStatus({
+          connected: res.connected ?? false,
+          accountId: res.accountId,
+          detailsSubmitted: res.detailsSubmitted,
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
+  const handleConnectStripe = async () => {
+    setStripeLoading(true);
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) return;
+
+      const res = await fetch("/api/stripe/account-creation", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      if (data.onboardingUrl) {
+        window.location.href = data.onboardingUrl;
+      } else if (data.error) {
+        toast.error(data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to initiate Stripe connection");
+    } finally {
+      setStripeLoading(false);
+    }
+  };
+
+  const handleLoginStripe = async () => {
+    setStripeLoading(true);
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) return;
+
+      const res = await createStripeLoginLink(token);
+      if (res.url) {
+        window.open(res.url, "_blank");
+      } else {
+        toast.error(res.error || "Failed to create login link");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to create login link");
+    } finally {
+      setStripeLoading(false);
+    }
+  };
 
   const totalReceived = useMemo(() => {
     const all = [...donations, ...liveDonations];
@@ -147,11 +225,14 @@ export default function Payments() {
 
   useEffect(() => {
     const unsub = auth.onAuthStateChanged((u) => {
-      if (u) fetchData();
+      if (u) {
+        fetchData();
+        fetchStripeStatus();
+      }
     });
 
     return () => unsub();
-  }, [fetchData]);
+  }, [fetchData, fetchStripeStatus]);
 
   const allDonations: DonationRecord[] = useMemo(
     () =>
@@ -410,22 +491,58 @@ export default function Payments() {
           <DialogHeader>
             <DialogTitle>Withdraw Funds</DialogTitle>
             <DialogDescription>
-              Stripe Connect integration coming soon.
+              {stripeStatus?.connected
+                ? "Manage your payouts and view balance."
+                : "Connect your bank account to receive payouts."}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-3 text-sm text-muted-foreground">
-            <p>
-              Withdrawals will be processed via Stripe Connect. You will be able
-              to link your bank account and request payouts directly from this
-              dashboard.
-            </p>
-            <p>In the meantime, track incoming donations above.</p>
+          <div className="space-y-4 py-4">
+            {!stripeStatus?.connected ? (
+              <div className="space-y-3 text-sm text-muted-foreground">
+                <p>
+                  To withdraw funds, you need to connect a Stripe Express
+                  account. This allows you to link your bank account and receive
+                  automatic payouts.
+                </p>
+                {stripeStatus?.accountId && !stripeStatus?.detailsSubmitted && (
+                  <div className="rounded-md bg-yellow-50 p-3 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200">
+                    You have created an account but haven&apos;t finished
+                    onboarding. Please continue below.
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-3 text-sm text-muted-foreground">
+                <p>
+                  Your account is connected! You can view your balance and
+                  payout history on the Stripe dashboard.
+                </p>
+              </div>
+            )}
           </div>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setWithdrawOpen(false)}>
               Close
             </Button>
-            <Button disabled>Request Withdrawal</Button>
+            {!stripeStatus?.connected || !stripeStatus?.detailsSubmitted ? (
+              <Button onClick={handleConnectStripe} disabled={stripeLoading}>
+                {stripeLoading && (
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                {stripeStatus?.accountId
+                  ? "Continue Onboarding"
+                  : "Connect with Stripe"}
+              </Button>
+            ) : (
+              <Button onClick={handleLoginStripe} disabled={stripeLoading}>
+                {stripeLoading ? (
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                )}
+                View Stripe Dashboard
+              </Button>
+            )}
           </div>
         </DialogContent>
       </Dialog>

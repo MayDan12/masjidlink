@@ -318,6 +318,8 @@ export default function CampaignDetailsDonations({
                           selectedAmount,
                         );
 
+                        // console.log(result);
+
                         // open in new tab
                         if (result?.url) {
                           window.open(result.url as string, "_blank");
