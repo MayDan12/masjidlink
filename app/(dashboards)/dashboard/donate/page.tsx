@@ -7,9 +7,9 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DonationCampaigns } from "@/components/dashboard/donation-campaigns";
-import { DonationHistory } from "@/components/dashboard/donation-history";
-import { RecurringDonations } from "@/components/dashboard/recurring-donations";
-import { Heart, History, RefreshCw } from "lucide-react";
+// import { DonationHistory } from "@/components/dashboard/donation-history";
+// import { RecurringDonations } from "@/components/dashboard/recurring-donations";
+import { Heart } from "lucide-react";
 import { DonationSearch } from "@/components/dashboard/donation-search";
 
 export default function DonatePage() {

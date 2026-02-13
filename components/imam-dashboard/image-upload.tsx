@@ -12,7 +12,11 @@ import { auth } from "@/firebase/client";
 import { uploadMasjidImage } from "@/app/(dashboards)/imam/profile/action";
 import { Loader2 } from "lucide-react";
 
-export default function UploadForm() {
+type UploadFormProps = {
+  getImages: () => void;
+};
+
+export default function UploadForm({ getImages }: UploadFormProps) {
   const [imageName, setImageName] = useState("");
   const [imageType, setImageType] = useState("");
   const [masjidImage, setMasjidImage] = useState<string>("");
@@ -79,6 +83,7 @@ export default function UploadForm() {
     setMasjidImage("");
     setImageName("");
     setImageType("");
+    getImages();
   };
 
   return (

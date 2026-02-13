@@ -116,6 +116,7 @@ export const getMasjidProfile = async (token: string) => {
 // let's add the image upload action
 
 export const uploadMasjidImage = async (data: {
+  id?: string;
   imageUrl: string;
   name: string;
   type: string;
@@ -135,6 +136,11 @@ export const uploadMasjidImage = async (data: {
 
   const uid = verifiedToken.uid;
   const userDocRef = firestore.collection("masjids").doc(uid);
+  // add id to the image object
+  const imageId = randomInt(1000000, 9999999).toString();
+
+  // add id to the image object
+  masjidImage.id = imageId;
 
   await userDocRef.update({
     images: FieldValue.arrayUnion({
@@ -178,5 +184,51 @@ export const getMasjidImages = async (token: string) => {
   return {
     success: true,
     data: sanitizedData.images,
+  };
+};
+
+export const deleteMasjidImage = async (token: string, imageId: string) => {
+  if (!imageId) {
+    return {
+      error: true,
+      message: "Image ID is required.",
+    };
+  }
+
+  const verifiedToken = await serverAuth.verifyIdToken(token);
+  const userRole = await checkUserRole(verifiedToken.uid);
+
+  if (userRole !== "imam") {
+    return {
+      error: true,
+      message: "Unauthorized: Only imams can update their profile.",
+    };
+  }
+
+  const uid = verifiedToken.uid;
+  const userDocRef = firestore.collection("masjids").doc(uid);
+
+  const userSnap = await userDocRef.get();
+
+  if (!userSnap.exists) {
+    return {
+      error: true,
+      message: "Masjid not found.",
+    };
+  }
+
+  const data = userSnap.data();
+  const images = data?.images || [];
+
+  const updatedImages = images.filter((image: any) => image.id !== imageId);
+
+  await userDocRef.update({
+    images: updatedImages,
+    updatedAt: new Date().toISOString(),
+  });
+
+  return {
+    success: true,
+    message: "Masjid image deleted successfully.",
   };
 };

@@ -15,7 +15,11 @@ import { Trash2 } from "lucide-react";
 import UploadForm from "./image-upload";
 import Image from "next/image";
 import { auth } from "@/firebase/client";
-import { getMasjidImages } from "@/app/(dashboards)/imam/profile/action";
+import {
+  deleteMasjidImage,
+  getMasjidImages,
+} from "@/app/(dashboards)/imam/profile/action";
+import { toast } from "sonner";
 
 type ImageType = {
   id: string;
@@ -51,8 +55,18 @@ export function MasjidMediaManager() {
       ? images
       : images.filter((image) => image.type === selectedTab);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
+    const token = await auth?.currentUser?.getIdToken();
+    if (!token) {
+      throw new Error("User not authenticated");
+    }
+    const response = await deleteMasjidImage(token, id);
+    if (response.error) {
+      throw new Error(response.message);
+    }
     setImages(images.filter((image) => image.id !== id));
+    toast.success("Image deleted successfully");
+    getImages();
   };
 
   return (
@@ -65,7 +79,7 @@ export function MasjidMediaManager() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <UploadForm />
+        <UploadForm getImages={getImages} />
 
         <Tabs
           defaultValue="all"
