@@ -132,46 +132,46 @@ export function UnifiedSidebar({ role }: SidebarProps) {
       icon: LayoutDashboard,
       href: "/admin",
     },
-    {
-      title: "Masjid Verification",
-      icon: Mosque,
-      href: "/admin/masjids",
-    },
-    {
-      title: "User Management",
-      icon: Users,
-      href: "/admin/users",
-    },
-    {
-      title: "Content Moderation",
-      icon: Flag,
-      href: "/admin/moderation",
-    },
-    {
-      title: "Announcements",
-      icon: Bell,
-      href: "/admin/announcements",
-    },
-    {
-      title: "Message Center",
-      icon: MessageSquare,
-      href: "/admin/messages",
-    },
-    {
-      title: "Analytics",
-      icon: BarChart,
-      href: "/admin/analytics",
-    },
-    {
-      title: "Platform Settings",
-      icon: Settings,
-      href: "/admin/settings",
-    },
-    {
-      title: "Admin Access",
-      icon: Shield,
-      href: "/admin/access",
-    },
+    // {
+    //   title: "Masjid Verification",
+    //   icon: Mosque,
+    //   href: "/admin/masjids",
+    // },
+    // {
+    //   title: "User Management",
+    //   icon: Users,
+    //   href: "/admin/users",
+    // },
+    // {
+    //   title: "Content Moderation",
+    //   icon: Flag,
+    //   href: "/admin/moderation",
+    // },
+    // {
+    //   title: "Announcements",
+    //   icon: Bell,
+    //   href: "/admin/announcements",
+    // },
+    // {
+    //   title: "Message Center",
+    //   icon: MessageSquare,
+    //   href: "/admin/messages",
+    // },
+    // {
+    //   title: "Analytics",
+    //   icon: BarChart,
+    //   href: "/admin/analytics",
+    // },
+    // {
+    //   title: "Platform Settings",
+    //   icon: Settings,
+    //   href: "/admin/settings",
+    // },
+    // {
+    //   title: "Admin Access",
+    //   icon: Shield,
+    //   href: "/admin/access",
+    // },
   ];
 
   const userRoutes: Route[] = [

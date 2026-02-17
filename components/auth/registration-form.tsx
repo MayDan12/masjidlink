@@ -28,6 +28,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import GoogleButton from "./google-button";
+import { useRouter } from "next/navigation";
 
 // Form validation schema
 const formSchema = z
@@ -74,6 +75,7 @@ export function RegistrationForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [registered, setRegistered] = useState(false);
+  const router = useRouter();
 
   // Initialize form
   const form = useForm<FormValues>({
@@ -108,6 +110,10 @@ export function RegistrationForm() {
         throw new Error(errorData.error || "Registration failed");
       }
 
+      if (values.role === "imam") {
+        // Redirect to components/imamverfily.html
+        router.push("/imamsverfily.html");
+      }
       setRegistered(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");

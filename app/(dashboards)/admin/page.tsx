@@ -1,3 +1,4 @@
+"use client";
 import {
   Card,
   CardContent,
@@ -9,10 +10,33 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardHeader } from "@/components/admin-dashboard/dashboard-header";
 import { AdminStats } from "@/components/admin-dashboard/admin-stats";
 import { MasjidVerificationQueue } from "@/components/admin-dashboard/masjid-verification-queue";
-import { RecentUserSignups } from "@/components/admin-dashboard/recent-user-signup";
-import { ReportedContent } from "@/components/admin-dashboard/reported-content";
+// import { RecentUserSignups } from "@/components/admin-dashboard/recent-user-signup";
+// import { ReportedContent } from "@/components/admin-dashboard/reported-content";
+import { useEffect, useState } from "react";
+import { getUsersAndMasjids } from "./action";
+import { User } from "@/types/user";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export default function AdminDashboardPage() {
+  const [data, setData] = useState<{
+    users: User[];
+    masjids: User[];
+  } | null>(null);
+
+  useEffect(() => {
+    getUsersAndMasjids().then((res) => {
+      if (res.success) {
+        setData(res.data);
+      }
+    });
+  }, []);
   return (
     <div className="space-y-6">
       <DashboardHeader
@@ -25,12 +49,14 @@ export default function AdminDashboardPage() {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="masjids">Masjids</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <AdminStats />
+            <AdminStats
+              users={data?.users || []}
+              masjids={data?.masjids || []}
+            />
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -42,11 +68,11 @@ export default function AdminDashboardPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <MasjidVerificationQueue />
+                <MasjidVerificationQueue masjids={data?.masjids || []} />
               </CardContent>
             </Card>
 
-            <Card className="lg:col-span-1">
+            {/* <Card className="lg:col-span-1">
               <CardHeader>
                 <CardTitle>Recent User Signups</CardTitle>
                 <CardDescription>
@@ -56,10 +82,10 @@ export default function AdminDashboardPage() {
               <CardContent>
                 <RecentUserSignups />
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
 
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle>Reported Content</CardTitle>
               <CardDescription>
@@ -69,7 +95,7 @@ export default function AdminDashboardPage() {
             <CardContent>
               <ReportedContent />
             </CardContent>
-          </Card>
+          </Card> */}
         </TabsContent>
 
         <TabsContent value="masjids" className="space-y-4">
@@ -81,9 +107,7 @@ export default function AdminDashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Complete masjid management interface will be shown here.
-              </p>
+              <MasjidVerificationQueue masjids={data?.masjids || []} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -97,25 +121,27 @@ export default function AdminDashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Complete user management interface will be shown here.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="reports" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Content Reports</CardTitle>
-              <CardDescription>
-                Review and moderate all reported content.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Complete content moderation interface will be shown here.
-              </p>
+              {/* format in good table form */}
+              {data?.users.length ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Email</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data?.users.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell>{user.name}</TableCell>
+                        <TableCell>{user.email}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div>No users found</div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

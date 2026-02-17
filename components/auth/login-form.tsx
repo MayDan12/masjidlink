@@ -22,6 +22,7 @@ import GoogleButton from "./google-button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/auth";
 import { toast } from "sonner";
+import { getMasjidById } from "@/app/(dashboards)/dashboard/masjids/action";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -60,45 +61,63 @@ export function LoginForm() {
     try {
       const result = await signIn(data.email, data.password);
 
-      if (!result || !result.user) {
+      if (!result?.user) {
         throw new Error("Invalid login credentials.");
       }
 
       const userRole = result.role;
+      if (!userRole) throw new Error("Unauthorized: No role assigned.");
 
-      if (!userRole) {
-        throw new Error("Unauthorized: No role assigned to user.");
+      // Special handling for imam
+      if (userRole === "imam") {
+        const imamProfile = await getMasjidById(result.user.user.uid);
+        if (!imamProfile) {
+          throw new Error("Imam profile not found.");
+        }
+
+        if (!imamProfile.data.imamApproved) {
+          // Block login entirely
+          toast.error(
+            "Imam profile is not complete. Please contact the admin.",
+            {
+              position: "top-right",
+            },
+          );
+          setErrorMessage(
+            "Imam profile is not complete. Please contact the admin at masjidlink6@gmail.com",
+          );
+          return; // <-- STOP here, no redirects
+        }
+
+        // Approved imam goes to their dashboard
+        router.push("/imam");
+        return; // <-- ensure nothing else runs
       }
 
+      // Show success toast for non-imam users
       toast("Login successful", {
         description: "You are now logged in.",
         duration: 2000,
       });
 
+      // Redirect if redirect query exists
       if (redirect) {
-        // Decode the redirect URL if it's encoded
-        const decodedRedirect = decodeURIComponent(redirect);
-        router.push(decodedRedirect);
+        router.push(decodeURIComponent(redirect));
         return;
       }
 
       // Redirect based on role
       const roleRoutes: Record<string, string> = {
         admin: "/admin",
-        imam: "/imam",
         user: "/dashboard",
       };
-
-      const redirectTo = roleRoutes[userRole] ?? "/login";
-
-      router.push(redirectTo);
+      router.push(roleRoutes[userRole] ?? "/login");
     } catch (error) {
-      // console.error("Login error:", error);
-      if (error instanceof Error) {
-        setErrorMessage(error.message); // already clean
-      } else {
-        setErrorMessage("Login failed. Please try again.");
-      }
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Login failed. Please try again.",
+      );
     } finally {
       setIsLoading(false);
     }

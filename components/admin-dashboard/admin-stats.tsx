@@ -1,37 +1,38 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, ChurchIcon as Mosque, Flag, Users } from "lucide-react";
+import { User } from "@/types/user";
+import { Flag, Users } from "lucide-react";
+import { MosqueIcon } from "../icons/MosqueIcon";
 
-export function AdminStats() {
+export function AdminStats({
+  users,
+  masjids,
+}: {
+  users: User[];
+  masjids: User[];
+}) {
   // Mock data - in a real app, this would come from an API
   const stats = [
     {
       title: "Total Users",
-      value: "12,345",
+      value: users.length.toString(),
       icon: Users,
       change: "+12%",
       description: "from last month",
     },
     {
       title: "Verified Masjids",
-      value: "324",
-      icon: Mosque,
+      value: masjids.filter((masjid) => masjid.imamApproved).length.toString(),
+      icon: MosqueIcon,
       change: "+8%",
       description: "from last month",
     },
     {
       title: "Pending Verifications",
-      value: "28",
+      value: masjids.filter((masjid) => !masjid.imamApproved).length.toString(),
       icon: Flag,
       change: "-5%",
-      description: "from last month",
-    },
-    {
-      title: "Content Reports",
-      value: "17",
-      icon: BarChart,
-      change: "+18%",
       description: "from last month",
     },
   ];
@@ -46,7 +47,7 @@ export function AdminStats() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stat.value}</div>
-            <p className="text-xs text-muted-foreground">
+            {/* <p className="text-xs text-muted-foreground">
               <span
                 className={
                   stat.change.startsWith("+")
@@ -57,7 +58,7 @@ export function AdminStats() {
                 {stat.change}
               </span>{" "}
               {stat.description}
-            </p>
+            </p> */}
           </CardContent>
         </Card>
       ))}

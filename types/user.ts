@@ -6,6 +6,24 @@ export interface SignupRequest {
   masjidId?: string; // Required when role=imam
 }
 
+export type User = {
+  id: string;
+  createdAt: string;
+  email: string;
+  followers: string[];
+  name: string;
+  lastUpdatedFrom: string;
+  masjidName: string | null;
+  masjidWebsite: string | null;
+  profilePicture: string;
+  denomination?: string;
+  role: string;
+  country?: string;
+  state?: string;
+  imamApproved?: boolean;
+  updatedAt: string;
+};
+
 export interface UserDocument {
   uid: string;
   email: string;
