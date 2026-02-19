@@ -37,7 +37,7 @@ export async function POST(req: Request) {
       {
         stripeAccountId: account.id,
         stripeConnected: false,
-        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       { merge: true },
     );
@@ -59,4 +59,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-// Create an api that return's i am fine

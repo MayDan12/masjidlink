@@ -39,6 +39,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { createDonations } from "@/app/(dashboards)/imam/donations/action";
 import { auth } from "@/firebase/client";
+import { getMasjidById } from "@/app/(dashboards)/dashboard/masjids/action";
 
 const formSchema = z.object({
   title: z.string().min(2, {
@@ -71,6 +72,12 @@ export function CreateCampaignDialog({
 }) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  // Get masjid id and check if it has stripe account ID
+  const uid = auth?.currentUser?.uid;
+  if (!uid) {
+    throw new Error("User not authenticated");
+  }
+  // Check if masjid has stripe account ID
 
   // Initialize form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -93,8 +100,24 @@ export function CreateCampaignDialog({
 
     try {
       const token = await auth?.currentUser?.getIdToken();
+      const uid = auth?.currentUser?.uid;
+      if (!uid) {
+        throw new Error("User not authenticated");
+      }
       if (!token) {
         throw new Error("User not authenticated");
+      }
+
+      const masjidData = await getMasjidById(uid);
+      if (!masjidData) {
+        throw new Error("Masjid not found for the given Imam.");
+      }
+      if (!masjidData.data?.stripeAccountId) {
+        toast({
+          title: "Error creating campaign",
+          description: "Your masjid does not have a stripe account ID.",
+        });
+        throw new Error("Masjid stripe account ID not found.");
       }
 
       const response = await createDonations({
