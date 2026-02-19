@@ -82,6 +82,10 @@ export async function createDonations(data: {
       throw new Error("Masjid not found for the given Imam.");
     }
 
+    if (!masjidData.data?.stripeAccountId) {
+      throw new Error("Masjid stripe account ID not found.");
+    }
+
     const donationToStore = {
       ...donationData,
       imamId: uid,

@@ -77,10 +77,15 @@ export function LoginForm() {
 
         if (!imamProfile.data.imamApproved) {
           // Block login entirely
+          // how do i make the gmail copyable when clicking the toast
           toast.error(
-            "Imam profile is not complete. Please contact the admin.",
+            "Imam profile is not complete. Please contact the admin at masjidlink6@gmail.com",
             {
               position: "top-right",
+              onDismiss: () => {
+                navigator.clipboard.writeText("masjidlink6@gmail.com");
+                toast.success("Email copied to clipboard!");
+              },
             },
           );
           setErrorMessage(
@@ -88,6 +93,10 @@ export function LoginForm() {
           );
           return; // <-- STOP here, no redirects
         }
+
+        toast.success("Imam profile is complete. You can now log in.", {
+          position: "top-right",
+        });
 
         // Approved imam goes to their dashboard
         router.push("/imam");

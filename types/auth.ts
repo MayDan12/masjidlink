@@ -34,4 +34,5 @@ export interface MasjidDocument {
   imamApproved?: boolean;
   createdAt: string;
   updatedAt: string;
+  stripeAccountId?: string;
 }

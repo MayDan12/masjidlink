@@ -1,1110 +1,1280 @@
-<!DOCTYPE html>
+<!-- Can i redirect to login after submission -->
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Imam Verification</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .verification-container {
+        width: 100%;
+        max-width: 850px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+      }
+
+      .form-content {
+        padding: 40px;
+      }
+
+      .section-title {
+        font-family: "Poppins", sans-serif;
+        color: #1e293b;
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #475569;
+        font-weight: 500;
+        font-size: 14px;
+      }
+
+      .form-label .required {
+        color: #ef4444;
+        font-weight: bold;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        font-family: "Inter", sans-serif;
+        font-size: 15px;
+        transition: all 0.3s;
+        background: white;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+      }
+
+      select.form-control {
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        background-size: 16px;
+        padding-right: 45px;
+        cursor: pointer;
+      }
+
+      /* File Upload Section */
+      .file-upload-section {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 25px;
+        margin: 25px 0;
+        border: 2px dashed #cbd5e1;
+        transition: all 0.3s;
+      }
+
+      .file-upload-section:hover {
+        border-color: #3b82f6;
+        background: #f0f9ff;
+      }
+
+      .upload-label {
+        display: block;
+        text-align: center;
+        cursor: pointer;
+        padding: 20px;
+      }
+
+      .upload-icon {
+        font-size: 48px;
+        color: #3b82f6;
+        margin-bottom: 15px;
+      }
+
+      .upload-text {
+        font-size: 17px;
+        color: #475569;
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+
+      .upload-subtext {
+        font-size: 14px;
+        color: #64748b;
+        margin-bottom: 15px;
+      }
+
+      .file-input {
+        display: none;
+      }
+
+      .file-preview {
+        margin-top: 20px;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        display: none;
+      }
+
+      .file-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+      }
+
+      .file-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #3b82f6;
+        font-size: 22px;
+      }
+
+      .file-details {
+        flex: 1;
+      }
+
+      .file-name {
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 6px;
+      }
+
+      .file-size {
+        font-size: 13px;
+        color: #64748b;
+      }
+
+      .remove-file {
+        background: none;
+        border: none;
+        color: #ef4444;
+        cursor: pointer;
+        font-size: 22px;
+        padding: 8px;
+        border-radius: 6px;
+      }
+
+      .remove-file:hover {
+        background: #fee2e2;
+      }
+
+      /* Image Preview */
+      .image-preview {
+        margin-top: 15px;
+        text-align: center;
+      }
+
+      .image-preview img {
+        max-width: 100%;
+        max-height: 350px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+      }
+
+      .image-preview p {
+        margin-top: 12px;
+        font-size: 14px;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .document-types {
+        margin-top: 25px;
+        padding: 20px;
+        background: #f1f5f9;
+        border-radius: 10px;
+      }
+
+      .document-types h4 {
+        font-size: 15px;
+        color: #475569;
+        margin-bottom: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .document-types ul {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .document-types li {
+        font-size: 14px;
+        color: #64748b;
+        margin-bottom: 8px;
+        padding-left: 24px;
+        position: relative;
+        line-height: 1.5;
+      }
+
+      .document-types li:before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: #3b82f6;
+        font-weight: bold;
+        font-size: 20px;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 35px;
+        padding-top: 25px;
+        border-top: 1px solid #e2e8f0;
+      }
+
+      .btn {
+        flex: 1;
+        padding: 16px 24px;
+        border: none;
+        border-radius: 10px;
+        font-family: "Inter", sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+      }
+
+      .btn-secondary {
+        background: #f1f5f9;
+        color: #475569;
+        border: 1px solid #cbd5e1;
+      }
+
+      .btn-secondary:hover {
+        background: #e2e8f0;
+      }
+
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+
+      .loading {
+        position: relative;
+        color: transparent !important;
+      }
+
+      .loading::after {
+        content: "";
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
         }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+        100% {
+          transform: rotate(360deg);
         }
-        
-        .verification-container {
-            width: 100%;
-            max-width: 850px;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-            border: 1px solid #e2e8f0;
-        }
-        
+      }
+
+      /* Success Message */
+      .success-message {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 20px 25px;
+        border-radius: 10px;
+        display: none;
+        flex-direction: column;
+        gap: 12px;
+        transform: translateX(400px);
+        transition: transform 0.4s;
+        z-index: 1000;
+        max-width: 400px;
+      }
+
+      .success-message.show {
+        display: flex;
+        transform: translateX(0);
+      }
+
+      .success-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .success-icon {
+        font-size: 28px;
+      }
+
+      .success-content h4 {
+        font-size: 16px;
+        margin-bottom: 4px;
+        font-weight: 700;
+      }
+
+      .success-content p {
+        font-size: 14px;
+        opacity: 0.9;
+      }
+
+      .discord-preview-info {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 10px;
+      }
+
+      .discord-preview-info p {
+        font-size: 14px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .discord-preview-info strong {
+        font-weight: 700;
+      }
+
+      .submission-id {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+        margin-top: 5px;
+        display: block;
+        text-align: center;
+      }
+
+      /* Upload Status */
+      .upload-status {
+        margin-top: 15px;
+        padding: 15px;
+        border-radius: 10px;
+        display: none;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .upload-status.uploading {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fbbf24;
+      }
+
+      .upload-status.success {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #10b981;
+      }
+
+      .upload-status.error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #ef4444;
+      }
+
+      /* Error Message */
+      .error-message {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-100px);
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 10px;
+        display: none;
+        align-items: center;
+        gap: 12px;
+        z-index: 1000;
+        max-width: 400px;
+        width: 90%;
+        transition: transform 0.3s ease-out;
+      }
+
+      .error-message.show {
+        display: flex;
+        transform: translateX(-50%) translateY(20px);
+      }
+
+      .error-content {
+        flex: 1;
+      }
+
+      .close-error {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+      }
+
+      .close-error:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
         .form-content {
-            padding: 40px;
+          padding: 25px;
         }
-        
-        .section-title {
-            font-family: 'Poppins', sans-serif;
-            color: #1e293b;
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
+
         .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+          grid-template-columns: 1fr;
         }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            color: #475569;
-            font-weight: 500;
-            font-size: 14px;
-        }
-        
-        .form-label .required {
-            color: #ef4444;
-            font-weight: bold;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 14px 16px;
-            border: 1px solid #cbd5e1;
-            border-radius: 10px;
-            font-family: 'Inter', sans-serif;
-            font-size: 15px;
-            transition: all 0.3s;
-            background: white;
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-        }
-        
-        select.form-control {
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 16px center;
-            background-size: 16px;
-            padding-right: 45px;
-            cursor: pointer;
-        }
-        
-        /* File Upload Section */
-        .file-upload-section {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 25px;
-            margin: 25px 0;
-            border: 2px dashed #cbd5e1;
-            transition: all 0.3s;
-        }
-        
-        .file-upload-section:hover {
-            border-color: #3b82f6;
-            background: #f0f9ff;
-        }
-        
-        .upload-label {
-            display: block;
-            text-align: center;
-            cursor: pointer;
-            padding: 20px;
-        }
-        
-        .upload-icon {
-            font-size: 48px;
-            color: #3b82f6;
-            margin-bottom: 15px;
-        }
-        
-        .upload-text {
-            font-size: 17px;
-            color: #475569;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-        
-        .upload-subtext {
-            font-size: 14px;
-            color: #64748b;
-            margin-bottom: 15px;
-        }
-        
-        .file-input {
-            display: none;
-        }
-        
-        .file-preview {
-            margin-top: 20px;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            display: none;
-        }
-        
-        .file-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .file-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #3b82f6;
-            font-size: 22px;
-        }
-        
-        .file-details {
-            flex: 1;
-        }
-        
-        .file-name {
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 6px;
-        }
-        
-        .file-size {
-            font-size: 13px;
-            color: #64748b;
-        }
-        
-        .remove-file {
-            background: none;
-            border: none;
-            color: #ef4444;
-            cursor: pointer;
-            font-size: 22px;
-            padding: 8px;
-            border-radius: 6px;
-        }
-        
-        .remove-file:hover {
-            background: #fee2e2;
-        }
-        
-        /* Image Preview */
-        .image-preview {
-            margin-top: 15px;
-            text-align: center;
-        }
-        
-        .image-preview img {
-            max-width: 100%;
-            max-height: 350px;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-        }
-        
-        .image-preview p {
-            margin-top: 12px;
-            font-size: 14px;
-            color: #64748b;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .document-types {
-            margin-top: 25px;
-            padding: 20px;
-            background: #f1f5f9;
-            border-radius: 10px;
-        }
-        
-        .document-types h4 {
-            font-size: 15px;
-            color: #475569;
-            margin-bottom: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .document-types ul {
-            list-style: none;
-            padding-left: 0;
-        }
-        
-        .document-types li {
-            font-size: 14px;
-            color: #64748b;
-            margin-bottom: 8px;
-            padding-left: 24px;
-            position: relative;
-            line-height: 1.5;
-        }
-        
-        .document-types li:before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: #3b82f6;
-            font-weight: bold;
-            font-size: 20px;
-        }
-        
+
         .form-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 35px;
-            padding-top: 25px;
-            border-top: 1px solid #e2e8f0;
+          flex-direction: column;
         }
-        
+
         .btn {
-            flex: 1;
-            padding: 16px 24px;
-            border: none;
-            border-radius: 10px;
-            font-family: 'Inter', sans-serif;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
+          width: 100%;
         }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            color: white;
+
+        .file-upload-section {
+          padding: 20px;
         }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
-        }
-        
-        .btn-secondary {
-            background: #f1f5f9;
-            color: #475569;
-            border: 1px solid #cbd5e1;
-        }
-        
-        .btn-secondary:hover {
-            background: #e2e8f0;
-        }
-        
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-        
-        .loading {
-            position: relative;
-            color: transparent !important;
-        }
-        
-        .loading::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top: 3px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Success Message */
+
         .success-message {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            padding: 20px 25px;
-            border-radius: 10px;
-            display: none;
-            flex-direction: column;
-            gap: 12px;
-            transform: translateX(400px);
-            transition: transform 0.4s;
-            z-index: 1000;
-            max-width: 400px;
+          left: 20px;
+          right: 20px;
+          max-width: none;
         }
-        
-        .success-message.show {
-            display: flex;
-            transform: translateX(0);
+
+        .image-preview img {
+          max-height: 250px;
         }
-        
-        .success-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 10px;
         }
-        
-        .success-icon {
-            font-size: 28px;
+
+        .form-content {
+          padding: 20px;
         }
-        
-        .success-content h4 {
-            font-size: 16px;
-            margin-bottom: 4px;
-            font-weight: 700;
+
+        .image-preview img {
+          max-height: 200px;
         }
-        
-        .success-content p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        
-        .discord-preview-info {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 10px;
-        }
-        
-        .discord-preview-info p {
-            font-size: 14px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .discord-preview-info strong {
-            font-weight: 700;
-        }
-        
-        .submission-id {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            margin-top: 5px;
-            display: block;
-            text-align: center;
-        }
-        
-        /* Upload Status */
-        .upload-status {
-            margin-top: 15px;
-            padding: 15px;
-            border-radius: 10px;
-            display: none;
-            align-items: center;
-            gap: 12px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .upload-status.uploading {
-            background: #fef3c7;
-            color: #92400e;
-            border: 1px solid #fbbf24;
-        }
-        
-        .upload-status.success {
-            background: #d1fae5;
-            color: #065f46;
-            border: 1px solid #10b981;
-        }
-        
-        .upload-status.error {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #ef4444;
-        }
-        
-        /* Error Message */
-        .error-message {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-100px);
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 10px;
-            display: none;
-            align-items: center;
-            gap: 12px;
-            z-index: 1000;
-            max-width: 400px;
-            width: 90%;
-            transition: transform 0.3s ease-out;
-        }
-        
-        .error-message.show {
-            display: flex;
-            transform: translateX(-50%) translateY(20px);
-        }
-        
-        .error-content {
-            flex: 1;
-        }
-        
-        .close-error {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-        
-        .close-error:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .form-content {
-                padding: 25px;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .form-actions {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-            
-            .file-upload-section {
-                padding: 20px;
-            }
-            
-            .success-message {
-                left: 20px;
-                right: 20px;
-                max-width: none;
-            }
-            
-            .image-preview img {
-                max-height: 250px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-            
-            .form-content {
-                padding: 20px;
-            }
-            
-            .image-preview img {
-                max-height: 200px;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="verification-container">
-        <div class="form-content">
-            <form id="verificationForm">
-                <!-- Masjid Information -->
-                <div class="section-title">
-                    <i class="fas fa-mosque"></i>
-                    Masjid Information
+      <div class="form-content">
+        <form id="verificationForm">
+          <!-- Masjid Information -->
+          <div class="section-title">
+            <i class="fas fa-mosque"></i>
+            Masjid Information
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label"
+                >Masjid Legal Name <span class="required">*</span></label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="masjidName"
+                placeholder="Enter legal name"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label"
+                >Physical Address <span class="required">*</span></label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="physicalAddress"
+                placeholder="Complete address"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label"
+                >City <span class="required">*</span></label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="city"
+                placeholder="City"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label"
+                >State/Province <span class="required">*</span></label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="state"
+                placeholder="State/Province"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label"
+                >Country <span class="required">*</span></label
+              >
+              <select class="form-control" id="country" required>
+                <option value="" disabled selected>Select country</option>
+                <option value="USA">United States</option>
+                <option value="CAN">Canada</option>
+                <option value="UK">United Kingdom</option>
+                <option value="AUS">Australia</option>
+                <option value="OTHER">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Imam Information -->
+          <div class="section-title">
+            <i class="fas fa-user-tie"></i>
+            Imam Information
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label"
+                >Full Name <span class="required">*</span></label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="fullName"
+                placeholder="Legal name as per ID"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label"
+                >Discord Name <span class="required">*</span></label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="discordName"
+                placeholder="Your Discord username"
+                required
+              />
+              <small
+                style="
+                  color: #64748b;
+                  font-size: 12px;
+                  margin-top: 4px;
+                  display: block;
+                "
+              >
+                Include discriminator if you have one (e.g., username#1234)
+              </small>
+            </div>
+            <div class="form-group">
+              <label class="form-label"
+                >Role/Position <span class="required">*</span></label
+              >
+              <select class="form-control" id="role" required>
+                <option value="" disabled selected>Select position</option>
+                <option value="Imam">Imam (Prayer Leader)</option>
+                <option value="Head Imam">Head Imam</option>
+                <option value="Associate Imam">Associate Imam</option>
+                <option value="Board Member">Board Member</option>
+                <option value="Administrator">Administrator</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label"
+                >Official Email <span class="required">*</span></label
+              >
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                placeholder="official@masjid.org"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label"
+                >Phone Number <span class="required">*</span></label
+              >
+              <input
+                type="tel"
+                class="form-control"
+                id="phone"
+                placeholder="1234567890"
+                required
+                pattern="[0-9]{10,15}"
+              />
+              <small
+                style="
+                  color: #64748b;
+                  font-size: 12px;
+                  margin-top: 4px;
+                  display: block;
+                "
+              >
+                Enter numbers only: 1234567890
+              </small>
+            </div>
+          </div>
+
+          <!-- File Upload Section -->
+          <div class="section-title">
+            <i class="fas fa-file-contract"></i>
+            Verification Documents
+          </div>
+
+          <div class="file-upload-section">
+            <input
+              type="file"
+              id="documentUpload"
+              class="file-input"
+              accept="image/*"
+              capture="environment"
+            />
+            <label for="documentUpload" class="upload-label">
+              <div class="upload-icon">
+                <i class="fas fa-camera"></i>
+              </div>
+              <div class="upload-text">Upload Image for Verify</div>
+              <div class="upload-subtext">
+                Take photo or upload JPG/PNG image (Max 8MB)
+              </div>
+            </label>
+
+            <div class="file-preview" id="filePreview">
+              <div class="file-info">
+                <div class="file-icon">
+                  <i class="fas fa-file-image"></i>
                 </div>
-                
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Masjid Legal Name <span class="required">*</span></label>
-                        <input type="text" class="form-control" id="masjidName" placeholder="Enter legal name" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Physical Address <span class="required">*</span></label>
-                        <input type="text" class="form-control" id="physicalAddress" placeholder="Complete address" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">City <span class="required">*</span></label>
-                        <input type="text" class="form-control" id="city" placeholder="City" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">State/Province <span class="required">*</span></label>
-                        <input type="text" class="form-control" id="state" placeholder="State/Province" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Country <span class="required">*</span></label>
-                        <select class="form-control" id="country" required>
-                            <option value="" disabled selected>Select country</option>
-                            <option value="USA">United States</option>
-                            <option value="CAN">Canada</option>
-                            <option value="UK">United Kingdom</option>
-                            <option value="AUS">Australia</option>
-                            <option value="OTHER">Other</option>
-                        </select>
-                    </div>
+                <div class="file-details">
+                  <div class="file-name" id="fileName">document.jpg</div>
+                  <div class="file-size" id="fileSize">2.4 MB</div>
                 </div>
-                
-                <!-- Imam Information -->
-                <div class="section-title">
-                    <i class="fas fa-user-tie"></i>
-                    Imam Information
-                </div>
-                
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Full Name <span class="required">*</span></label>
-                        <input type="text" class="form-control" id="fullName" placeholder="Legal name as per ID" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Discord Name <span class="required">*</span></label>
-                        <input type="text" class="form-control" id="discordName" placeholder="Your Discord username" required>
-                        <small style="color: #64748b; font-size: 12px; margin-top: 4px; display: block;">
-                            Include discriminator if you have one (e.g., username#1234)
-                        </small>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Role/Position <span class="required">*</span></label>
-                        <select class="form-control" id="role" required>
-                            <option value="" disabled selected>Select position</option>
-                            <option value="Imam">Imam (Prayer Leader)</option>
-                            <option value="Head Imam">Head Imam</option>
-                            <option value="Associate Imam">Associate Imam</option>
-                            <option value="Board Member">Board Member</option>
-                            <option value="Administrator">Administrator</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Official Email <span class="required">*</span></label>
-                        <input type="email" class="form-control" id="email" placeholder="official@masjid.org" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Phone Number <span class="required">*</span></label>
-                        <input type="tel" class="form-control" id="phone" placeholder="1234567890" required pattern="[0-9]{10,15}">
-                        <small style="color: #64748b; font-size: 12px; margin-top: 4px; display: block;">
-                            Enter numbers only: 1234567890
-                        </small>
-                    </div>
-                </div>
-                
-                <!-- File Upload Section -->
-                <div class="section-title">
-                    <i class="fas fa-file-contract"></i>
-                    Verification Documents
-                </div>
-                
-                <div class="file-upload-section">
-                    <input type="file" id="documentUpload" class="file-input" accept="image/*" capture="environment">
-                    <label for="documentUpload" class="upload-label">
-                        <div class="upload-icon">
-                            <i class="fas fa-camera"></i>
-                        </div>
-                        <div class="upload-text">Upload Image for Verify</div>
-                        <div class="upload-subtext">Take photo or upload JPG/PNG image (Max 8MB)</div>
-                    </label>
-                    
-                    <div class="file-preview" id="filePreview">
-                        <div class="file-info">
-                            <div class="file-icon">
-                                <i class="fas fa-file-image"></i>
-                            </div>
-                            <div class="file-details">
-                                <div class="file-name" id="fileName">document.jpg</div>
-                                <div class="file-size" id="fileSize">2.4 MB</div>
-                            </div>
-                            <button type="button" class="remove-file" id="removeFile">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        
-                        <div class="image-preview" id="imagePreview">
-                            <!-- Image will be inserted here -->
-                        </div>
-                    </div>
-                    
-                    <div class="upload-status" id="uploadStatus">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <span id="statusText">Uploading to Discord...</span>
-                    </div>
-                    
-                    <div class="document-types">
-                        <h4><i class="fas fa-check-circle"></i> Accepted Verification Documents:</h4>
-                        <ul>
-                            <li>EIN letter OR</li>
-                            <li>Articles of Incorporation OR</li>
-                            <li>501(c)(3) letter</li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <!-- Additional Information -->
-                <div class="form-group">
-                    <label class="form-label">Additional Information (Optional)</label>
-                    <textarea class="form-control" id="additionalInfo" rows="4" placeholder="Any additional details about your masjid or verification request..."></textarea>
-                </div>
-                
-                <!-- Form Actions -->
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" id="submitBtn">
-                        <i class="fas fa-paper-plane"></i>
-                        Send to Discord with Image
-                    </button>
-                    <button type="reset" class="btn btn-secondary" id="resetBtn">
-                        <i class="fas fa-redo"></i>
-                        Clear Form
-                    </button>
-                </div>
-            </form>
-        </div>
+                <button type="button" class="remove-file" id="removeFile">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+
+              <div class="image-preview" id="imagePreview">
+                <!-- Image will be inserted here -->
+              </div>
+            </div>
+
+            <div class="upload-status" id="uploadStatus">
+              <i class="fas fa-spinner fa-spin"></i>
+              <span id="statusText">Uploading to Discord...</span>
+            </div>
+
+            <div class="document-types">
+              <h4>
+                <i class="fas fa-check-circle"></i> Accepted Verification
+                Documents:
+              </h4>
+              <ul>
+                <li>EIN letter OR</li>
+                <li>Articles of Incorporation OR</li>
+                <li>501(c)(3) letter</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Additional Information -->
+          <div class="form-group">
+            <label class="form-label">Additional Information (Optional)</label>
+            <textarea
+              class="form-control"
+              id="additionalInfo"
+              rows="4"
+              placeholder="Any additional details about your masjid or verification request..."
+            ></textarea>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+              <i class="fas fa-paper-plane"></i>
+              Send to Discord with Image
+            </button>
+            <button type="reset" class="btn btn-secondary" id="resetBtn">
+              <i class="fas fa-redo"></i>
+              Clear Form
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-    
+
     <!-- Success Message -->
     <div class="success-message" id="successMessage">
-        <div class="success-header">
-            <div class="success-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="success-content">
-                <h4>✅ Verification Submitted!</h4>
-                <p>Your verification has been sent to Discord.</p>
-            </div>
+      <div class="success-header">
+        <div class="success-icon">
+          <i class="fas fa-check-circle"></i>
         </div>
-        
-        <div class="discord-preview-info">
-            <p><i class="fab fa-discord"></i> <strong>In Discord:</strong></p>
-            <p>• Image will display directly</p>
-            <p>• Click to view full size</p>
-            <span class="submission-id" id="submissionIdDisplay">ID: Loading...</span>
+        <div class="success-content">
+          <h4>✅ Verification Submitted!</h4>
+          <p>Your verification has been sent to Discord.</p>
         </div>
+      </div>
+
+      <div class="discord-preview-info">
+        <p><i class="fab fa-discord"></i> <strong>In Discord:</strong></p>
+        <p>• Image will display directly</p>
+        <p>• Click to view full size</p>
+        <span class="submission-id" id="submissionIdDisplay"
+          >ID: Loading...</span
+        >
+      </div>
+      <!-- return button to login -->
+      <div>
+        <button class="btn btn-link" id="returnBtn">
+          <i class="fas fa-arrow-left"></i>
+          Return to Login
+        </button>
+      </div>
     </div>
-    
+
     <!-- Error Message -->
     <div class="error-message" id="errorMessage">
-        <div class="error-content">
-            <h4><i class="fas fa-exclamation-triangle"></i> Submission Error</h4>
-            <p id="errorText">There was an error submitting your verification. Please try again.</p>
-        </div>
-        <button class="close-error" id="closeError">
-            <i class="fas fa-times"></i>
-        </button>
+      <div class="error-content">
+        <h4><i class="fas fa-exclamation-triangle"></i> Submission Error</h4>
+        <p id="errorText">
+          There was an error submitting your verification. Please try again.
+        </p>
+      </div>
+      <button class="close-error" id="closeError">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
-    
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Elements
-            const form = document.getElementById('verificationForm');
-            const fileInput = document.getElementById('documentUpload');
-            const filePreview = document.getElementById('filePreview');
-            const fileName = document.getElementById('fileName');
-            const fileSize = document.getElementById('fileSize');
-            const removeFileBtn = document.getElementById('removeFile');
-            const imagePreview = document.getElementById('imagePreview');
-            const uploadStatus = document.getElementById('uploadStatus');
-            const statusText = document.getElementById('statusText');
-            const submitBtn = document.getElementById('submitBtn');
-            const resetBtn = document.getElementById('resetBtn');
-            const successMessage = document.getElementById('successMessage');
-            const submissionIdDisplay = document.getElementById('submissionIdDisplay');
-            const errorMessage = document.getElementById('errorMessage');
-            const errorText = document.getElementById('errorText');
-            const closeError = document.getElementById('closeError');
-            
-            // Discord Webhook URL
-            const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1459868537400197294/FQjLB9w_xEF7-mFV3Z_rgvUqFl7Do_blaZnjxvDcWlV-7n7Bqtud0X_0pVDohAd6-DAk';
-            
-            let uploadedFile = null;
-            
-            // Phone number input - simple number input
-            const phoneInput = document.getElementById('phone');
-            
-            // Allow only numbers in phone input
-            phoneInput.addEventListener('input', function(e) {
-                // Remove any non-numeric characters
-                let value = e.target.value.replace(/\D/g, '');
-                
-                // Limit to 15 digits (max for international numbers)
-                if (value.length > 15) {
-                    value = value.substring(0, 15);
-                }
-                
-                e.target.value = value;
-                
-                // Show format hint
-                if (value.length >= 10) {
-                    // Format as US number if 10 digits, otherwise show as-is
-                    if (value.length === 10) {
-                        e.target.value = `(${value.substring(0,3)}) ${value.substring(3,6)}-${value.substring(6)}`;
-                    }
-                }
-            });
-            
-            // File upload handler
-            fileInput.addEventListener('change', function(e) {
-                if (e.target.files.length > 0) {
-                    uploadedFile = e.target.files[0];
-                    displayFileInfo(uploadedFile);
-                    previewImage(uploadedFile);
-                }
-            });
-            
-            // Drag and drop functionality
-            const uploadSection = document.querySelector('.file-upload-section');
-            
-            uploadSection.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                this.style.borderColor = '#3b82f6';
-                this.style.background = '#f0f9ff';
-            });
-            
-            uploadSection.addEventListener('dragleave', function(e) {
-                e.preventDefault();
-                this.style.borderColor = '#cbd5e1';
-                this.style.background = '#f8fafc';
-            });
-            
-            uploadSection.addEventListener('drop', function(e) {
-                e.preventDefault();
-                this.style.borderColor = '#cbd5e1';
-                this.style.background = '#f8fafc';
-                
-                if (e.dataTransfer.files.length > 0) {
-                    uploadedFile = e.dataTransfer.files[0];
-                    displayFileInfo(uploadedFile);
-                    previewImage(uploadedFile);
-                    fileInput.files = e.dataTransfer.files;
-                }
-            });
-            
-            // Remove file handler
-            removeFileBtn.addEventListener('click', function() {
-                uploadedFile = null;
-                fileInput.value = '';
-                filePreview.style.display = 'none';
-                imagePreview.innerHTML = '';
-                hideUploadStatus();
-            });
-            
-            // Display file information
-            function displayFileInfo(file) {
-                fileName.textContent = file.name;
-                fileSize.textContent = formatFileSize(file.size);
-                filePreview.style.display = 'block';
+      document.addEventListener("DOMContentLoaded", function () {
+        // Elements
+        const form = document.getElementById("verificationForm");
+        const fileInput = document.getElementById("documentUpload");
+        const filePreview = document.getElementById("filePreview");
+        const fileName = document.getElementById("fileName");
+        const fileSize = document.getElementById("fileSize");
+        const removeFileBtn = document.getElementById("removeFile");
+        const imagePreview = document.getElementById("imagePreview");
+        const uploadStatus = document.getElementById("uploadStatus");
+        const statusText = document.getElementById("statusText");
+        const submitBtn = document.getElementById("submitBtn");
+        const resetBtn = document.getElementById("resetBtn");
+        const successMessage = document.getElementById("successMessage");
+        const submissionIdDisplay = document.getElementById(
+          "submissionIdDisplay",
+        );
+        const errorMessage = document.getElementById("errorMessage");
+        const errorText = document.getElementById("errorText");
+        const closeError = document.getElementById("closeError");
+        const returnBtn = document.getElementById("returnBtn");
+
+        // Add click event listener to return button
+        returnBtn.addEventListener("click", function () {
+          window.location.href = "/login";
+        });
+
+        // Discord Webhook URL
+        const DISCORD_WEBHOOK_URL =
+          "https://discord.com/api/webhooks/1459868537400197294/FQjLB9w_xEF7-mFV3Z_rgvUqFl7Do_blaZnjxvDcWlV-7n7Bqtud0X_0pVDohAd6-DAk";
+
+        let uploadedFile = null;
+
+        // Phone number input - simple number input
+        const phoneInput = document.getElementById("phone");
+
+        // Allow only numbers in phone input
+        phoneInput.addEventListener("input", function (e) {
+          // Remove any non-numeric characters
+          let value = e.target.value.replace(/\D/g, "");
+
+          // Limit to 15 digits (max for international numbers)
+          if (value.length > 15) {
+            value = value.substring(0, 15);
+          }
+
+          e.target.value = value;
+
+          // Show format hint
+          if (value.length >= 10) {
+            // Format as US number if 10 digits, otherwise show as-is
+            if (value.length === 10) {
+              e.target.value = `(${value.substring(0, 3)}) ${value.substring(3, 6)}-${value.substring(6)}`;
             }
-            
-            // Preview image
-            function previewImage(file) {
-                if (!file.type.match('image.*')) {
-                    imagePreview.innerHTML = '<p>📄 Please upload an image file</p>';
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imagePreview.innerHTML = `
+          }
+        });
+
+        // File upload handler
+        fileInput.addEventListener("change", function (e) {
+          if (e.target.files.length > 0) {
+            uploadedFile = e.target.files[0];
+            displayFileInfo(uploadedFile);
+            previewImage(uploadedFile);
+          }
+        });
+
+        // Drag and drop functionality
+        const uploadSection = document.querySelector(".file-upload-section");
+
+        uploadSection.addEventListener("dragover", function (e) {
+          e.preventDefault();
+          this.style.borderColor = "#3b82f6";
+          this.style.background = "#f0f9ff";
+        });
+
+        uploadSection.addEventListener("dragleave", function (e) {
+          e.preventDefault();
+          this.style.borderColor = "#cbd5e1";
+          this.style.background = "#f8fafc";
+        });
+
+        uploadSection.addEventListener("drop", function (e) {
+          e.preventDefault();
+          this.style.borderColor = "#cbd5e1";
+          this.style.background = "#f8fafc";
+
+          if (e.dataTransfer.files.length > 0) {
+            uploadedFile = e.dataTransfer.files[0];
+            displayFileInfo(uploadedFile);
+            previewImage(uploadedFile);
+            fileInput.files = e.dataTransfer.files;
+          }
+        });
+
+        // Remove file handler
+        removeFileBtn.addEventListener("click", function () {
+          uploadedFile = null;
+          fileInput.value = "";
+          filePreview.style.display = "none";
+          imagePreview.innerHTML = "";
+          hideUploadStatus();
+        });
+
+        // Display file information
+        function displayFileInfo(file) {
+          fileName.textContent = file.name;
+          fileSize.textContent = formatFileSize(file.size);
+          filePreview.style.display = "block";
+        }
+
+        // Preview image
+        function previewImage(file) {
+          if (!file.type.match("image.*")) {
+            imagePreview.innerHTML = "<p>📄 Please upload an image file</p>";
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            imagePreview.innerHTML = `
                         <img src="${e.target.result}" alt="Verification Document Preview">
                         <p><i class="fas fa-eye"></i> This verification document will be sent to Discord</p>
                     `;
-                };
-                reader.readAsDataURL(file);
-            }
-            
-            // Format file size
-            function formatFileSize(bytes) {
-                if (bytes === 0) return '0 Bytes';
-                const k = 1024;
-                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-                const i = Math.floor(Math.log(bytes) / Math.log(k));
-                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-            }
-            
-            // Show upload status
-            function showUploadStatus(type, message) {
-                uploadStatus.className = 'upload-status ' + type;
-                statusText.textContent = message;
-                uploadStatus.style.display = 'flex';
-                
-                const icon = uploadStatus.querySelector('i');
-                icon.className = type === 'uploading' ? 'fas fa-spinner fa-spin' :
-                                type === 'success' ? 'fas fa-check-circle' :
-                                'fas fa-exclamation-circle';
-            }
-            
-            // Hide upload status
-            function hideUploadStatus() {
-                uploadStatus.style.display = 'none';
-            }
-            
-            // Show error message
-            function showError(message) {
-                errorText.textContent = message;
-                errorMessage.classList.add('show');
-                
-                setTimeout(() => {
-                    errorMessage.classList.remove('show');
-                }, 8000);
-            }
-            
-            // Close error message
-            closeError.addEventListener('click', function() {
-                errorMessage.classList.remove('show');
-            });
-            
-            // Form submission
-            form.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                
-                // Validation
-                const requiredFields = form.querySelectorAll('[required]');
-                let isValid = true;
-                
-                requiredFields.forEach(field => {
-                    if (!field.value.trim()) {
-                        isValid = false;
-                        field.style.borderColor = '#ef4444';
-                        field.addEventListener('input', function() {
-                            this.style.borderColor = '';
-                        }, { once: true });
-                    }
-                });
-                
-                // Phone number validation
-                const phoneValue = phoneInput.value.replace(/\D/g, '');
-                if (phoneValue.length < 10) {
-                    isValid = false;
-                    phoneInput.style.borderColor = '#ef4444';
-                    phoneInput.addEventListener('input', function() {
-                        this.style.borderColor = '';
-                    }, { once: true });
-                }
-                
-                if (!isValid) {
-                    showError('Please fill in all required fields correctly. Phone must be at least 10 digits.');
-                    return;
-                }
-                
-                if (!uploadedFile) {
-                    showError('Please upload a verification image.');
-                    return;
-                }
-                
-                // Validate file is an image
-                if (!uploadedFile.type.match('image.*')) {
-                    showError('Please upload an image file (JPG, PNG, GIF, WebP) for verification.');
-                    return;
-                }
-                
-                // Validate file size
-                const maxSize = 8 * 1024 * 1024;
-                if (uploadedFile.size > maxSize) {
-                    showError('Image size exceeds 8MB limit. Please choose a smaller image.');
-                    return;
-                }
-                
-                // Show loading state
-                submitBtn.disabled = true;
-                submitBtn.classList.add('loading');
-                submitBtn.innerHTML = '';
-                showUploadStatus('uploading', 'Preparing verification submission...');
-                
-                try {
-                    // Generate unique submission ID
-                    const submissionId = 'VER-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-                    
-                    // Format phone for display
-                    const phoneDisplay = phoneValue.length === 10 ? 
-                        `(${phoneValue.substring(0,3)}) ${phoneValue.substring(3,6)}-${phoneValue.substring(6)}` : 
-                        phoneValue;
-                    
-                    // Prepare form data
-                    const formData = {
-                        masjidName: document.getElementById('masjidName').value.trim(),
-                        physicalAddress: document.getElementById('physicalAddress').value.trim(),
-                        city: document.getElementById('city').value.trim(),
-                        state: document.getElementById('state').value.trim(),
-                        country: document.getElementById('country').value,
-                        fullName: document.getElementById('fullName').value.trim(),
-                        discordName: document.getElementById('discordName').value.trim(),
-                        role: document.getElementById('role').value,
-                        email: document.getElementById('email').value.trim(),
-                        phone: phoneDisplay,
-                        additionalInfo: document.getElementById('additionalInfo').value.trim() || 'None',
-                        submissionDate: new Date().toLocaleString('en-US', {
-                            month: '2-digit',
-                            day: '2-digit',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        }),
-                        submissionId: submissionId,
-                        fileName: uploadedFile.name,
-                        fileSize: formatFileSize(uploadedFile.size),
-                        fileType: uploadedFile.type
-                    };
-                    
-                    // Send to Discord using FormData for file upload
-                    const response = await sendToDiscordWithImage(formData, uploadedFile);
-                    
-                    if (response.ok) {
-                        showUploadStatus('success', '✓ Verification sent to Discord!');
-                        
-                        // Update submission ID display
-                        submissionIdDisplay.textContent = `ID: ${submissionId}`;
-                        
-                        // Show success message
-                        successMessage.classList.add('show');
-                        setTimeout(() => {
-                            successMessage.classList.remove('show');
-                        }, 8000);
-                        
-                        // Reset form after 3 seconds
-                        setTimeout(() => {
-                            form.reset();
-                            uploadedFile = null;
-                            filePreview.style.display = 'none';
-                            fileInput.value = '';
-                            imagePreview.innerHTML = '';
-                            hideUploadStatus();
-                        }, 3000);
-                    } else {
-                        const errorData = await response.text();
-                        console.error('Discord API Error:', errorData);
-                        throw new Error(`Discord upload failed: ${response.status}`);
-                    }
-                    
-                } catch (error) {
-                    console.error('Submission Error:', error);
-                    showUploadStatus('error', '❌ Verification failed');
-                    
-                    // Show specific error message
-                    if (error.message.includes('Failed to fetch')) {
-                        showError('Network error. Please check your internet connection.');
-                    } else if (error.message.includes('404')) {
-                        showError('Discord webhook not found. Please check the webhook URL.');
-                    } else {
-                        showError('There was an error submitting your verification. Please try again.');
-                    }
-                } finally {
-                    submitBtn.disabled = false;
-                    submitBtn.classList.remove('loading');
-                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send to Discord with Image';
-                    setTimeout(() => hideUploadStatus(), 5000);
-                }
-            });
-            
-            // Send to Discord with image using FormData
-            async function sendToDiscordWithImage(formData, imageFile) {
-                // Create FormData object
-                const formDataToSend = new FormData();
-                
-                // Create the Discord embed payload
-                const discordPayload = {
-                    username: "MasjidLink Verification Bot",
-                    avatar_url: "https://cdn-icons-png.flaticon.com/512/2046/2046929.png",
-                    content: `@here **📬 NEW VERIFICATION - WITH IMAGE PREVIEW**\n**Submission ID:** ${formData.submissionId}\n**Masjid:** ${formData.masjidName}\n**Discord:** ${formData.discordName}`,
-                    embeds: [
-                        {
-                            title: "🕌 NEW IMAM VERIFICATION SUBMISSION",
-                            description: `**Submission ID:** ${formData.submissionId}\n**Masjid:** ${formData.masjidName}\n**Imam:** ${formData.fullName}\n**Discord Username:** ${formData.discordName}`,
-                            color: 0x3b82f6,
-                            fields: [
-                                {
-                                    name: "📋 Masjid Information",
-                                    value: `**Name:** ${formData.masjidName}\n**Address:** ${formData.physicalAddress}\n**Location:** ${formData.city}, ${formData.state}, ${formData.country}`,
-                                    inline: false
-                                },
-                                {
-                                    name: "👤 Imam Information",
-                                    value: `**Name:** ${formData.fullName}\n**Discord:** ${formData.discordName}\n**Role:** ${formData.role}\n**Email:** ${formData.email}\n**Phone:** ${formData.phone}`,
-                                    inline: false
-                                },
-                                {
-                                    name: "📎 Document Details",
-                                    value: `**File:** ${formData.fileName}\n**Size:** ${formData.fileSize}\n**Type:** ${formData.fileType}`,
-                                    inline: true
-                                },
-                                {
-                                    name: "📊 Submission Details",
-                                    value: `**ID:** ${formData.submissionId}\n**Date:** ${formData.submissionDate}\n**Status:** ✅ Submitted`,
-                                    inline: true
-                                }
-                            ],
-                            timestamp: new Date().toISOString()
-                        }
-                    ]
-                };
-                
-                // Add additional info if provided
-                if (formData.additionalInfo !== 'None') {
-                    discordPayload.embeds[0].fields.push({
-                        name: "📝 Additional Information",
-                        value: formData.additionalInfo.substring(0, 1000) + (formData.additionalInfo.length > 1000 ? "..." : ""),
-                        inline: false
-                    });
-                }
-                
-                // Add the image file to FormData
-                formDataToSend.append('file', imageFile, imageFile.name);
-                
-                // Add the payload as JSON
-                formDataToSend.append('payload_json', JSON.stringify(discordPayload));
-                
-                // Send to Discord webhook
-                const response = await fetch(DISCORD_WEBHOOK_URL, {
-                    method: 'POST',
-                    body: formDataToSend
-                });
-                
-                return response;
-            }
-            
-            // Form reset
-            resetBtn.addEventListener('click', function() {
-                uploadedFile = null;
-                filePreview.style.display = 'none';
-                fileInput.value = '';
-                imagePreview.innerHTML = '';
-                hideUploadStatus();
-                successMessage.classList.remove('show');
-                errorMessage.classList.remove('show');
-                
-                // Reset field borders
-                const fields = form.querySelectorAll('.form-control');
-                fields.forEach(field => {
-                    field.style.borderColor = '';
-                });
-            });
+          };
+          reader.readAsDataURL(file);
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+          if (bytes === 0) return "0 Bytes";
+          const k = 1024;
+          const sizes = ["Bytes", "KB", "MB", "GB"];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          return (
+            parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
+          );
+        }
+
+        // Show upload status
+        function showUploadStatus(type, message) {
+          uploadStatus.className = "upload-status " + type;
+          statusText.textContent = message;
+          uploadStatus.style.display = "flex";
+
+          const icon = uploadStatus.querySelector("i");
+          icon.className =
+            type === "uploading"
+              ? "fas fa-spinner fa-spin"
+              : type === "success"
+                ? "fas fa-check-circle"
+                : "fas fa-exclamation-circle";
+        }
+
+        // Hide upload status
+        function hideUploadStatus() {
+          uploadStatus.style.display = "none";
+        }
+
+        // Show error message
+        function showError(message) {
+          errorText.textContent = message;
+          errorMessage.classList.add("show");
+
+          setTimeout(() => {
+            errorMessage.classList.remove("show");
+          }, 8000);
+        }
+
+        // Close error message
+        closeError.addEventListener("click", function () {
+          errorMessage.classList.remove("show");
         });
+
+        // Form submission
+        form.addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          // Validation
+          const requiredFields = form.querySelectorAll("[required]");
+          let isValid = true;
+
+          requiredFields.forEach((field) => {
+            if (!field.value.trim()) {
+              isValid = false;
+              field.style.borderColor = "#ef4444";
+              field.addEventListener(
+                "input",
+                function () {
+                  this.style.borderColor = "";
+                },
+                { once: true },
+              );
+            }
+          });
+
+          // Phone number validation
+          const phoneValue = phoneInput.value.replace(/\D/g, "");
+          if (phoneValue.length < 10) {
+            isValid = false;
+            phoneInput.style.borderColor = "#ef4444";
+            phoneInput.addEventListener(
+              "input",
+              function () {
+                this.style.borderColor = "";
+              },
+              { once: true },
+            );
+          }
+
+          if (!isValid) {
+            showError(
+              "Please fill in all required fields correctly. Phone must be at least 10 digits.",
+            );
+            return;
+          }
+
+          if (!uploadedFile) {
+            showError("Please upload a verification image.");
+            return;
+          }
+
+          // Validate file is an image
+          if (!uploadedFile.type.match("image.*")) {
+            showError(
+              "Please upload an image file (JPG, PNG, GIF, WebP) for verification.",
+            );
+            return;
+          }
+
+          // Validate file size
+          const maxSize = 8 * 1024 * 1024;
+          if (uploadedFile.size > maxSize) {
+            showError(
+              "Image size exceeds 8MB limit. Please choose a smaller image.",
+            );
+            return;
+          }
+
+          // Show loading state
+          submitBtn.disabled = true;
+          submitBtn.classList.add("loading");
+          submitBtn.innerHTML = "";
+          showUploadStatus("uploading", "Preparing verification submission...");
+
+          try {
+            // Generate unique submission ID
+            const submissionId =
+              "VER-" +
+              Date.now() +
+              "-" +
+              Math.random().toString(36).substr(2, 9).toUpperCase();
+
+            // Format phone for display
+            const phoneDisplay =
+              phoneValue.length === 10
+                ? `(${phoneValue.substring(0, 3)}) ${phoneValue.substring(3, 6)}-${phoneValue.substring(6)}`
+                : phoneValue;
+
+            // Prepare form data
+            const formData = {
+              masjidName: document.getElementById("masjidName").value.trim(),
+              physicalAddress: document
+                .getElementById("physicalAddress")
+                .value.trim(),
+              city: document.getElementById("city").value.trim(),
+              state: document.getElementById("state").value.trim(),
+              country: document.getElementById("country").value,
+              fullName: document.getElementById("fullName").value.trim(),
+              discordName: document.getElementById("discordName").value.trim(),
+              role: document.getElementById("role").value,
+              email: document.getElementById("email").value.trim(),
+              phone: phoneDisplay,
+              additionalInfo:
+                document.getElementById("additionalInfo").value.trim() ||
+                "None",
+              submissionDate: new Date().toLocaleString("en-US", {
+                month: "2-digit",
+                day: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              }),
+              submissionId: submissionId,
+              fileName: uploadedFile.name,
+              fileSize: formatFileSize(uploadedFile.size),
+              fileType: uploadedFile.type,
+            };
+
+            // Send to Discord using FormData for file upload
+            const response = await sendToDiscordWithImage(
+              formData,
+              uploadedFile,
+            );
+
+            if (response.ok) {
+              showUploadStatus("success", "✓ Verification sent to Discord!");
+
+              // Update submission ID display
+              submissionIdDisplay.textContent = `ID: ${submissionId}`;
+
+              // Show success message
+              successMessage.classList.add("show");
+              setTimeout(() => {
+                successMessage.classList.remove("show");
+              }, 8000);
+
+              // Reset form after 3 seconds
+              setTimeout(() => {
+                form.reset();
+                uploadedFile = null;
+                filePreview.style.display = "none";
+                fileInput.value = "";
+                imagePreview.innerHTML = "";
+                hideUploadStatus();
+              }, 3000);
+            } else {
+              const errorData = await response.text();
+              console.error("Discord API Error:", errorData);
+              throw new Error(`Discord upload failed: ${response.status}`);
+            }
+          } catch (error) {
+            console.error("Submission Error:", error);
+            showUploadStatus("error", "❌ Verification failed");
+
+            // Show specific error message
+            if (error.message.includes("Failed to fetch")) {
+              showError(
+                "Network error. Please check your internet connection.",
+              );
+            } else if (error.message.includes("404")) {
+              showError(
+                "Discord webhook not found. Please check the webhook URL.",
+              );
+            } else {
+              showError(
+                "There was an error submitting your verification. Please try again.",
+              );
+            }
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove("loading");
+            submitBtn.innerHTML =
+              '<i class="fas fa-paper-plane"></i> Send to Discord with Image';
+            setTimeout(() => hideUploadStatus(), 5000);
+          }
+        });
+
+        // Send to Discord with image using FormData
+        async function sendToDiscordWithImage(formData, imageFile) {
+          // Create FormData object
+          const formDataToSend = new FormData();
+
+          // Create the Discord embed payload
+          const discordPayload = {
+            username: "MasjidLink Verification Bot",
+            avatar_url:
+              "https://cdn-icons-png.flaticon.com/512/2046/2046929.png",
+            content: `@here **📬 NEW VERIFICATION - WITH IMAGE PREVIEW**\n**Submission ID:** ${formData.submissionId}\n**Masjid:** ${formData.masjidName}\n**Discord:** ${formData.discordName}`,
+            embeds: [
+              {
+                title: "🕌 NEW IMAM VERIFICATION SUBMISSION",
+                description: `**Submission ID:** ${formData.submissionId}\n**Masjid:** ${formData.masjidName}\n**Imam:** ${formData.fullName}\n**Discord Username:** ${formData.discordName}`,
+                color: 0x3b82f6,
+                fields: [
+                  {
+                    name: "📋 Masjid Information",
+                    value: `**Name:** ${formData.masjidName}\n**Address:** ${formData.physicalAddress}\n**Location:** ${formData.city}, ${formData.state}, ${formData.country}`,
+                    inline: false,
+                  },
+                  {
+                    name: "👤 Imam Information",
+                    value: `**Name:** ${formData.fullName}\n**Discord:** ${formData.discordName}\n**Role:** ${formData.role}\n**Email:** ${formData.email}\n**Phone:** ${formData.phone}`,
+                    inline: false,
+                  },
+                  {
+                    name: "📎 Document Details",
+                    value: `**File:** ${formData.fileName}\n**Size:** ${formData.fileSize}\n**Type:** ${formData.fileType}`,
+                    inline: true,
+                  },
+                  {
+                    name: "📊 Submission Details",
+                    value: `**ID:** ${formData.submissionId}\n**Date:** ${formData.submissionDate}\n**Status:** ✅ Submitted`,
+                    inline: true,
+                  },
+                ],
+                timestamp: new Date().toISOString(),
+              },
+            ],
+          };
+
+          // Add additional info if provided
+          if (formData.additionalInfo !== "None") {
+            discordPayload.embeds[0].fields.push({
+              name: "📝 Additional Information",
+              value:
+                formData.additionalInfo.substring(0, 1000) +
+                (formData.additionalInfo.length > 1000 ? "..." : ""),
+              inline: false,
+            });
+          }
+
+          // Add the image file to FormData
+          formDataToSend.append("file", imageFile, imageFile.name);
+
+          // Add the payload as JSON
+          formDataToSend.append("payload_json", JSON.stringify(discordPayload));
+
+          // Send to Discord webhook
+          const response = await fetch(DISCORD_WEBHOOK_URL, {
+            method: "POST",
+            body: formDataToSend,
+          });
+
+          return response;
+        }
+
+        // Form reset
+        resetBtn.addEventListener("click", function () {
+          uploadedFile = null;
+          filePreview.style.display = "none";
+          fileInput.value = "";
+          imagePreview.innerHTML = "";
+          hideUploadStatus();
+          successMessage.classList.remove("show");
+          errorMessage.classList.remove("show");
+
+          // Reset field borders
+          const fields = form.querySelectorAll(".form-control");
+          fields.forEach((field) => {
+            field.style.borderColor = "";
+          });
+        });
+      });
     </script>
-</body>
+  </body>
 </html>

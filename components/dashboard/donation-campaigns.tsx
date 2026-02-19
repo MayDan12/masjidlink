@@ -94,6 +94,18 @@ export function DonationCampaigns() {
     }
   };
 
+  if (!loading && filteredCampaigns.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <Heart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+        <h3 className="text-lg font-medium mb-2">No Campaigns Found</h3>
+        <p className="text-muted-foreground mb-4">
+          There are no active campaigns in this category at the moment.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

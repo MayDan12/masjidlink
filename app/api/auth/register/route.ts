@@ -59,6 +59,7 @@ export async function POST(request: Request) {
         imamId: userRecord.uid,
         imamName: name,
         imamApproved: false,
+        stripeAccountId: "",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
@@ -89,71 +90,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
-
-// dffff;
-
-// export async function POST(req: Request) {
-//   try {
-//     const token = req.headers.get("authorization")?.split("Bearer ")[1];
-//     if (!token) throw new Error("Unauthorized");
-
-//     const decoded = await serverAuth.verifyIdToken(token);
-//     const uid = decoded.uid;
-
-//     const data: SignupRequest = await req.json();
-
-//     if (!data.name || !data.termsAccepted) {
-//       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
-//     }
-
-//     const userDoc: UserDocument = {
-//       uid,
-//       email: decoded.email!,
-//       name: data.name,
-//       role: data.role,
-//       donorRank: "Muḥsin",
-//       followingMasjids: [],
-//       termsAccepted: data.termsAccepted,
-//       createdAt: new Date().toISOString(),
-//       updatedAt: new Date().toISOString(),
-//     };
-
-//     let masjidId: string | undefined;
-
-//     if (data.role === "imam") {
-//       if (!data.masjidName || !data.masjidAddress) {
-//         throw new Error("Masjid info required");
-//       }
-
-//       const masjidRef = firestore.collection("masjids").doc();
-//       masjidId = masjidRef.id;
-
-//       const masjidDoc: MasjidDocument = {
-//         masjidId,
-//         name: data.masjidName,
-//         address: data.masjidAddress,
-//         imamId: uid,
-//         imamName: data.name,
-//         imamApproved: false,
-//         createdAt: new Date().toISOString(),
-//         updatedAt: new Date().toISOString(),
-//       };
-
-//       userDoc.masjidId = masjidId;
-//       userDoc.role = data.role;
-//       userDoc.imamApproved = false;
-
-//       await firestore.runTransaction(async (tx) => {
-//         tx.set(masjidRef, masjidDoc);
-//         tx.set(firestore.doc(`users/${uid}`), userDoc);
-//       });
-//     } else {
-//       await firestore.doc(`users/${uid}`).set(userDoc);
-//     }
-
-//     return NextResponse.json({ success: true, uid, masjidId, role: data.role });
-//   } catch (err: any) {
-//     console.error("Signup profile error:", err);
-//     return NextResponse.json({ error: err.message }, { status: 500 });
-//   }
-// }

@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { MasjidDetails } from "./masjid-details";
 import type { Masjid } from "@/types/masjid";
 import { Skeleton } from "../ui/skeleton";
+import { MosqueIcon } from "../icons/MosqueIcon";
 
 const ITEMS_PER_PAGE = 6;
 
@@ -72,6 +73,18 @@ export function MasjidsList() {
 
   const hasMore = filteredMasjids.length > paginatedMasjids.length;
 
+  if (!loading && paginatedMasjids.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <MosqueIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+        <h3 className="text-lg font-medium mb-2">No Masjids Found</h3>
+        <p className="text-muted-foreground mb-4">
+          There are no masjids in this category at the moment.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       {/* Search + Filter Bar */}
@@ -109,6 +122,8 @@ export function MasjidsList() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* If there is nothing to show */}
 
       {/* Masjid Cards */}
       {loading ? (
