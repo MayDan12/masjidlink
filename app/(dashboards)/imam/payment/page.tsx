@@ -31,13 +31,7 @@ import {
   getImamDonations,
   getImamLiveDonations,
 } from "@/app/(dashboards)/imam/donations/action";
-import {
-  DollarSign,
-  History,
-  Wallet,
-  Loader,
-  ExternalLink,
-} from "lucide-react";
+import { DollarSign, History, Loader, ExternalLink } from "lucide-react";
 import { getImamStripeStatus, createStripeLoginLink } from "./action";
 import { toast } from "sonner";
 
@@ -271,10 +265,10 @@ export default function Payments() {
             View donations to your masjid and track history.
           </p>
         </div>
-        <Button onClick={() => setWithdrawOpen(true)} className="gap-2">
+        {/* <Button onClick={() => setWithdrawOpen(true)} className="gap-2">
           <Wallet className="h-4 w-4" />
           Withdraw
-        </Button>
+        </Button> */}
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">

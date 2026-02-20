@@ -26,6 +26,7 @@ export async function POST(req: Request) {
     // ✅ Create Stripe Connect Express account
     const account = await stripe.accounts.create({
       type: "express",
+      email: imamData?.email,
       capabilities: {
         transfers: { requested: true },
       },
@@ -45,8 +46,8 @@ export async function POST(req: Request) {
     // ✅ Create onboarding link
     const link = await stripe.accountLinks.create({
       account: account.id,
-      refresh_url: `${process.env.NEXT_PUBLIC_APP_URL}/connect-stripe`,
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+      refresh_url: `${process.env.NEXT_PUBLIC_API_URL}/connect-stripe`,
+      return_url: `${process.env.NEXT_PUBLIC_API_URL}/dashboard`,
       type: "account_onboarding",
     });
 

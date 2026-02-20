@@ -212,5 +212,38 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true });
   }
 
+  // ===================================================================
+  // SECONDARY HANDLER: account.updated
+  // ===================================================================
+
+  if (event.type === "account.updated") {
+    console.log(`[Webhook] Processing account.updated ${event.id}`);
+    const account = event.data.object as Stripe.Account;
+
+    const masjidRef = firestore
+      .collection("masjids")
+      .doc(account.metadata?.uid || account.id);
+
+    // Check if onboarding is complete
+    const connected =
+      account.details_submitted &&
+      account.charges_enabled &&
+      account.payouts_enabled;
+
+    try {
+      await masjidRef.update({
+        stripeConnected: true,
+        stripeAccountId: account.id,
+        updatedAt: Timestamp.now(),
+      });
+
+      console.log(`[Webhook] Masjid stripeConnected updated: ${connected}`);
+    } catch (err) {
+      console.error("[Webhook] Failed to update masjid Stripe status:", err);
+    }
+
+    return NextResponse.json({ received: true });
+  }
+
   return NextResponse.json({ received: true });
 }

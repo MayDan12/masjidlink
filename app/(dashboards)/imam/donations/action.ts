@@ -93,6 +93,7 @@ export async function createDonations(data: {
       createdBy: uid,
       createdAt: timestamp,
       updatedAt: timestamp,
+      stripeAccountId: masjidData.data?.stripeAccountId,
       status: "active",
       amountRaised: 0,
     };

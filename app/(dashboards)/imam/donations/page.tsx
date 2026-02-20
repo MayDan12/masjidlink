@@ -15,33 +15,115 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { CreateCampaignDialog } from "@/components/imam-dashboard/create-campaign-dialog";
 import { useEffect, useState } from "react";
-import { auth } from "@/firebase/client";
-import { getMasjidById } from "../../dashboard/masjids/action";
 import { toast } from "sonner";
+import { auth } from "@/firebase/client";
 
 export default function DonationsPage() {
-  const [isStripeAccountIdSet, setIsStripeAccountIdSet] = useState(false);
+  const [stripeStatus, setStripeStatus] = useState("not_started");
   const [isLoading, setIsLoading] = useState(false);
+  // useEffect(() => {
+  //   const checkMasjidStripeAccountId = async () => {
+  //     const uid = auth?.currentUser?.uid;
+  //     if (!uid) {
+  //       throw new Error("User not authenticated");
+  //     }
+  //     const masjidData = await getMasjidById(uid);
+  //     if (!masjidData) {
+  //       throw new Error("Masjid not found for the given Imam.");
+  //     }
+  //     // const checkStripeStatus = fetch(``)
+  //     if (
+  //       !masjidData.data?.stripeAccountId &&
+  //       !masjidData.data?.stripeConnected
+  //     ) {
+  //       setIsStripeAccountIdSet(false);
+  //       return;
+  //     }
+  //     setIsStripeAccountIdSet(true);
+  //   };
+  //   checkMasjidStripeAccountId();
+  // }, []);
+
+  // useEffect(() => {
+  //   const checkMasjidStripeAccountId = async () => {
+  //     const uid = auth?.currentUser?.uid;
+  //     if (!uid) {
+  //       throw new Error("User not authenticated");
+  //     }
+
+  //     const masjidData = await getMasjidById(uid);
+  //     if (!masjidData) {
+  //       throw new Error("Masjid not found for the given Imam.");
+  //     }
+
+  //     const stripeAccountId = masjidData.data?.stripeAccountId;
+  //     const stripeConnected = masjidData.data?.stripeConnected;
+
+  //     if (!stripeAccountId) {
+  //       // Never started onboarding
+  //       setStripeStatus("not_started");
+  //       return;
+  //     }
+
+  //     if (stripeAccountId && !stripeConnected) {
+  //       // Started but not completed
+  //       setStripeStatus("incomplete");
+  //       return;
+  //     }
+
+  //     if (stripeAccountId && stripeConnected) {
+  //       // Fully connected
+  //       setStripeStatus("connected");
+  //       return;
+  //     }
+  //   };
+
+  //   checkMasjidStripeAccountId();
+  // }, []);
+
   useEffect(() => {
-    const checkMasjidStripeAccountId = async () => {
-      const uid = auth?.currentUser?.uid;
-      if (!uid) {
+    const checkStripeStatus = async () => {
+      const token = await auth?.currentUser?.getIdToken();
+      if (!token) {
         throw new Error("User not authenticated");
       }
-      const masjidData = await getMasjidById(uid);
-      if (!masjidData) {
-        throw new Error("Masjid not found for the given Imam.");
+      try {
+        const res = await fetch("/api/stripe/status", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+        console.log(data);
+
+        if (!data.accountId) {
+          setStripeStatus("not_started");
+          return;
+        }
+
+        if (!data.connected) {
+          setStripeStatus("incomplete");
+          return;
+        }
+
+        if (data.connected) {
+          setStripeStatus("connected");
+        }
+      } catch (error) {
+        console.error("Stripe status error:", error);
       }
-      if (!masjidData.data?.stripeAccountId) {
-        setIsStripeAccountIdSet(false);
-        return;
-      }
-      setIsStripeAccountIdSet(true);
     };
-    checkMasjidStripeAccountId();
+
+    checkStripeStatus();
   }, []);
 
   const handleConnectStripe = async () => {
+    if (stripeStatus === "connected") {
+      toast.info("Stripe account already connected.");
+      return;
+    }
     setIsLoading(true);
     try {
       const token = await auth?.currentUser?.getIdToken();
@@ -62,9 +144,7 @@ export default function DonationsPage() {
     } catch (error) {
       console.error("Error connecting Stripe account:", error);
       // TODO: show an error message to the user
-      toast.error(
-        `Error connecting Stripe account. Please try again. ${error.message}`,
-      );
+      toast.error("Error connecting Stripe account. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +166,7 @@ export default function DonationsPage() {
           </p>
         </div>
 
-        {isStripeAccountIdSet ? (
+        {stripeStatus === "connected" ? (
           <CreateCampaignDialog>
             <Button>
               <PlusCircle className="mr-2 h-4 w-4" />

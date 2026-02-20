@@ -61,6 +61,12 @@ export async function POST(request: NextRequest) {
         { status: 404 },
       );
     }
+    if (!campaign.stripeAccountId) {
+      return NextResponse.json(
+        { success: false, error: "Stripe account ID not found" },
+        { status: 400 },
+      );
+    }
     if (campaign.status !== "active") {
       return NextResponse.json(
         {
