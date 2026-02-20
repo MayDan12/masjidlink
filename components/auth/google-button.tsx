@@ -21,6 +21,11 @@ function GoogleButton() {
       const result = await signInWithGoogle();
 
       const idToken = await result.user.getIdToken();
+      const fullname = result.user.displayName;
+
+      if (!fullname) {
+        throw new Error("Fullname is required");
+      }
 
       if (!result.user.emailVerified) {
         await sendEmailVerification(result.user);
@@ -30,7 +35,7 @@ function GoogleButton() {
       const res = await fetch("/api/google", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: idToken }),
+        body: JSON.stringify({ token: idToken, fullname }),
       });
       if (!res.ok) {
         const errorData = await res.json();

@@ -5,7 +5,7 @@ import { firestore } from "@/firebase/server"; // Use Admin SDK
 
 export async function POST(request: NextRequest) {
   try {
-    const { token } = await request.json();
+    const { token, fullname } = await request.json();
 
     if (!token) {
       return NextResponse.json({ message: "Missing token" }, { status: 400 });
@@ -18,8 +18,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
 
+    // i need to save the uid to the users collection if it doesn't exist
+    const userRef = firestore.collection("users").doc(uid);
+    const userSnap = await userRef.get();
+    if (!userSnap.exists) {
+      await userRef.set({
+        role: "user",
+        stripeConnected: false,
+        name: fullname,
+        email: decodedToken.email,
+        uid,
+        termsAccepted: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    }
+
     // 🔍 Fetch role from Firestore
-    const userSnap = await firestore.collection("users").doc(uid).get();
     const userData = userSnap.data();
     const role = userData?.role ?? "user";
 
@@ -60,7 +75,7 @@ export async function POST(request: NextRequest) {
     console.error("Google login error:", error);
     return NextResponse.json(
       { message: "Google login failed", error },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

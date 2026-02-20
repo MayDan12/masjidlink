@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     const imamDoc = await firestore.doc(`masjids/${imamId}`).get();
     const imamData = imamDoc.data();
 
-    if (imamData?.stripeAccountId) {
+    if (imamData?.stripeAccountId && imamData?.stripeConnected) {
       return NextResponse.json({ accountId: imamData.stripeAccountId });
     }
 

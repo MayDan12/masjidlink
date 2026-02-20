@@ -207,7 +207,7 @@ export default function DonationsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <DonationCampaigns />
+              <DonationCampaigns stripeStatus={stripeStatus} />
             </CardContent>
           </Card>
         </TabsContent>

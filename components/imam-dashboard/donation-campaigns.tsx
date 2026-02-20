@@ -62,7 +62,7 @@ type CampaignUI = Omit<Campaign, "createdAt" | "updatedAt"> & {
   createdAt?: string;
   updatedAt?: string;
 };
-export function DonationCampaigns() {
+export function DonationCampaigns({ stripeStatus }: { stripeStatus: string }) {
   const [activeTab, setActiveTab] = useState("active");
   const [loading, setLoading] = useState(false);
   const [campaigns, setCampaigns] = useState<CampaignUI[]>([]);
@@ -340,12 +340,14 @@ export function DonationCampaigns() {
                       ? "You don't have any completed campaigns yet."
                       : "You don't have any archived campaigns."}
               </p>
-              <CreateCampaignDialog>
-                <Button>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Create Campaign
-                </Button>
-              </CreateCampaignDialog>
+              {stripeStatus === "connected" && (
+                <CreateCampaignDialog>
+                  <Button>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Create Campaign
+                  </Button>
+                </CreateCampaignDialog>
+              )}
             </div>
           )}
         </TabsContent>
