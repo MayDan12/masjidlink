@@ -9,6 +9,7 @@ export interface SignupRequest {
   masjidAddress?: string;
   masjidWebsite?: string;
   termsAccepted: boolean;
+  masjidProfileImage?: string;
 }
 
 export interface UserDocument {
@@ -35,4 +36,5 @@ export interface MasjidDocument {
   createdAt: string;
   updatedAt: string;
   stripeAccountId?: string;
+  masjidProfileImage?: string;
 }

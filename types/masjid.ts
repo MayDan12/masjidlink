@@ -19,4 +19,5 @@ export type Masjid = {
   capacity?: string;
   email?: string;
   prayerTimes?: PrayerTime[];
+  masjidProfileImage?: string;
 };

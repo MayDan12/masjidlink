@@ -142,9 +142,9 @@ export function MasjidsList() {
             <Card key={masjid.id} className="w-full">
               <CardContent className="p-3 sm:p-4">
                 <div className="flex gap-2 sm:gap-4">
-                  <Avatar className="h-12 w-12 sm:h-16 sm:w-16 rounded-md flex-shrink-0">
+                  <Avatar className="h-14 w-14 sm:h-22 sm:w-22 rounded-md flex-shrink-0">
                     <AvatarImage
-                      src={masjid.image || "/placeholder.svg"}
+                      src={masjid.masjidProfileImage}
                       alt={masjid.name}
                       className="object-cover"
                     />

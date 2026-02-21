@@ -29,6 +29,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import GoogleButton from "./google-button";
 import { useRouter } from "next/navigation";
+import { FileUpload } from "../landing/file-upload";
 
 // Form validation schema
 const formSchema = z
@@ -75,6 +76,7 @@ export function RegistrationForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [registered, setRegistered] = useState(false);
+  const [masjidProfileImage, setMasjidProfileImage] = useState<string>("");
   const router = useRouter();
 
   // Initialize form
@@ -97,12 +99,28 @@ export function RegistrationForm() {
   const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
     setError(null);
+    if (values.role === "imam" && !masjidProfileImage) {
+      setError("Please upload a profile image.");
+      setIsLoading(false);
+      return;
+    }
+    // i want to add profile images to the request
+    const formData = new FormData();
+    formData.append("name", values.name);
+    formData.append("email", values.email);
+    formData.append("password", values.password);
+    formData.append("role", values.role);
+    formData.append("masjidName", values.masjidName || "");
+    formData.append("masjidAddress", values.masjidAddress || "");
+    formData.append("termsAccepted", values.termsAccepted.toString());
+    if (masjidProfileImage) {
+      formData.append("masjidProfileImage", masjidProfileImage);
+    }
 
     try {
       const response = await fetch("/api/auth/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: formData,
       });
 
       if (!response.ok) {
@@ -384,6 +402,12 @@ export function RegistrationForm() {
                       <FormMessage />
                     </FormItem>
                   )}
+                />
+                <FileUpload
+                  label="Masjid Profile Image"
+                  onChange={setMasjidProfileImage}
+                  value={masjidProfileImage}
+                  accept="image/*"
                 />
               </TabsContent>
 

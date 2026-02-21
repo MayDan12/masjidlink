@@ -1,21 +1,29 @@
 import { NextResponse } from "next/server";
 import { serverAuth, firestore } from "@/firebase/server";
-import { UserDocument, MasjidDocument, SignupRequest } from "@/types/auth";
+import {
+  UserDocument,
+  MasjidDocument,
+  SignupRequest,
+  UserRole,
+} from "@/types/auth";
 
 export async function POST(request: Request) {
   try {
-    const {
-      email,
-      password,
-      name,
-      role,
-      masjidName,
-      masjidAddress,
-      termsAccepted,
-    }: SignupRequest = await request.json();
+    const formData = await request.formData();
+
+    const signupData: SignupRequest = {
+      email: formData.get("email") as string,
+      password: formData.get("password") as string,
+      name: formData.get("name") as string,
+      role: formData.get("role") as UserRole,
+      masjidName: formData.get("masjidName") as string,
+      masjidAddress: formData.get("masjidAddress") as string,
+      termsAccepted: formData.get("termsAccepted") === "true",
+      masjidProfileImage: formData.get("masjidProfileImage") as string,
+    };
 
     // Validate input
-    if (!email || !password || !name || !termsAccepted) {
+    if (!signupData) {
       return NextResponse.json(
         { error: "All required fields must be provided" },
         { status: 400 },
@@ -24,20 +32,20 @@ export async function POST(request: Request) {
 
     // Create user in Firebase Auth
     const userRecord = await serverAuth.createUser({
-      email,
-      password,
-      displayName: name,
+      email: signupData.email,
+      password: signupData.password,
+      displayName: signupData.name,
     });
 
     // Prepare user document
     const userDoc: UserDocument = {
       uid: userRecord.uid,
-      email,
-      name,
-      role,
+      email: signupData.email,
+      name: signupData.name,
+      role: signupData.role,
       donorRank: "Muḥsin",
       followingMasjids: [],
-      termsAccepted,
+      termsAccepted: signupData.termsAccepted,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -45,8 +53,8 @@ export async function POST(request: Request) {
     let masjidId: string | undefined;
 
     // Handle imam registration
-    if (role === "imam") {
-      if (!masjidName || !masjidAddress) {
+    if (signupData.role === "imam") {
+      if (!signupData.masjidName || !signupData.masjidAddress) {
         throw new Error("Masjid name and address are required for imams");
       }
 
@@ -54,10 +62,11 @@ export async function POST(request: Request) {
 
       const masjidDoc: MasjidDocument = {
         masjidId,
-        name: masjidName,
-        address: masjidAddress,
+        name: signupData.masjidName,
+        address: signupData.masjidAddress,
+        masjidProfileImage: signupData.masjidProfileImage,
         imamId: userRecord.uid,
-        imamName: name,
+        imamName: signupData.name,
         imamApproved: false,
         stripeAccountId: "",
         createdAt: new Date().toISOString(),
@@ -78,10 +87,10 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       uid: userRecord.uid,
-      email,
-      name,
-      role,
-      ...(role === "imam" && { masjidId, imamApproved: false }),
+      email: signupData.email,
+      name: signupData.name,
+      role: signupData.role,
+      ...(signupData.role === "imam" && { masjidId, imamApproved: false }),
     });
   } catch (error) {
     console.error("Registration error:", error);
