@@ -39,11 +39,21 @@ export const createEvents = async (data: {
 
   const uid = verifiedToken.uid;
   const timestamp = Timestamp.now();
+  const masjidRef = firestore.collection("masjids").doc(uid);
+  const masjidDoc = await masjidRef.get();
+
+  if (!masjidDoc.exists) {
+    return {
+      error: true,
+      message: "Masjid not found.",
+    };
+  }
 
   const eventToStore = {
     ...eventData,
     status: "upcoming", // 👈 Default status for new events
-    createdBy: uid,
+    // Masjid name as the event creator
+    createdBy: masjidDoc.data()?.name,
     createdAt: timestamp,
     updatedAt: timestamp,
     rsvps: [], // 👈 Initialize RSVP list

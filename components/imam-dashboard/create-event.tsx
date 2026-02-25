@@ -143,7 +143,6 @@ export function CreateEvent() {
     }
 
     setIsLoading(true);
-
     try {
       const token = await auth?.currentUser?.getIdToken();
       if (!token) {
