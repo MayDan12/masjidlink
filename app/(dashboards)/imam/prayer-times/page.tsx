@@ -25,9 +25,9 @@ export default function PrayerTimesPage() {
       <Tabs defaultValue="daily" className="space-y-4">
         <TabsList>
           <TabsTrigger value="daily">Daily Prayers</TabsTrigger>
-          <TabsTrigger value="jumuah">Jumu&apos;ah</TabsTrigger>
-          <TabsTrigger value="calculation">Calculation Method</TabsTrigger>
-          <TabsTrigger value="ramadan">Ramadan</TabsTrigger>
+          {/* <TabsTrigger value="jumuah">Jumu&apos;ah</TabsTrigger>
+          <TabsTrigger value="calculation">Calculation Method</TabsTrigger> */}
+          {/* <TabsTrigger value="ramadan">Ramadan</TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="daily" className="space-y-4">

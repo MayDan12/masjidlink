@@ -82,33 +82,29 @@ export default function DonationsPage() {
   // }, []);
 
   useEffect(() => {
+    if (!auth?.currentUser) return;
+
     const checkStripeStatus = async () => {
-      const token = await auth?.currentUser?.getIdToken();
-      if (!token) {
-        throw new Error("User not authenticated");
-      }
       try {
+        const token = await auth?.currentUser?.getIdToken();
+
         const res = await fetch("/api/stripe/status", {
           method: "GET",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         });
+
+        if (!res.ok) throw new Error("Failed to fetch Stripe status");
+
         const data = await res.json();
         console.log(data);
 
-        if (!data.accountId) {
+        if (!data.stripeAccountId) {
           setStripeStatus("not_started");
-          return;
-        }
-
-        if (!data.connected) {
+        } else if (!data.chargesEnabled) {
           setStripeStatus("incomplete");
-          return;
-        }
-
-        if (data.connected) {
+        } else {
           setStripeStatus("connected");
         }
       } catch (error) {
@@ -124,26 +120,36 @@ export default function DonationsPage() {
       toast.info("Stripe account already connected.");
       return;
     }
+
+    if (!auth?.currentUser) {
+      toast.error("User not authenticated.");
+      return;
+    }
+
     setIsLoading(true);
+
     try {
-      const token = await auth?.currentUser?.getIdToken();
+      const token = await auth.currentUser.getIdToken();
+
       const res = await fetch("/api/stripe/account-creation", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
+
+      if (!res.ok) throw new Error("Failed to create Stripe account");
+
       const data = await res.json();
-      // it's returning accountId and onboardingUrl
-      // we need to redirect the user to the onboardingUrl opened in a new tab
       console.log(data);
+
       if (data.onboardingUrl) {
         window.open(data.onboardingUrl, "_blank");
+      } else {
+        toast.error("Failed to start Stripe onboarding.");
       }
     } catch (error) {
       console.error("Error connecting Stripe account:", error);
-      // TODO: show an error message to the user
       toast.error("Error connecting Stripe account. Please try again.");
     } finally {
       setIsLoading(false);
@@ -178,13 +184,6 @@ export default function DonationsPage() {
             Connect Stripe Account
           </Button>
         )}
-
-        {/* <CreateCampaignDialog>
-          <Button>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Create Campaign
-          </Button>
-        </CreateCampaignDialog> */}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

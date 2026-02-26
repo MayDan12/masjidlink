@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,12 +15,14 @@ import { FeatureSection } from "@/components/landing/feature-section";
 import { TestimonialsSection } from "@/components/landing/testimonials";
 import { PricingSection } from "@/components/landing/pricing-section";
 import { FooterSection } from "@/components/landing/footer";
+import StripeDelButton from "@/components/stripeDelButton";
 
 export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-1">
         {/* Hero Section */}
+
         <HeroSection />
 
         {/* Role-Based Sections */}
@@ -167,6 +170,7 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+        {/* <StripeDelButton accountId="acct_1T4rKSQMcVR1a5Hd" /> */}
       </main>
 
       {/* Footer */}
@@ -174,3 +178,10 @@ export default function LandingPage() {
     </div>
   );
 }
+// acct_1T2t8tKtY30Xux2h;
+// acct_1T2t8b3wmQPovRnY;
+// acct_1T2doeKo21YYYOHi;
+// acct_1T2de93JesSyYbnH;
+// acct_1T2lza40FLpD6Npq;
+// acct_1T21OyKd450xWekj;
+// acct_1T2GtEKazp1Jkv8D;

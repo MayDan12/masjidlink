@@ -60,7 +60,7 @@ export function PrayerTimesEditor() {
       ([name, settings]) => ({
         name: name as PrayerTime["name"],
         time: settings.time,
-      })
+      }),
     );
 
     // Show success message
@@ -95,7 +95,7 @@ export function PrayerTimesEditor() {
                 >
                   {prayer}
                 </Label>
-                <div className="flex items-center space-x-2">
+                {/* <div className="flex items-center space-x-2">
                   <Switch
                     id={`${prayer}-notification`}
                     checked={settings.notification}
@@ -106,7 +106,7 @@ export function PrayerTimesEditor() {
                   <Label htmlFor={`${prayer}-notification`} className="text-xs">
                     Azan
                   </Label>
-                </div>
+                </div> */}
               </div>
 
               <div className="flex items-center gap-2">
@@ -119,7 +119,7 @@ export function PrayerTimesEditor() {
                 />
               </div>
 
-              <div className="flex items-center space-x-2 pt-2">
+              {/* <div className="flex items-center space-x-2 pt-2">
                 <Switch
                   id={`${prayer}-bell`}
                   checked={settings.bellReminder}
@@ -133,7 +133,7 @@ export function PrayerTimesEditor() {
                 >
                   <Bell className="h-3 w-3 mr-1" /> 15 min reminder
                 </Label>
-              </div>
+              </div> */}
             </div>
           ))}
         </div>

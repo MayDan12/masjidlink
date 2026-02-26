@@ -293,8 +293,8 @@ export async function POST(request: NextRequest) {
     });
 
     // Create Stripe Checkout Session with direct transfer
-    const successUrl = `${process.env.NEXT_PUBLIC_API_URL}/donate/${campaignId}?status=success&donationId=${donationRef.id}`;
-    const cancelUrl = `${process.env.NEXT_PUBLIC_API_URL}/donate/${campaignId}?status=cancel&donationId=${donationRef.id}`;
+    const successUrl = `${process.env.NEXT_PUBLIC_API_URL}/imam/donations/${campaignId}?status=success&donationId=${donationRef.id}`;
+    const cancelUrl = `${process.env.NEXT_PUBLIC_API_URL}/imam/donations/${campaignId}?status=cancel&donationId=${donationRef.id}`;
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",

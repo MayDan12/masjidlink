@@ -7,7 +7,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: Request) {
   try {
-    // ✅ Verify Firebase user
     const authHeader = req.headers.get("authorization");
     if (!authHeader) throw new Error("Unauthorized");
 
@@ -15,44 +14,45 @@ export async function POST(req: Request) {
     const decoded = await serverAuth.verifyIdToken(token);
     const imamId = decoded.uid;
 
-    // ✅ Check if Imam already has Stripe account
-    const imamDoc = await firestore.doc(`masjids/${imamId}`).get();
+    const imamRef = firestore.doc(`masjids/${imamId}`);
+    const imamDoc = await imamRef.get();
     const imamData = imamDoc.data();
 
-    if (imamData?.stripeAccountId && imamData?.stripeConnected) {
-      return NextResponse.json({ accountId: imamData.stripeAccountId });
+    let accountId = imamData?.stripeAccountId;
+
+    // ✅ If no account exists, create one
+    if (!accountId) {
+      const account = await stripe.accounts.create({
+        type: "express",
+        email: imamData?.email,
+        capabilities: {
+          transfers: { requested: true },
+        },
+        metadata: { imamId },
+      });
+
+      accountId = account.id;
+
+      await imamRef.set(
+        {
+          stripeAccountId: accountId,
+          stripeConnected: false,
+          updatedAt: new Date(),
+        },
+        { merge: true },
+      );
     }
 
-    // ✅ Create Stripe Connect Express account
-    const account = await stripe.accounts.create({
-      type: "express",
-      email: imamData?.email,
-      capabilities: {
-        transfers: { requested: true },
-      },
-      metadata: { imamId },
-    });
-
-    // ✅ Save to Firestore
-    await firestore.doc(`masjids/${imamId}`).set(
-      {
-        stripeAccountId: account.id,
-        stripeConnected: false,
-        updatedAt: new Date(),
-      },
-      { merge: true },
-    );
-
-    // ✅ Create onboarding link
+    // ✅ Always create onboarding link using existing or new accountId
     const link = await stripe.accountLinks.create({
-      account: account.id,
+      account: accountId,
       refresh_url: `${process.env.NEXT_PUBLIC_API_URL}/connect-stripe`,
-      return_url: `${process.env.NEXT_PUBLIC_API_URL}/dashboard`,
+      return_url: `${process.env.NEXT_PUBLIC_API_URL}/dashboard?stripe=refresh`,
       type: "account_onboarding",
     });
 
     return NextResponse.json({
-      accountId: account.id,
+      accountId,
       onboardingUrl: link.url,
     });
   } catch (error: any) {
