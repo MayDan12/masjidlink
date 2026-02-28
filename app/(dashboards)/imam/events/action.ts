@@ -54,6 +54,7 @@ export const createEvents = async (data: {
     status: "upcoming", // 👈 Default status for new events
     // Masjid name as the event creator
     createdBy: masjidDoc.data()?.name,
+    masjidId: uid,
     createdAt: timestamp,
     updatedAt: timestamp,
     rsvps: [], // 👈 Initialize RSVP list
@@ -445,7 +446,7 @@ export const getEventsByUserId = async (data: {
     }
 
     const eventsRef = firestore.collection("events");
-    const snapshot = await eventsRef.where("createdBy", "==", userId).get();
+    const snapshot = await eventsRef.where("masjidId", "==", userId).get();
 
     const events: Event[] = snapshot.docs.map((doc) => {
       const data = doc.data();

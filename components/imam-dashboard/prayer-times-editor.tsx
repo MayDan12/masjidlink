@@ -1,47 +1,66 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, Loader, Save } from "lucide-react";
-import { saveMasjidPrayerTime } from "@/app/(dashboards)/imam/action";
+import { Loader, Save } from "lucide-react";
+import {
+  saveMasjidPrayerTime,
+  getMasjidPrayerTimes,
+} from "@/app/(dashboards)/imam/action";
 import { toast } from "sonner";
 import { auth } from "@/firebase/client";
 import { PrayerTime } from "@/types/masjid";
 
+const defaultPrayerTimes = {
+  fajr: { time: "05:15" },
+  sunrise: { time: "06:30" },
+  dhuhr: { time: "12:30" },
+  asr: { time: "15:45" },
+  maghrib: { time: "18:15" },
+  isha: { time: "19:45" },
+};
+
 export function PrayerTimesEditor() {
   // Mock data - in a real app, this would come from an API
-  const [prayerTimes, setPrayerTimes] = useState({
-    fajr: { time: "05:15", notification: true, bellReminder: true },
-    sunrise: { time: "06:30", notification: false, bellReminder: false },
-    dhuhr: { time: "12:30", notification: true, bellReminder: true },
-    asr: { time: "15:45", notification: true, bellReminder: true },
-    maghrib: { time: "18:15", notification: true, bellReminder: true },
-    isha: { time: "19:45", notification: true, bellReminder: true },
-  });
-  const [loading, setLoading] = useState(false);
+  const [prayerTimes, setPrayerTimes] = useState(defaultPrayerTimes);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPrayerTimes = async () => {
+      const token = await auth?.currentUser?.getIdToken();
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      const result = await getMasjidPrayerTimes(token);
+
+      if (result.success && result.prayerTimes) {
+        const formatted = result.prayerTimes.reduce((acc: any, prayer: any) => {
+          acc[prayer.name] = { time: prayer.time };
+          return acc;
+        }, {});
+
+        setPrayerTimes({
+          ...defaultPrayerTimes,
+          ...formatted, // overwrite defaults with saved values
+        });
+      }
+
+      setLoading(false);
+    };
+
+    fetchPrayerTimes();
+  }, []);
 
   const handleTimeChange = (prayer: string, time: string) => {
     setPrayerTimes((prev) => ({
       ...prev,
       [prayer]: { ...prev[prayer as keyof typeof prev], time },
-    }));
-  };
-
-  const handleNotificationChange = (prayer: string, enabled: boolean) => {
-    setPrayerTimes((prev) => ({
-      ...prev,
-      [prayer]: { ...prev[prayer as keyof typeof prev], notification: enabled },
-    }));
-  };
-
-  const handleBellReminderChange = (prayer: string, enabled: boolean) => {
-    setPrayerTimes((prev) => ({
-      ...prev,
-      [prayer]: { ...prev[prayer as keyof typeof prev], bellReminder: enabled },
     }));
   };
 
@@ -74,6 +93,7 @@ export function PrayerTimesEditor() {
     } else {
       toast.error(result.message || "Failed to save prayer times.");
     }
+    setLoading(false);
   };
 
   return (
