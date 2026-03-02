@@ -78,7 +78,7 @@ export function ProfileInformation() {
       .map((n) => n[0])
       .join("");
     const joinDate = new Date(
-      user?.metadata?.creationTime || Date.now()
+      user?.metadata?.creationTime || Date.now(),
     ).toLocaleDateString();
 
     return { fullName, email, initials, joinDate };
@@ -168,7 +168,7 @@ export function ProfileInformation() {
         setIsUploading(false);
       }
     },
-    [form, refreshUser]
+    [form, refreshUser],
   );
 
   const triggerFileInput = () => fileInputRef.current?.click();

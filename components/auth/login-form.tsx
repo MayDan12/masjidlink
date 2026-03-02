@@ -122,6 +122,11 @@ export function LoginForm() {
       };
       router.push(roleRoutes[userRole] ?? "/login");
     } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Login failed. Please try again.",
+      );
       setErrorMessage(
         error instanceof Error
           ? error.message

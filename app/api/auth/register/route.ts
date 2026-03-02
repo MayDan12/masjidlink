@@ -42,6 +42,7 @@ export async function POST(request: Request) {
       uid: userRecord.uid,
       email: signupData.email,
       name: signupData.name,
+      masjidProfileImage: signupData.masjidProfileImage,
       role: signupData.role,
       donorRank: "Muḥsin",
       followingMasjids: [],

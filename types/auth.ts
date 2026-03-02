@@ -24,6 +24,7 @@ export interface UserDocument {
   termsAccepted: boolean;
   createdAt: string;
   updatedAt: string;
+  masjidProfileImage?: string;
 }
 
 export interface MasjidDocument {

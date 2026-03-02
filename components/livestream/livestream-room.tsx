@@ -216,14 +216,14 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
           <div
             className={cn(
               "absolute inset-0 bg-black/80 backdrop-blur-sm z-20 lg:hidden transition-all duration-300",
-              showChat ? "opacity-100 visible" : "opacity-0 invisible"
+              showChat ? "opacity-100 visible" : "opacity-0 invisible",
             )}
             onClick={() => setShowChat(false)}
           >
             <div
               className={cn(
                 "absolute bottom-0 left-0 right-0 bg-gray-900 rounded-t-3xl max-h-[75vh] flex flex-col shadow-2xl border-t border-gray-700 transition-transform duration-300",
-                showChat ? "translate-y-0" : "translate-y-full"
+                showChat ? "translate-y-0" : "translate-y-full",
               )}
               onClick={(e) => e.stopPropagation()}
             >
@@ -265,7 +265,7 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
                         "p-3 rounded-xl transition-all duration-200 hover:scale-[1.02]",
                         msg.isDonation
                           ? "bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 border border-yellow-400/30 shadow-lg"
-                          : "bg-gray-800/80 hover:bg-gray-800"
+                          : "bg-gray-800/80 hover:bg-gray-800",
                       )}
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
@@ -338,7 +338,7 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
         <div
           className={cn(
             "hidden lg:block lg:w-80 h-full border-l border-gray-700 bg-gray-900 transition-all duration-300",
-            showParticipants ? "lg:block" : "lg:hidden"
+            showParticipants ? "lg:block" : "lg:hidden",
           )}
           style={{ paddingBottom: "76px" }} // Add padding to account for control bar height
         >
@@ -349,7 +349,7 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
         <div
           className={cn(
             "hidden lg:flex lg:w-80 bg-gray-900 border-l border-gray-700 flex-col transition-all duration-300",
-            showChat ? "lg:flex" : "lg:hidden"
+            showChat ? "lg:flex" : "lg:hidden",
           )}
           style={{ paddingBottom: "76px" }} // Add padding to account for control bar height
         >
@@ -384,7 +384,7 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
                     "p-3 rounded-lg transition-all duration-200 hover:scale-[1.01]",
                     msg.isDonation
                       ? "bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 border border-yellow-400/30 shadow-lg"
-                      : "bg-gray-800/80 hover:bg-gray-800"
+                      : "bg-gray-800/80 hover:bg-gray-800",
                   )}
                 >
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -454,14 +454,14 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
       <div
         className={cn(
           "absolute inset-0 bg-black/80 backdrop-blur-sm z-20 lg:hidden transition-all duration-300",
-          showParticipants ? "opacity-100 visible" : "opacity-0 invisible"
+          showParticipants ? "opacity-100 visible" : "opacity-0 invisible",
         )}
         onClick={() => setShowParticipants(false)}
       >
         <div
           className={cn(
             "absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-gray-900 shadow-2xl border-l py-4 border-gray-700 transition-transform duration-300",
-            showParticipants ? "translate-x-0" : "translate-x-full"
+            showParticipants ? "translate-x-0" : "translate-x-full",
           )}
           onClick={(e) => e.stopPropagation()}
         >
@@ -529,7 +529,7 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
               "h-10 w-10 p-0 border border-gray-600 transition-colors",
               showParticipants
                 ? "bg-blue-600 hover:bg-blue-700 text-white"
-                : "bg-gray-800 hover:bg-gray-700"
+                : "bg-gray-800 hover:bg-gray-700",
             )}
           >
             <Users className="w-4 h-4" />
@@ -543,7 +543,7 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
               "h-10 w-10 p-0 border border-gray-600 transition-colors relative",
               showChat
                 ? "bg-blue-600 hover:bg-blue-700 text-white"
-                : "bg-gray-800 hover:bg-gray-700"
+                : "bg-gray-800 hover:bg-gray-700",
             )}
           >
             <MessageCircle className="w-4 h-4" />
@@ -580,7 +580,7 @@ const CallLayouts = () => {
   const hostParticipant = participants.find((p) => p.userId === callCreatorId);
 
   const otherParticipants = participants.filter(
-    (p) => p.sessionId !== hostParticipant?.sessionId
+    (p) => p.sessionId !== hostParticipant?.sessionId,
   );
 
   return (

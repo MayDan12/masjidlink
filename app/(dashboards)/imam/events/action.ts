@@ -58,6 +58,7 @@ export const createEvents = async (data: {
     createdAt: timestamp,
     updatedAt: timestamp,
     rsvps: [], // 👈 Initialize RSVP list
+    stripeAccountId: masjidDoc.data()?.stripeAccountId,
   };
 
   // Use auto-generated ID for each new event

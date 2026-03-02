@@ -17,11 +17,12 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import { ChurchIcon as Mosque, Calendar, Bell, Heart } from "lucide-react";
+import { Calendar, Bell, Heart } from "lucide-react";
+import { MosqueIcon } from "./icons/MosqueIcon";
 
 const dashboardCards = [
   {
-    icon: <Mosque size={24} />,
+    icon: <MosqueIcon size={24} />,
     title: "Masjid Profiles",
     description: "Discover and connect with masjids in your area",
     link: "/dashboard/masjids",
