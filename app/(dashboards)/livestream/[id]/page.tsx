@@ -44,6 +44,7 @@ export default function Page({ params: { id } }: { params: { id: string } }) {
       </div>
     );
   }
+  // Live Stream
 
   return (
     <main className="h-screen w-full">
