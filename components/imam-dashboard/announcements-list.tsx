@@ -21,7 +21,6 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Search,
-  MoreHorizontal,
   Edit,
   Trash,
   Eye,
@@ -31,8 +30,19 @@ import {
 } from "lucide-react";
 import { auth } from "@/firebase/client";
 import { toast } from "sonner";
-import { getAnnouncementsByUserId } from "@/app/(dashboards)/imam/announcements/action";
+import {
+  deleteAnnouncement,
+  getAnnouncementsByUserId,
+} from "@/app/(dashboards)/imam/announcements/action";
 import { Card, CardContent } from "../ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 type Announcement = {
   id: string;
@@ -118,6 +128,29 @@ export function AnnouncementsList() {
         return "bg-gray-100 text-gray-800";
       default:
         return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      const token = await auth?.currentUser?.getIdToken();
+      if (!token) {
+        toast.error("Token not found");
+        return;
+      }
+
+      const response = await deleteAnnouncement({ token, announcementId: id });
+
+      if ("error" in response && response.error) {
+        toast.error(response.message || "Failed to delete announcement");
+        return;
+      }
+
+      toast.success("Announcement deleted successfully");
+      setAnnouncements((prev) => prev.filter((a) => a.id !== id));
+    } catch (error) {
+      console.error("Error deleting announcement:", error);
+      toast.error("Something went wrong while deleting the announcement.");
     }
   };
 
@@ -284,15 +317,99 @@ export function AnnouncementsList() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Eye className="h-4 w-4" />
-                        <span className="sr-only">View</span>
-                      </Button>
+                      {/* Open a dialog to see the full content of the announcement */}
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 hover:bg-muted"
+                          >
+                            <Eye className="h-4 w-4" />
+                            <span className="sr-only">View announcement</span>
+                          </Button>
+                        </DialogTrigger>
+
+                        <DialogContent className="sm:max-w-lg">
+                          <DialogHeader>
+                            <DialogTitle>Announcement Details</DialogTitle>
+                            <DialogDescription>
+                              View the full details of this announcement.
+                            </DialogDescription>
+                          </DialogHeader>
+
+                          <div className="space-y-4 text-sm">
+                            <div>
+                              <p className="text-muted-foreground text-xs">
+                                Title
+                              </p>
+                              <p className="font-medium">
+                                {announcement.title}
+                              </p>
+                            </div>
+
+                            <div>
+                              <p className="text-muted-foreground text-xs">
+                                Content
+                              </p>
+                              <p>{announcement.content}</p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <p className="text-muted-foreground text-xs">
+                                  Severity
+                                </p>
+                                <p className="capitalize">
+                                  {announcement.severity}
+                                </p>
+                              </div>
+
+                              <div>
+                                <p className="text-muted-foreground text-xs">
+                                  Type
+                                </p>
+                                <p className="capitalize">
+                                  {announcement.type}
+                                </p>
+                              </div>
+
+                              <div>
+                                <p className="text-muted-foreground text-xs">
+                                  Status
+                                </p>
+                                <p className="capitalize">
+                                  {announcement.status}
+                                </p>
+                              </div>
+
+                              <div>
+                                <p className="text-muted-foreground text-xs">
+                                  Created
+                                </p>
+                                <p>{formatDate(announcement.createdAt)}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
                         <Edit className="h-4 w-4" />
                         <span className="sr-only">Edit</span>
                       </Button>
-                      <DropdownMenu>
+                      <Button
+                        onClick={() => {
+                          handleDelete(announcement.id);
+                        }}
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                      >
+                        <Trash className="h-4 w-4 text-destructive" />
+                        <span className="sr-only"> Delete Announcement</span>
+                      </Button>
+
+                      {/* <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="ghost"
@@ -321,7 +438,7 @@ export function AnnouncementsList() {
                             Delete Announcement
                           </DropdownMenuItem>
                         </DropdownMenuContent>
-                      </DropdownMenu>
+                      </DropdownMenu> */}
                     </div>
                   </TableCell>
                 </TableRow>

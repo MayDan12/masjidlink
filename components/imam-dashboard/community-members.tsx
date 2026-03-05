@@ -54,7 +54,7 @@ type Member = {
 
 export function CommunityMembers() {
   const [isLoading, setIsLoading] = useState(false);
-  const [member, setMembers] = useState<Member[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
 
@@ -103,81 +103,7 @@ export function CommunityMembers() {
     fetchMembers();
   }, []);
 
-  console.log("Members:", member);
-
-  // Mock members data
-  const members: Member[] = [
-    {
-      id: "1",
-      name: "Ahmed Khan",
-      email: "ahmed@example.com",
-      phone: "(555) 123-4567",
-      joinDate: "2022-05-15",
-      status: "active",
-      role: "member",
-      image: "/placeholder.svg?height=32&width=32",
-    },
-    {
-      id: "2",
-      name: "Fatima Ali",
-      email: "fatima@example.com",
-      phone: "(555) 234-5678",
-      joinDate: "2022-06-20",
-      status: "active",
-      role: "volunteer",
-      image: "/placeholder.svg?height=32&width=32",
-    },
-    {
-      id: "3",
-      name: "Omar Rahman",
-      email: "omar@example.com",
-      phone: "(555) 345-6789",
-      joinDate: "2022-07-10",
-      status: "active",
-      role: "committee",
-      image: "/placeholder.svg?height=32&width=32",
-    },
-    {
-      id: "4",
-      name: "Aisha Malik",
-      email: "aisha@example.com",
-      phone: "(555) 456-7890",
-      joinDate: "2022-08-05",
-      status: "pending",
-      role: "member",
-      image: "/placeholder.svg?height=32&width=32",
-    },
-    {
-      id: "5",
-      name: "Yusuf Ibrahim",
-      email: "yusuf@example.com",
-      phone: "(555) 567-8901",
-      joinDate: "2022-09-15",
-      status: "inactive",
-      role: "member",
-      image: "/placeholder.svg?height=32&width=32",
-    },
-    {
-      id: "6",
-      name: "Zainab Hassan",
-      email: "zainab@example.com",
-      phone: "(555) 678-9012",
-      joinDate: "2022-10-20",
-      status: "active",
-      role: "admin",
-      image: "/placeholder.svg?height=32&width=32",
-    },
-    {
-      id: "7",
-      name: "Khalid Mahmood",
-      email: "khalid@example.com",
-      phone: "(555) 789-0123",
-      joinDate: "2022-11-10",
-      status: "active",
-      role: "volunteer",
-      image: "/placeholder.svg?height=32&width=32",
-    },
-  ];
+  console.log("Members:", members);
 
   // Filter members based on search query and status filter
   const filteredMembers = members.filter((member) => {

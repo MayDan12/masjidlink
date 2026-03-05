@@ -210,27 +210,45 @@ export const getAnnouncementsByUserId = async (data: {
   }
 };
 
-type EmergencyAlert = {
-  title: string;
-  description: string;
-  alertType:
-    | "janazah"
-    | "missing_child"
-    | "security"
-    | "disaster"
-    | "closure"
-    | "other";
-  severity: "low" | "medium" | "high" | "critical";
-  isResolved: boolean;
-  resolvedAt?: Timestamp;
-  relatedMasjidId: string;
-  createdAt: Timestamp;
-  createdBy: string;
-  updatedAt: Timestamp;
+export const deleteAnnouncement = async (data: {
+  token: string;
+  announcementId: string;
+}) => {
+  try {
+    const { token, announcementId } = data;
+    const verifiedToken = await serverAuth.verifyIdToken(token);
+    const userRole = await checkUserRole(verifiedToken.uid);
+
+    if (userRole !== "imam") {
+      return {
+        error: true,
+        message: "Unauthorized: Only imams can delete announcements.",
+      };
+    }
+
+    const announcementRef = firestore
+      .collection("announcements")
+      .doc(announcementId);
+    await announcementRef.delete();
+
+    return {
+      success: true,
+      message: "Announcement deleted successfully.",
+    };
+  } catch (error) {
+    console.error("Error deleting announcement:", error);
+    return {
+      error: true,
+      message:
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred while deleting the announcement.",
+    };
+  }
 };
 
 export const createEmergencyAlert = async (
-  data: { token: string } & Omit<EmergencyAlert, "isResolved" | "resolvedAt">
+  data: { token: string } & Omit<EmergencyAlert, "isResolved" | "resolvedAt">,
 ) => {
   const { token, ...alertData } = data;
 

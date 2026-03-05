@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { AnnouncementsList } from "@/components/imam-dashboard/announcements-list";
 import { AnnouncementEditor } from "@/components/imam-dashboard/announcements";
-import { EmergencyAlerts } from "@/components/imam-dashboard/emergency-alerts";
+// import { EmergencyAlerts } from "@/components/imam-dashboard/emergency-alerts";
 import { AlertCircle, Edit, PlusCircle } from "lucide-react";
 
 export default function AnnouncementsPage() {
@@ -32,9 +32,9 @@ export default function AnnouncementsPage() {
             <Edit className="h-5 w-5" />
             View
           </TabsTrigger>
-          <TabsTrigger value="emergency" className="gap-1">
+          {/* <TabsTrigger value="emergency" className="gap-1">
             <AlertCircle className="h-5 w-5" /> Emergency
-          </TabsTrigger>
+          </TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="create" className="space-y-4">
@@ -65,7 +65,7 @@ export default function AnnouncementsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="emergency" className="space-y-4">
+        {/* <TabsContent value="emergency" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Emergency Alerts</CardTitle>
@@ -77,7 +77,7 @@ export default function AnnouncementsPage() {
               <EmergencyAlerts />
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
     </div>
   );

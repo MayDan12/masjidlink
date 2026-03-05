@@ -29,9 +29,9 @@ export default function CommunityPage() {
       <Tabs defaultValue="members" className="space-y-4">
         <TabsList>
           <TabsTrigger value="members">Members</TabsTrigger>
-          <TabsTrigger value="groups">Groups</TabsTrigger>
+          {/* <TabsTrigger value="groups">Groups</TabsTrigger>
           <TabsTrigger value="volunteers">Volunteers</TabsTrigger>
-          <TabsTrigger value="messages">Messages</TabsTrigger>
+          <TabsTrigger value="messages">Messages</TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="members" className="space-y-4">

@@ -229,9 +229,9 @@ export function LoginForm() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="flex justify-center gap-4">
         <GoogleButton />
-        <Button variant="outline" className="bg-background">
+        {/* <Button variant="outline" className="bg-background">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -247,7 +247,7 @@ export function LoginForm() {
             <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
           </svg>
           Facebook
-        </Button>
+        </Button> */}
       </div>
     </div>
   );
