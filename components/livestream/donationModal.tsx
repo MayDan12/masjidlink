@@ -61,7 +61,6 @@ function DonationModal({ isOpen, onClose, imamId }: DonationModalProps) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             imamId,
-            stripeAccountId,
             token,
             amount: donationAmount,
             message,

@@ -42,6 +42,7 @@ import {
   getDonationById,
   editDonationCampaign,
 } from "@/app/(dashboards)/imam/donations/action";
+import { Switch } from "../ui/switch";
 
 type Campaign = {
   id: string;
@@ -76,7 +77,7 @@ const formSchema = z.object({
   category: z.string().min(1, {
     message: "Category is required.",
   }),
-  // isPublic: z.boolean(),
+  isPublic: z.boolean(),
   // allowAnonymous: z.boolean(),
   // showProgress: z.boolean(),
 });
@@ -111,7 +112,7 @@ export function EditCampaignDialog({
       startDate: campaign.startDate,
       endDate: campaign.endDate,
       category: campaign.category,
-      // isPublic: true,
+      isPublic: true,
       // allowAnonymous: true,
       // showProgress: true,
     },
@@ -133,6 +134,7 @@ export function EditCampaignDialog({
             startDate: response.campaign.startDate || "",
             endDate: response.campaign.endDate || "",
             category: response.campaign.category || "",
+            isPublic: response.campaign.isPublic || false,
           });
         } else {
           toast({
@@ -166,6 +168,7 @@ export function EditCampaignDialog({
         startDate: values.startDate,
         endDate: values.endDate,
         category: values.category,
+        isPublic: values.isPublic,
         token,
       });
 
@@ -309,7 +312,7 @@ export function EditCampaignDialog({
               )}
             />
 
-            {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="isPublic"
@@ -330,7 +333,8 @@ export function EditCampaignDialog({
                   </FormItem>
                 )}
               />
-
+            </div>
+            {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="allowAnonymous"

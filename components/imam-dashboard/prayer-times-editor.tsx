@@ -19,9 +19,9 @@ const defaultPrayerTimes = {
   fajr: { time: "05:15" },
   sunrise: { time: "06:30" },
   dhuhr: { time: "12:30" },
-  asr: { time: "15:45" },
-  maghrib: { time: "18:15" },
-  isha: { time: "19:45" },
+  asr: { time: "3:45" },
+  maghrib: { time: "6:15" },
+  isha: { time: "7:45" },
 };
 
 export function PrayerTimesEditor() {

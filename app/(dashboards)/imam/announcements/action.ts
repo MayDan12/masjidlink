@@ -247,101 +247,101 @@ export const deleteAnnouncement = async (data: {
   }
 };
 
-export const createEmergencyAlert = async (
-  data: { token: string } & Omit<EmergencyAlert, "isResolved" | "resolvedAt">,
-) => {
-  const { token, ...alertData } = data;
+// export const createEmergencyAlert = async (
+//   data: { token: string } & Omit<EmergencyAlert, "isResolved" | "resolvedAt">,
+// ) => {
+//   const { token, ...alertData } = data;
 
-  // Authorization
-  const verifiedToken = await serverAuth.verifyIdToken(token);
-  const userRole = await checkUserRole(verifiedToken.uid);
+//   // Authorization
+//   const verifiedToken = await serverAuth.verifyIdToken(token);
+//   const userRole = await checkUserRole(verifiedToken.uid);
 
-  if (userRole !== "imam") {
-    return {
-      error: true,
-      message:
-        "Unauthorized: Only imams and admins can create emergency alerts.",
-    };
-  }
+//   if (userRole !== "imam") {
+//     return {
+//       error: true,
+//       message:
+//         "Unauthorized: Only imams and admins can create emergency alerts.",
+//     };
+//   }
 
-  const uid = verifiedToken.uid;
-  const timestamp = Timestamp.now();
+//   const uid = verifiedToken.uid;
+//   const timestamp = Timestamp.now();
 
-  const alertToStore: EmergencyAlert = {
-    ...alertData,
-    isResolved: false,
-    createdBy: uid,
-    createdAt: timestamp,
-    updatedAt: timestamp,
-  };
+//   const alertToStore: EmergencyAlert = {
+//     ...alertData,
+//     isResolved: false,
+//     createdBy: uid,
+//     createdAt: timestamp,
+//     updatedAt: timestamp,
+//   };
 
-  // Store alert
-  const alertRef = firestore.collection("emergencyAlerts").doc();
-  await alertRef.set(alertToStore);
+//   // Store alert
+//   const alertRef = firestore.collection("emergencyAlerts").doc();
+//   await alertRef.set(alertToStore);
 
-  // Send push notifications to all followers
-  try {
-    const masjidFollowers = await firestore
-      .collection("users")
-      .where("followedMasjids", "array-contains", alertData.relatedMasjidId)
-      .get();
+//   // Send push notifications to all followers
+//   try {
+//     const masjidFollowers = await firestore
+//       .collection("users")
+//       .where("followedMasjids", "array-contains", alertData.relatedMasjidId)
+//       .get();
 
-    const tokens = masjidFollowers.docs
-      .map((doc) => doc.data().fcmToken)
-      .filter((token) => token);
+//     const tokens = masjidFollowers.docs
+//       .map((doc) => doc.data().fcmToken)
+//       .filter((token) => token);
 
-    if (tokens.length > 0) {
-      await messaging.sendEachForMulticast({
-        tokens,
-        notification: {
-          title: `[URGENT] ${alertData.title}`,
-          body: alertData.description,
-        },
-        data: {
-          alertId: alertRef.id,
-          masjidId: alertData.relatedMasjidId,
-          type: alertData.alertType,
-        },
-      });
-    }
-  } catch (error) {
-    console.error("Error sending notifications:", error);
-  }
+//     if (tokens.length > 0) {
+//       await messaging.sendEachForMulticast({
+//         tokens,
+//         notification: {
+//           title: `[URGENT] ${alertData.title}`,
+//           body: alertData.description,
+//         },
+//         data: {
+//           alertId: alertRef.id,
+//           masjidId: alertData.relatedMasjidId,
+//           type: alertData.alertType,
+//         },
+//       });
+//     }
+//   } catch (error) {
+//     console.error("Error sending notifications:", error);
+//   }
 
-  return {
-    success: true,
-    message: "Emergency alert successfully created and notifications sent.",
-    alertId: alertRef.id,
-  };
-};
+//   return {
+//     success: true,
+//     message: "Emergency alert successfully created and notifications sent.",
+//     alertId: alertRef.id,
+//   };
+// };
 
-export const resolveEmergencyAlert = async (data: {
-  token: string;
-  alertId: string;
-}) => {
-  const { token, alertId } = data;
+// export const resolveEmergencyAlert = async (data: {
+//   token: string;
+//   alertId: string;
+// }) => {
+//   const { token, alertId } = data;
 
-  // Authorization
-  const verifiedToken = await serverAuth.verifyIdToken(token);
-  const userRole = await checkUserRole(verifiedToken.uid);
+//   // Authorization
+//   const verifiedToken = await serverAuth.verifyIdToken(token);
+//   const userRole = await checkUserRole(verifiedToken.uid);
 
-  if (userRole !== "imam" && userRole !== "admin") {
-    return {
-      error: true,
-      message: "Unauthorized: Only imams and admins can resolve alerts.",
-    };
-  }
+//   if (userRole !== "imam" && userRole !== "admin") {
+//     return {
+//       error: true,
+//       message: "Unauthorized: Only imams and admins can resolve alerts.",
+//     };
+//   }
 
-  const timestamp = Timestamp.now();
+//   const timestamp = Timestamp.now();
 
-  await firestore.collection("emergencyAlerts").doc(alertId).update({
-    isResolved: true,
-    resolvedAt: timestamp,
-    updatedAt: timestamp,
-  });
+//   await firestore.collection("emergencyAlerts").doc(alertId).update({
+//     isResolved: true,
+//     resolvedAt: timestamp,
+//     updatedAt: timestamp,
+//   });
 
-  return {
-    success: true,
-    message: "Emergency alert marked as resolved.",
-  };
-};
+//   return {
+//     success: true,
+//     message: "Emergency alert marked as resolved.",
+//   };
+// };

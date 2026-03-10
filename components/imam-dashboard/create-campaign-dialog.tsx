@@ -40,6 +40,7 @@ import { toast } from "@/hooks/use-toast";
 import { createDonations } from "@/app/(dashboards)/imam/donations/action";
 import { auth } from "@/firebase/client";
 import { getMasjidById } from "@/app/(dashboards)/dashboard/masjids/action";
+import { Switch } from "../ui/switch";
 
 const formSchema = z.object({
   title: z.string().min(2, {
@@ -60,7 +61,7 @@ const formSchema = z.object({
   category: z.string().min(1, {
     message: "Category is required.",
   }),
-  // isPublic: z.boolean(),
+  isPublic: z.boolean(),
   // allowAnonymous: z.boolean(),
   // showProgress: z.boolean(),
 });
@@ -89,7 +90,7 @@ export function CreateCampaignDialog({
       startDate: "",
       endDate: "",
       category: "",
-      // isPublic: true,
+      isPublic: true,
       // allowAnonymous: true,
       // showProgress: true,
     },
@@ -172,7 +173,6 @@ export function CreateCampaignDialog({
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="description"
@@ -194,7 +194,6 @@ export function CreateCampaignDialog({
                 </FormItem>
               )}
             />
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
@@ -238,7 +237,6 @@ export function CreateCampaignDialog({
                 )}
               />
             </div>
-
             <FormField
               control={form.control}
               name="category"
@@ -266,8 +264,7 @@ export function CreateCampaignDialog({
                 </FormItem>
               )}
             />
-
-            {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="isPublic"
@@ -288,7 +285,9 @@ export function CreateCampaignDialog({
                   </FormItem>
                 )}
               />
+            </div>
 
+            {/* 
               <FormField
                 control={form.control}
                 name="allowAnonymous"
@@ -327,7 +326,6 @@ export function CreateCampaignDialog({
                 )}
               />
             </div> */}
-
             <DialogFooter>
               <Button
                 type="button"

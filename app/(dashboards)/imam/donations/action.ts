@@ -70,6 +70,7 @@ export async function createDonations(data: {
   startDate: string;
   endDate: string;
   category: string;
+  isPublic: boolean;
   token: string;
 }) {
   try {
@@ -122,6 +123,7 @@ export async function editDonationCampaign(
     startDate?: string;
     endDate?: string;
     category?: string;
+    isPublic?: boolean;
     token: string;
   },
 ) {

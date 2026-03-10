@@ -33,7 +33,6 @@ import {
   Eye,
   BarChart,
   PlusCircle,
-  Loader,
 } from "lucide-react";
 import { CreateCampaignDialog } from "./create-campaign-dialog";
 import { EditCampaignDialog } from "./edit-campaign-dialog";

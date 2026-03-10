@@ -33,6 +33,7 @@ type Campaign = {
   category: "general" | "construction" | "education" | "charity" | "emergency";
   createdAt?: string;
   updatedAt?: string;
+  isPublic: boolean;
 };
 
 const categoryColors = {
@@ -186,19 +187,21 @@ export default function CampaignDetailsDonations({
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <DollarSign className="w-6 h-6 text-blue-600" />
+            {campaign.isPublic && (
+              <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <DollarSign className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <span className="text-2xl font-bold text-blue-700">
+                      {formatCurrency(campaign.amountRaised)}
+                    </span>
                   </div>
-                  <span className="text-2xl font-bold text-blue-700">
-                    {formatCurrency(campaign.amountRaised)}
-                  </span>
-                </div>
-                <p className="text-sm text-blue-600">Amount Raised</p>
-              </CardContent>
-            </Card>
+                  <p className="text-sm text-blue-600">Amount Raised</p>
+                </CardContent>
+              </Card>
+            )}
 
             <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200">
               <CardContent className="p-6">
@@ -214,40 +217,46 @@ export default function CampaignDetailsDonations({
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="p-2 bg-amber-100 rounded-lg">
-                    <TrendingUp className="w-6 h-6 text-amber-600" />
+            {campaign.isPublic && (
+              <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="p-2 bg-amber-100 rounded-lg">
+                      <TrendingUp className="w-6 h-6 text-amber-600" />
+                    </div>
+                    <span className="text-2xl font-bold text-amber-700">
+                      {calculateProgress().toFixed(1)}%
+                    </span>
                   </div>
-                  <span className="text-2xl font-bold text-amber-700">
-                    {calculateProgress().toFixed(1)}%
-                  </span>
-                </div>
-                <p className="text-sm text-amber-600">Progress</p>
-              </CardContent>
-            </Card>
+                  <p className="text-sm text-amber-600">Progress</p>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Progress Section */}
-          <Card className="mb-8">
-            <CardContent className="p-6">
-              <div className="mb-4">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Campaign Progress</span>
-                  <span className="text-sm font-bold ">
-                    {formatCurrency(campaign.amountRaised)} of{" "}
-                    {formatCurrency(campaign.goal_amount)}
-                  </span>
+          {campaign.isPublic && (
+            <Card className="mb-8">
+              <CardContent className="p-6">
+                <div className="mb-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">
+                      Campaign Progress
+                    </span>
+                    <span className="text-sm font-bold ">
+                      {formatCurrency(campaign.amountRaised)} of{" "}
+                      {formatCurrency(campaign.goal_amount)}
+                    </span>
+                  </div>
+                  <Progress value={calculateProgress()} className="h-3" />
                 </div>
-                <Progress value={calculateProgress()} className="h-3" />
-              </div>
-              <div className="flex justify-between text-sm">
-                <span>0%</span>
-                <span>100%</span>
-              </div>
-            </CardContent>
-          </Card>
+                <div className="flex justify-between text-sm">
+                  <span>0%</span>
+                  <span>100%</span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Timeline Section */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
