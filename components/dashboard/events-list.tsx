@@ -50,6 +50,16 @@ export function EventsList() {
   }, [events, searchQuery, filter, timeframe]);
   // }, [events, searchQuery, filter, timeframe]);
 
+  function formatDates(date: string | Date): string {
+    const parsedDate = new Date(date);
+
+    return parsedDate.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
+
   // Fetch events with error handling
   const fetchEvents = useCallback(async () => {
     setIsLoading(true);
@@ -93,7 +103,7 @@ export function EventsList() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="h-4 w-4" />
-              <span className="font-medium">{formatDate(event.date)}</span>
+              <span className="font-medium">{formatDates(event.date)}</span>
             </div>
             <Badge variant="default">{event.type}</Badge>
           </div>
@@ -153,7 +163,7 @@ export function EventsList() {
         </CardContent>
       </Card>
     ),
-    [toggleRegistration]
+    [toggleRegistration],
   );
 
   if (isLoading) {
@@ -252,8 +262,8 @@ export function EventsList() {
               {searchQuery
                 ? "No events match your search criteria."
                 : timeframe === "upcoming"
-                ? "There are no upcoming events scheduled."
-                : "There are no past events to display."}
+                  ? "There are no upcoming events scheduled."
+                  : "There are no past events to display."}
             </p>
           </div>
         )}

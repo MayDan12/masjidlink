@@ -36,7 +36,7 @@ import CustomCallControls from "./custom-call-controls";
 import { Badge } from "@/components/ui/badge";
 // import { Card } from "@/components/ui/card";
 import { getLiveEventById } from "@/app/(dashboards)/imam/events/action";
-import { Event } from "@/types/events";
+import { Event, Events } from "@/types/events";
 // import { Checkbox } from "../ui/checkbox";
 
 import DonationModal from "./donationModal";
@@ -54,6 +54,16 @@ interface ChatMessage {
 
 interface LiveStreamRoomProps {
   userRole?: "host" | "viewer";
+}
+
+function formatDates(date: string | Date): string {
+  const parsedDate = new Date(date);
+
+  return parsedDate.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {

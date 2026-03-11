@@ -203,19 +203,21 @@ export default function CampaignDetailsDonations({
               </Card>
             )}
 
-            <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="p-2 bg-emerald-100 rounded-lg">
-                    <Target className="w-6 h-6 text-emerald-600" />
+            {campaign.isPublic && (
+              <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="p-2 bg-emerald-100 rounded-lg">
+                      <Target className="w-6 h-6 text-emerald-600" />
+                    </div>
+                    <span className="text-2xl font-bold text-emerald-700">
+                      {formatCurrency(campaign.goal_amount)}
+                    </span>
                   </div>
-                  <span className="text-2xl font-bold text-emerald-700">
-                    {formatCurrency(campaign.goal_amount)}
-                  </span>
-                </div>
-                <p className="text-sm text-emerald-600">Goal Amount</p>
-              </CardContent>
-            </Card>
+                  <p className="text-sm text-emerald-600">Goal Amount</p>
+                </CardContent>
+              </Card>
+            )}
 
             {campaign.isPublic && (
               <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">

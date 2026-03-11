@@ -81,12 +81,16 @@ export const createEvents = async (data: {
   }
 
   // Extract emails
-  const followerEmails = followersSnap.docs
-    .map((doc) => doc.data()?.email)
-    .filter(Boolean) as string[];
+  // const followerEmails = followersSnap.docs
+  //   .map((doc) => doc.data()?.email)
+  //   .filter(Boolean) as string[];
 
   // ✅ Send emails
-  await sendEmailToFollowers(followerEmails, eventToStore);
+  // try {
+  //   await sendEmailToFollowers(followerEmails, eventToStore);
+  // } catch (error) {
+  //   console.error("Email sending failed:", error);
+  // }
 
   return {
     success: true,
@@ -306,7 +310,7 @@ type Eent = {
   id: string;
   title: string;
   description: string;
-  date: string;
+  date: Date;
   startTime: string;
   endTime?: string;
   location: string;

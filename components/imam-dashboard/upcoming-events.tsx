@@ -86,6 +86,16 @@ export function UpcomingEventsAdmin() {
     return new Date(dateString).toLocaleDateString("en-US", options);
   };
 
+  function formatDates(date: string | Date): string {
+    const parsedDate = new Date(date);
+
+    return parsedDate.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  }
+
   if (events.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-10 px-4">
@@ -142,7 +152,7 @@ export function UpcomingEventsAdmin() {
           <div className="mt-2 space-y-1 text-sm text-muted-foreground">
             <div className="flex items-center">
               <Calendar className="h-3.5 w-3.5 mr-2" />
-              <span>{formatDate(event.date)}</span>
+              <span>{formatDates(event.date)}</span>
             </div>
             <div className="flex items-center">
               <Clock className="h-3.5 w-3.5 mr-2" />

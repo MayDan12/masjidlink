@@ -13,20 +13,27 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CalendarIcon, Clock, MapPin, Users, X } from "lucide-react";
+import { CalendarIcon, Clock, Loader, MapPin, Users, X } from "lucide-react";
 import { toast } from "sonner";
-import { getEventsByUserId } from "@/app/(dashboards)/imam/events/action";
+import {
+  deleteEvent,
+  getEventsByUserId,
+} from "@/app/(dashboards)/imam/events/action";
 import { auth } from "@/firebase/client";
-import { Events } from "@/types/events";
+import { Event, Events } from "@/types/events";
+import { EventEditForm } from "./event-edit-form";
 
 // Define the Event type at the top level
 
 export function EventCalendar() {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [selectedEvent, setSelectedEvent] = useState<Events | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<Events>();
+  const [selectedEditEvent, setSelectedEditEvent] = useState<Event>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [events, setEvents] = useState<Events[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Get event type badge color
   const getEventTypeColor = (type: string) => {
@@ -44,49 +51,49 @@ export function EventCalendar() {
     }
   };
 
+  const fetchEvents = async () => {
+    setIsLoading(true);
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) {
+        toast.error("Authentication required");
+        return;
+      }
+
+      const result = await getEventsByUserId({ token });
+
+      if (!result.success) {
+        toast.error(result.message || "Failed to fetch events");
+        return;
+      }
+
+      // Ensure we have events data, fallback to empty array if undefined
+      const eventsData = result.events || [];
+
+      // Convert date strings to Date objects with validation
+      const formattedEvents = eventsData
+        .map((event) => {
+          try {
+            const date = new Date(event.date);
+            return isNaN(date.getTime()) ? null : { ...event, date };
+          } catch {
+            return null;
+          }
+        })
+        .filter((event): event is Events => event !== null);
+
+      setEvents(formattedEvents);
+    } catch (error) {
+      toast.error("Failed to fetch events");
+      console.error("Error fetching events:", error);
+      setEvents([]); // Reset to empty array on error
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Fetch events from backend
   useEffect(() => {
-    const fetchEvents = async () => {
-      setIsLoading(true);
-      try {
-        const token = await auth.currentUser?.getIdToken();
-        if (!token) {
-          toast.error("Authentication required");
-          return;
-        }
-
-        const result = await getEventsByUserId({ token });
-
-        if (!result.success) {
-          toast.error(result.message || "Failed to fetch events");
-          return;
-        }
-
-        // Ensure we have events data, fallback to empty array if undefined
-        const eventsData = result.events || [];
-
-        // Convert date strings to Date objects with validation
-        const formattedEvents = eventsData
-          .map((event) => {
-            try {
-              const date = new Date(event.date);
-              return isNaN(date.getTime()) ? null : { ...event, date };
-            } catch {
-              return null;
-            }
-          })
-          .filter((event): event is Events => event !== null);
-
-        setEvents(formattedEvents);
-      } catch (error) {
-        toast.error("Failed to fetch events");
-        console.error("Error fetching events:", error);
-        setEvents([]); // Reset to empty array on error
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchEvents();
   }, []);
 
@@ -103,7 +110,7 @@ export function EventCalendar() {
       (event) =>
         event.date.getDate() === date.getDate() &&
         event.date.getMonth() === date.getMonth() &&
-        event.date.getFullYear() === date.getFullYear()
+        event.date.getFullYear() === date.getFullYear(),
     );
   };
 
@@ -118,6 +125,43 @@ export function EventCalendar() {
     if (eventsOnDate.length === 1) {
       handleEventClick(eventsOnDate[0]);
     }
+  };
+
+  async function handleDelete(eventId: string) {
+    // Show a toast with action buttons
+    toast("Are you sure you want to delete this event?", {
+      action: {
+        label: "Delete",
+        onClick: async () => {
+          setIsDeleting(true);
+          try {
+            const token = await auth.currentUser?.getIdToken();
+            if (!token) {
+              toast.error("Authentication required");
+              return;
+            }
+            await deleteEvent({ token, eventId });
+            toast.success("Event deleted successfully");
+            await fetchEvents(); // Refetch data
+          } catch (error) {
+            toast.error(`Failed to delete event ${error}`);
+          } finally {
+            setIsDeleting(false);
+          }
+        },
+      },
+      cancel: {
+        label: "Cancel",
+        onClick: () => {}, // No action on cancel
+      },
+      duration: Number.POSITIVE_INFINITY, // Stays open until user acts
+    });
+  }
+
+  // Handle edit dialog open
+  const handleEditClick = (event: Event) => {
+    setSelectedEditEvent(event);
+    setIsEditDialogOpen(true);
   };
 
   return (
@@ -209,6 +253,21 @@ export function EventCalendar() {
         </CardContent>
       </Card>
 
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Event</DialogTitle>
+          </DialogHeader>
+          {selectedEditEvent && (
+            <EventEditForm
+              event={selectedEditEvent}
+              onClose={() => setIsEditDialogOpen(false)}
+              onSuccess={fetchEvents}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* Event Details Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-md">
@@ -260,12 +319,28 @@ export function EventCalendar() {
             </div>
 
             <div className="flex justify-end gap-2">
-              <Button variant="outline" size="sm">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleEditClick(selectedEvent as Event)}
+              >
                 Edit Event
               </Button>
-              <Button variant="destructive" size="sm">
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => {
+                  if (selectedEvent?.id) {
+                    handleDelete(selectedEvent.id);
+                  }
+                }}
+              >
                 <X className="h-4 w-4 mr-2" />
-                Cancel Event
+                {isDeleting ? (
+                  <Loader className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  "Cancel Event"
+                )}
               </Button>
             </div>
           </div>

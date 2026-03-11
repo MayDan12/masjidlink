@@ -136,15 +136,24 @@ export function EventsList() {
     return colors[type] || colors.other;
   };
 
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = {
-      weekday: "short",
+  // const formatDate = (dateString: string) => {
+  //   const options: Intl.DateTimeFormatOptions = {
+  //     weekday: "short",
+  //     month: "short",
+  //     day: "numeric",
+  //     year: "numeric",
+  //   };
+  //   return new Date(dateString).toLocaleDateString("en-US", options);
+  // };
+  function formatDates(date: string | Date): string {
+    const parsedDate = new Date(date);
+
+    return parsedDate.toLocaleDateString("en-GB", {
+      day: "2-digit",
       month: "short",
-      day: "numeric",
       year: "numeric",
-    };
-    return new Date(dateString).toLocaleDateString("en-US", options);
-  };
+    });
+  }
 
   if (isLoading) {
     return (
@@ -236,7 +245,7 @@ export function EventsList() {
                 <div className="space-y-2 mt-3 text-sm">
                   <div className="flex items-center">
                     <Calendar className="h-3.5 w-3.5 mr-2 text-muted-foreground" />
-                    <span>{formatDate(event.date)}</span>
+                    <span>{formatDates(event.date)}</span>
                   </div>
                   <div className="flex items-center">
                     <Clock className="h-3.5 w-3.5 mr-2 text-muted-foreground" />
@@ -311,7 +320,7 @@ export function EventsList() {
                       <div className="flex flex-col">
                         <div className="flex items-center">
                           <Calendar className="h-3.5 w-3.5 mr-2 text-muted-foreground" />
-                          <span>{formatDate(event.date)}</span>
+                          <span>{formatDates(event.date)}</span>
                         </div>
                         <div className="flex items-center mt-1">
                           <Clock className="h-3.5 w-3.5 mr-2 text-muted-foreground" />
