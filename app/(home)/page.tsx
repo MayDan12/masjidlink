@@ -16,6 +16,7 @@ import { TestimonialsSection } from "@/components/landing/testimonials";
 import { PricingSection } from "@/components/landing/pricing-section";
 import { FooterSection } from "@/components/landing/footer";
 import StripeDelButton from "@/components/stripeDelButton";
+import { MosqueIcon } from "@/components/icons/MosqueIcon";
 
 export default function LandingPage() {
   return (
@@ -82,7 +83,7 @@ export default function LandingPage() {
                 </p>
                 <ul className="mt-4 space-y-2">
                   <li className="flex items-center">
-                    <Mosque className="h-5 w-5 mr-2 text-primary" />
+                    <MosqueIcon className="h-5 w-5 mr-2 text-primary" />
                     <span>Manage masjid profile</span>
                   </li>
                   <li className="flex items-center">

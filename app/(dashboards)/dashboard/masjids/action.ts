@@ -48,7 +48,7 @@ export const getMasjidById = async (masjidId: string) => {
 
 export const joinMasjid = async (data: { token: string; masjidId: string }) => {
   const { token, masjidId } = data;
-  let displayName = "";
+  let name = "";
   let email = "";
   let photoURL = "";
 
@@ -61,9 +61,9 @@ export const joinMasjid = async (data: { token: string; masjidId: string }) => {
 
     if (userDoc.exists) {
       const userData = userDoc.data();
-      displayName = userData?.displayName || "";
+      name = userData?.name || "";
       email = userData?.email || "";
-      photoURL = userData?.photoURL || "";
+      photoURL = userData?.profilePicture || "";
     }
 
     const masjidRef = firestore.collection("masjids").doc(masjidId);
@@ -87,14 +87,14 @@ export const joinMasjid = async (data: { token: string; masjidId: string }) => {
       {
         followersCount: FieldValue.increment(1),
       },
-      { merge: true }
+      { merge: true },
     );
 
     // Add user to masjid's followers subcollection
     await followerRef.set({
       userId,
       joinedAt: new Date().toISOString(),
-      displayName,
+      name,
       email,
       photoURL,
     });

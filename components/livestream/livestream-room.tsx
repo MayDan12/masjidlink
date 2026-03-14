@@ -18,30 +18,19 @@ import { useState, useEffect, useRef } from "react";
 //   DropdownMenuSeparator,
 //   DropdownMenuTrigger,
 // } from "@/components/ui/dropdown-menu";
-import {
-  // LayoutList,
-  Loader,
-  MessageCircle,
-  Send,
-  DollarSign,
-  X,
-  Users,
-  Gift,
-} from "lucide-react";
+import { Loader, MessageCircle, Send, Users, Gift, Circle } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import EndCallButton from "./endcallButton";
 import CustomCallControls from "./custom-call-controls";
 import { Badge } from "@/components/ui/badge";
-// import { Card } from "@/components/ui/card";
 import { getLiveEventById } from "@/app/(dashboards)/imam/events/action";
-import { Event, Events } from "@/types/events";
-// import { Checkbox } from "../ui/checkbox";
+import { Event } from "@/types/events";
+import { toast } from "sonner";
 
 import DonationModal from "./donationModal";
-
-// type CallLayoutType = "grid" | "speaker-left" | "speaker-right" | "top";
+import Image from "next/image";
 
 interface ChatMessage {
   id: string;
@@ -56,82 +45,49 @@ interface LiveStreamRoomProps {
   userRole?: "host" | "viewer";
 }
 
-function formatDates(date: string | Date): string {
-  const parsedDate = new Date(date);
-
-  return parsedDate.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
-
 function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
   const searchParams = useSearchParams();
   const isPersonalRoom = !!searchParams.get("personal");
-  // const [layout, setLayout] = useState<CallLayoutType>("top");
   const [showParticipants, setShowParticipants] = useState(false);
-  const [showChat, setShowChat] = useState(false);
+  const [showChat, setShowChat] = useState(true); // Default to true on desktop
   const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
-  // const chatContainerRef = useRef<HTMLDivElement>(null);
   const chatRefMobile = useRef<HTMLDivElement>(null);
   const chatRefDesktop = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  const { useCallCallingState } = useCallStateHooks();
+  const { useCallCallingState, useParticipants } = useCallStateHooks();
   const callingState = useCallCallingState();
+  const participants = useParticipants();
   const call = useCall();
   const [event, setEvent] = useState<Event | null>(null);
   const { id } = useParams();
 
-  // console.log(id);
+  const viewerCount = participants.length;
 
-  // Ensure call is available before proceeding
   useEffect(() => {
     if (!id) return;
     const fetchEvent = async () => {
       const res = await getLiveEventById({ eventId: id as string });
-
-      if (res.status === "error") {
-        console.error("Failed to load event:", res.message);
-        setEvent(null);
-        return;
+      if (res.status === "success") {
+        setEvent(res.event);
       }
-
-      setEvent(res.event); // ✅ store the event
     };
-
     fetchEvent();
   }, [id]);
 
   useEffect(() => {
-    if (event) console.log("Fetched event:", event);
-  }, [event]);
-  // Ensure viewers can't enable their devices even if they try
-  useEffect(() => {
     if (userRole === "viewer" && call) {
-      call.camera.disable();
-      call.microphone.disable();
-
-      // const unsubCam = call.camera.on("changed", () => call.camera.disable());
-      // const unsubMic = call.microphone.on("changed", () =>
-      //   call.microphone.disable()
-      // );
       const enforceViewerRestrictions = async () => {
         await call.camera.disable();
         await call.microphone.disable();
       };
-
-      // Enforce restrictions periodically
       const interval = setInterval(enforceViewerRestrictions, 1000);
-
       return () => clearInterval(interval);
     }
   }, [userRole, call]);
 
-  // Auto-scroll chat to bottom
   useEffect(() => {
     const refs = [chatRefMobile.current, chatRefDesktop.current];
     refs.forEach((ref) => {
@@ -139,52 +95,60 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
     });
   }, [chatMessages]);
 
-  // Listen for custom events (donations, messages)
   useEffect(() => {
     if (!call) return;
-
-    const handleCustomEvent = (event: any) => {
+    const handleCustomEvent = (event: {
+      type: string;
+      user: { name?: string; id: string };
+      custom: { message?: string; amount?: number; isAnonymous?: boolean };
+    }) => {
       if (event.type === "chat_message") {
         const message: ChatMessage = {
           id: Date.now().toString(),
           user: event.user.name || event.user.id,
-          message: event.custom.message,
+          message: event.custom.message || "",
           timestamp: new Date(),
         };
         setChatMessages((prev) => [...prev, message]);
       } else if (event.type === "donation") {
         const donation: ChatMessage = {
           id: Date.now().toString(),
-          user: event.user.name || event.user.id,
+          user: event.custom.isAnonymous
+            ? "Anonymous Donor"
+            : event.user.name || event.user.id,
           message: event.custom.message || "",
           timestamp: new Date(),
           isDonation: true,
           amount: event.custom.amount,
         };
         setChatMessages((prev) => [...prev, donation]);
+
+        // Special toast notification for the host
+        if (userRole === "host") {
+          toast.success(`New Donation: $${event.custom.amount}!`, {
+            description: event.custom.isAnonymous
+              ? "From an anonymous donor"
+              : `From ${event.user.name || event.user.id}`,
+            duration: 5000,
+          });
+        }
       }
     };
-
     call.on("custom", handleCustomEvent);
-
-    return () => {
-      call.off("custom", handleCustomEvent);
-    };
-  }, [call]);
+    return () => call.off("custom", handleCustomEvent);
+  }, [call, userRole]);
 
   if (callingState !== CallingState.JOINED) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-gray-950">
+      <div className="flex h-screen w-full items-center justify-center bg-[#0a0a0c]">
         <div className="flex flex-col items-center gap-4">
-          <Loader className="animate-spin w-8 h-8 text-blue-500" />
+          <Loader className="animate-spin w-8 h-8 text-purple-500" />
           <Button
-            onClick={() => {
-              if (userRole === "viewer") {
-                router.push("/dashboard");
-              } else {
-                router.push("/imam/events");
-              }
-            }}
+            variant="outline"
+            className="border-purple-500/50 text-purple-400 hover:bg-purple-500/10"
+            onClick={() =>
+              router.push(userRole === "viewer" ? "/dashboard" : "/imam/events")
+            }
           >
             Back to Dashboard
           </Button>
@@ -196,379 +160,218 @@ function LiveStreamRoom({ userRole = "viewer" }: LiveStreamRoomProps) {
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !call) return;
-
     await call.sendCustomEvent({
       type: "chat_message",
       custom: { message: newMessage.trim() },
     });
-
     setNewMessage("");
   };
 
   return (
-    <section className="relative h-screen w-full overflow-hidden bg-gray-950">
-      <div className="relative flex flex-col lg:flex-row size-full">
-        {/* Main video area */}
-        <div className="flex-1 flex flex-col relative bg-gray-900 mb-16">
-          {/* Title or Event Metadata */}
-          {event && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-md px-4 py-2 rounded-lg z-10 text-center">
-              <h1 className="text-lg md:text-2xl font-bold text-white">
-                {event.title}
-              </h1>
-            </div>
-          )}
+    <section className="relative h-screen w-full overflow-hidden bg-[#0a0a0c] text-white font-sans">
+      <div className="flex flex-col h-full">
+        {/* Header */}
+        <header className="flex items-center justify-between px-6 py-4 bg-[#0a0a0c]">
+          <div className="flex flex-col">
+            <h1 className="text-xl font-bold tracking-tight">
+              {event?.title || "Livestream"}
+            </h1>
+            <p className="text-sm text-gray-400">
+              {event?.createdBy || "Host"} • started recently
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Badge className="bg-red-500/10 text-red-500 border-none px-3 py-1 flex items-center gap-2">
+              <Circle className="w-2 h-2 fill-current animate-pulse" />
+              LIVE
+            </Badge>
+            <Badge className="bg-gray-800 text-gray-300 border-none px-3 py-1 flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              {viewerCount.toLocaleString()}
+            </Badge>
+          </div>
+        </header>
 
-          {/* Live Video Layout */}
-          <CallLayouts />
-
-          {/* Mobile chat overlay */}
-          <div
-            className={cn(
-              "absolute inset-0 bg-black/80 backdrop-blur-sm z-20 lg:hidden transition-all duration-300",
-              showChat ? "opacity-100 visible" : "opacity-0 invisible",
-            )}
-            onClick={() => setShowChat(false)}
-          >
+        <div className="flex flex-1 overflow-hidden">
+          {/* Main Video Area */}
+          <main className="flex-1 relative bg-[#0f0f12] overflow-hidden m-4 rounded-2xl border border-gray-800 shadow-2xl">
+            {/* Grid Background Effect */}
             <div
-              className={cn(
-                "absolute bottom-0 left-0 right-0 bg-gray-900 rounded-t-3xl max-h-[75vh] flex flex-col shadow-2xl border-t border-gray-700 transition-transform duration-300",
-                showChat ? "translate-y-0" : "translate-y-full",
-              )}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Mobile chat header */}
-              <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800 rounded-t-3xl">
-                <div className="flex items-center gap-2">
-                  <MessageCircle className="w-5 h-5 text-blue-400" />
-                  <h3 className="text-white font-semibold">Live Chat</h3>
-                  <Badge variant="secondary" className="text-xs">
-                    {chatMessages.length}
+              className="absolute inset-0 opacity-10 pointer-events-none"
+              style={{
+                backgroundImage:
+                  "radial-gradient(#ffffff 1px, transparent 1px)",
+                backgroundSize: "40px 40px",
+              }}
+            />
+
+            <div className="relative size-full p-4">
+              <CallLayouts />
+
+              {/* Host Overlay Badge */}
+              <div className="absolute bottom-8 left-8">
+                <div className="bg-black/80 backdrop-blur-md border border-white/10 rounded-full px-4 py-2 flex items-center gap-3">
+                  <span className="font-semibold text-sm">
+                    {event?.createdBy || "Imam"}
+                  </span>
+                  <Badge className="bg-purple-600 hover:bg-purple-700 text-[10px] font-bold py-0 h-5">
+                    HOST
                   </Badge>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowChat(false)}
-                  className="text-white hover:bg-gray-700 h-8 w-8 p-0"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
               </div>
+            </div>
+          </main>
 
-              {/* Mobile chat messages */}
-              <div
-                ref={chatRefMobile}
-                className="flex-1 overflow-y-auto p-4 space-y-3 min-h-[200px] max-h-[45vh] scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800"
-              >
-                {chatMessages.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-32 text-gray-500">
-                    <MessageCircle className="w-8 h-8 mb-2 opacity-50" />
-                    <p className="text-sm">No messages yet</p>
-                    <p className="text-xs">Be the first to say something!</p>
+          {/* Sidebar (Chat & Participants) */}
+          <aside
+            className={cn(
+              "w-[380px] flex flex-col bg-[#0a0a0c] border-l border-gray-800 transition-all duration-300",
+              !showChat &&
+                !showParticipants &&
+                "w-0 border-none overflow-hidden",
+            )}
+          >
+            {showChat && (
+              <div className="flex flex-col h-full">
+                <div className="p-6 border-b border-gray-800 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <MessageCircle className="w-5 h-5 text-purple-400" />
+                    <h3 className="font-bold text-lg">Live Chat</h3>
+                    <span className="bg-gray-800 text-gray-400 px-2 py-0.5 rounded text-xs font-bold">
+                      {chatMessages.length}
+                    </span>
                   </div>
-                ) : (
-                  chatMessages.map((msg) => (
+                </div>
+
+                {/* Chat Messages */}
+                <div
+                  ref={chatRefDesktop}
+                  className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide"
+                >
+                  {chatMessages.map((msg) => (
                     <div
                       key={msg.id}
                       className={cn(
-                        "p-3 rounded-xl transition-all duration-200 hover:scale-[1.02]",
+                        "group animate-in fade-in slide-in-from-bottom-2 duration-300",
                         msg.isDonation
-                          ? "bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 border border-yellow-400/30 shadow-lg"
-                          : "bg-gray-800/80 hover:bg-gray-800",
+                          ? "bg-gradient-to-r from-yellow-500/10 to-transparent border-l-2 border-yellow-500 p-3 rounded-r-lg"
+                          : "",
                       )}
                     >
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
-                        <span className="text-sm font-semibold text-white truncate">
-                          {msg.user}
-                        </span>
+                      <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold text-purple-400">
+                            {msg.user}
+                          </span>
                           {msg.isDonation && (
-                            <Badge className="bg-yellow-500 text-black text-xs font-bold">
-                              <DollarSign className="w-3 h-3 mr-1" />
-                              {msg.amount}
+                            <Badge className="bg-yellow-500/20 text-yellow-500 hover:bg-yellow-500/30 border-none text-[10px] font-bold">
+                              ★ ${msg.amount}
                             </Badge>
                           )}
-                          <span className="text-xs text-gray-400">
-                            {msg.timestamp.toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </span>
                         </div>
+                        <span className="text-[10px] text-gray-600 group-hover:text-gray-400 transition-colors">
+                          {msg.timestamp.toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
                       </div>
-                      {msg.message && (
-                        <p className="text-sm text-gray-200 break-words leading-relaxed">
-                          {msg.message}
-                        </p>
-                      )}
+                      <p className="text-sm text-gray-300 leading-relaxed break-words">
+                        {msg.message}
+                      </p>
                     </div>
-                  ))
-                )}
-              </div>
+                  ))}
+                </div>
 
-              {/* Mobile chat input */}
-              <div className="p-4 border-t border-gray-700 bg-gray-800 space-y-3">
-                <form onSubmit={sendMessage} className="flex gap-2">
-                  <Input
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="Type a message..."
-                    className="flex-1 bg-gray-700 border-gray-600 text-white text-base h-11 focus:ring-2 focus:ring-blue-500"
-                    maxLength={200}
-                  />
-                  <Button
-                    type="submit"
-                    size="sm"
-                    className="px-4 h-11 bg-blue-600 hover:bg-blue-700"
-                    disabled={!newMessage.trim()}
-                  >
-                    <Send className="w-4 h-4" />
-                  </Button>
-                </form>
-                {userRole === "viewer" && (
-                  <Button
-                    onClick={() => {
-                      setIsDonationModalOpen(true);
-                      setShowChat(false);
-                    }}
-                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-medium h-11"
-                    size="sm"
-                  >
-                    <Gift className="w-4 h-4 mr-2" />
-                    Send Donation
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Desktop participants panel */}
-        <div
-          className={cn(
-            "hidden lg:block lg:w-80 h-full border-l border-gray-700 bg-gray-900 transition-all duration-300",
-            showParticipants ? "lg:block" : "lg:hidden",
-          )}
-          style={{ paddingBottom: "76px" }} // Add padding to account for control bar height
-        >
-          <CallParticipantsList onClose={() => setShowParticipants(false)} />
-        </div>
-
-        {/* Desktop chat panel */}
-        <div
-          className={cn(
-            "hidden lg:flex lg:w-80 bg-gray-900 border-l border-gray-700 flex-col transition-all duration-300",
-            showChat ? "lg:flex" : "lg:hidden",
-          )}
-          style={{ paddingBottom: "76px" }} // Add padding to account for control bar height
-        >
-          {/* Desktop chat header */}
-          <div className="p-4 border-b border-gray-700 flex items-center justify-between bg-gray-800">
-            <div className="flex items-center gap-2">
-              <MessageCircle className="w-5 h-5 text-blue-400" />
-              <h3 className="text-white font-semibold">Live Chat</h3>
-              <Badge variant="secondary" className="text-xs">
-                {chatMessages.length}
-              </Badge>
-            </div>
-          </div>
-
-          {/* Desktop chat messages */}
-          <div
-            ref={chatRefDesktop}
-            className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800"
-            style={{ maxHeight: "calc(100vh - 190px)" }} // Account for header, input area and controls
-          >
-            {chatMessages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-32 text-gray-500">
-                <MessageCircle className="w-8 h-8 mb-2 opacity-50" />
-                <p className="text-sm">No messages yet</p>
-                <p className="text-xs">Be the first to say something!</p>
-              </div>
-            ) : (
-              chatMessages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={cn(
-                    "p-3 rounded-lg transition-all duration-200 hover:scale-[1.01]",
-                    msg.isDonation
-                      ? "bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 border border-yellow-400/30 shadow-lg"
-                      : "bg-gray-800/80 hover:bg-gray-800",
-                  )}
-                >
-                  <div className="flex items-center gap-2 mb-2 flex-wrap">
-                    <span className="text-sm font-semibold text-white truncate">
-                      {msg.user}
-                    </span>
-                    {msg.isDonation && (
-                      <Badge className="bg-yellow-500 text-black text-xs font-bold">
-                        <DollarSign className="w-3 h-3 mr-1" />
-                        {msg.amount}
-                      </Badge>
-                    )}
-                    <span className="text-xs text-gray-400 ml-auto">
-                      {msg.timestamp.toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                  </div>
-                  {msg.message && (
-                    <p className="text-sm text-gray-200 break-words leading-relaxed">
-                      {msg.message}
-                    </p>
+                {/* Chat Input */}
+                <div className="p-4 border-t border-gray-800 bg-[#0f0f12]">
+                  <form onSubmit={sendMessage} className="relative mb-3">
+                    <Input
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      placeholder="Type a message..."
+                      className="bg-[#1a1a1e] border-gray-700 focus:border-purple-500 h-12 pr-12 rounded-xl text-sm"
+                    />
+                    <Button
+                      type="submit"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-purple-500 hover:text-purple-400"
+                      disabled={!newMessage.trim()}
+                    >
+                      <Send className="w-5 h-5" />
+                    </Button>
+                  </form>
+                  {userRole === "viewer" && (
+                    <Button
+                      onClick={() => setIsDonationModalOpen(true)}
+                      className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-black font-bold h-12 rounded-xl shadow-lg shadow-yellow-500/10 border-none flex items-center justify-center gap-2"
+                    >
+                      <Gift className="w-5 h-5" />
+                      Send Donation
+                    </Button>
                   )}
                 </div>
-              ))
+              </div>
             )}
-          </div>
 
-          {/* Desktop chat input */}
-          <div className="p-4 border-t border-gray-700 bg-gray-800 space-y-3">
-            <form onSubmit={sendMessage} className="flex gap-2">
-              <Input
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type a message..."
-                className="flex-1 bg-gray-700 border-gray-600 text-white focus:ring-2 focus:ring-blue-500"
-                maxLength={200}
-              />
-              <Button
-                type="submit"
-                size="sm"
-                className="bg-blue-600 hover:bg-blue-700"
-                disabled={!newMessage.trim()}
-              >
-                <Send className="w-4 h-4" />
-              </Button>
-            </form>
-            {userRole === "viewer" && (
-              <Button
-                onClick={() => {
-                  setIsDonationModalOpen(true);
-                  setShowChat(false);
-                }}
-                className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-medium h-11"
-                size="sm"
-              >
-                <Gift className="w-4 h-4 mr-2" />
-                Send Donation
-              </Button>
+            {showParticipants && (
+              <div className="absolute inset-y-0 right-0 w-80 bg-[#0a0a0c] border-l border-gray-800 z-50">
+                <CallParticipantsList
+                  onClose={() => setShowParticipants(false)}
+                />
+              </div>
             )}
-          </div>
+          </aside>
         </div>
-      </div>
 
-      {/* Mobile participants overlay */}
-      <div
-        className={cn(
-          "absolute inset-0 bg-black/80 backdrop-blur-sm z-20 lg:hidden transition-all duration-300",
-          showParticipants ? "opacity-100 visible" : "opacity-0 invisible",
-        )}
-        onClick={() => setShowParticipants(false)}
-      >
-        <div
-          className={cn(
-            "absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-gray-900 shadow-2xl border-l py-4 border-gray-700 transition-transform duration-300",
-            showParticipants ? "translate-x-0" : "translate-x-full",
-          )}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <CallParticipantsList onClose={() => setShowParticipants(false)} />
-        </div>
-      </div>
-
-      {/* Enhanced Responsive Controls */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-700 shadow-2xl z-30">
-        <div className="flex items-center justify-center gap-1 sm:gap-3 p-3 sm:p-4 overflow-x-auto">
-          {/* Custom call controls */}
-          <div className="flex items-center gap-1 sm:gap-2">
+        {/* Bottom Controls */}
+        <footer className="h-24 bg-[#0a0a0c] border-t border-gray-800 flex items-center justify-center relative px-6">
+          <div className="flex items-center gap-4">
             <CustomCallControls
               userRole={userRole}
-              onLeave={() => {
-                call?.leave();
-              }}
+              onLeave={() => call?.leave()}
             />
+
+            <div className="w-[1px] h-8 bg-gray-800 mx-2" />
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowChat((prev) => !prev)}
+              className={cn(
+                "w-12 h-12 rounded-xl border border-gray-800 transition-all",
+                showChat
+                  ? "bg-purple-600 text-white border-purple-500"
+                  : "bg-[#1a1a1e] text-gray-400 hover:bg-gray-800",
+              )}
+            >
+              <MessageCircle className="w-5 h-5" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowParticipants((prev) => !prev)}
+              className={cn(
+                "w-12 h-12 rounded-xl border border-gray-800 transition-all",
+                showParticipants
+                  ? "bg-purple-600 text-white border-purple-500"
+                  : "bg-[#1a1a1e] text-gray-400 hover:bg-gray-800",
+              )}
+            >
+              <Users className="w-5 h-5" />
+            </Button>
+
+            {!isPersonalRoom && userRole === "host" && (
+              <div className="ml-4">
+                <EndCallButton />
+              </div>
+            )}
           </div>
-
-          {/* Layout dropdown - enhanced for mobile */}
-          {/* <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-10 w-10 p-0 bg-gray-800 hover:bg-gray-700 border border-gray-600"
-              >
-                <LayoutList className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="w-40">
-              {[
-                { label: "Grid", value: "grid" },
-                { label: "Speaker Left", value: "speaker-left" },
-                { label: "Speaker Right", value: "speaker-right" },
-              ].map((item, index) => (
-                <div key={index}>
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={() => {
-                      setLayout(item.value as CallLayoutType);
-                    }}
-                  >
-                    {item.label}
-                    {layout === item.value && (
-                      <Badge variant="secondary" className="ml-auto text-xs">
-                        Active
-                      </Badge>
-                    )}
-                  </DropdownMenuItem>
-                  {index < 2 && <DropdownMenuSeparator />}
-                </div>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu> */}
-
-          {/* <CallStatsButton /> */}
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowParticipants((prev) => !prev)}
-            className={cn(
-              "h-10 w-10 p-0 border border-gray-600 transition-colors",
-              showParticipants
-                ? "bg-blue-600 hover:bg-blue-700 text-white"
-                : "bg-gray-800 hover:bg-gray-700",
-            )}
-          >
-            <Users className="w-4 h-4" />
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowChat((prev) => !prev)}
-            className={cn(
-              "h-10 w-10 p-0 border border-gray-600 transition-colors relative",
-              showChat
-                ? "bg-blue-600 hover:bg-blue-700 text-white"
-                : "bg-gray-800 hover:bg-gray-700",
-            )}
-          >
-            <MessageCircle className="w-4 h-4" />
-            {chatMessages.length > 0 && (
-              <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-red-500 border-2 border-gray-900">
-                {chatMessages.length > 9 ? "9+" : chatMessages.length}
-              </Badge>
-            )}
-          </Button>
-
-          {!isPersonalRoom && userRole === "host" && <EndCallButton />}
-        </div>
+        </footer>
       </div>
 
-      {/* Enhanced Donation Modal */}
       <DonationModal
         isOpen={isDonationModalOpen}
         onClose={() => setIsDonationModalOpen(false)}
@@ -584,36 +387,60 @@ const CallLayouts = () => {
   const { useParticipants } = useCallStateHooks();
   const call = useCall();
   const participants = useParticipants();
-
   const callCreatorId = call?.state.createdBy?.id;
 
   const hostParticipant = participants.find((p) => p.userId === callCreatorId);
-
   const otherParticipants = participants.filter(
     (p) => p.sessionId !== hostParticipant?.sessionId,
   );
 
   return (
-    <div className="flex flex-col lg:flex-row w-full h-full gap-4 p-2">
-      {/* Host's large video */}
-      <div className="flex-1 bg-black rounded-xl overflow-hidden flex items-center justify-center">
+    <div className="relative size-full flex items-center justify-center">
+      {/* Main Host Video */}
+      <div className="w-full h-full rounded-2xl overflow-hidden bg-black relative shadow-2xl">
         {hostParticipant ? (
           <ParticipantView participant={hostParticipant} />
         ) : (
-          <p className="text-white">Host not available</p>
+          <div className="flex items-center justify-center h-full flex-col gap-4">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-3xl font-bold shadow-xl shadow-purple-500/20">
+              {callCreatorId?.slice(0, 2).toUpperCase() || "H"}
+            </div>
+            <p className="text-gray-500 font-medium">Host video stream</p>
+          </div>
         )}
       </div>
 
-      {/* Small participant thumbnails */}
-      <div className="flex lg:flex-col gap-2 overflow-auto max-h-full">
-        {otherParticipants.map((p) => (
-          <div
-            key={p.sessionId}
-            className="w-28 h-20 bg-gray-800 rounded-lg overflow-hidden"
-          >
-            <ParticipantView participant={p} />
+      {/* Floating Participant Thumbnails */}
+      <div className="absolute top-6 right-6 flex flex-col gap-3">
+        {otherParticipants.slice(0, 4).map((p) => (
+          <div key={p.sessionId} className="group relative">
+            <div className="w-16 h-16 rounded-2xl bg-[#1a1a1e] border-2 border-gray-800 overflow-hidden shadow-xl transition-transform hover:scale-110 cursor-pointer">
+              {p.image ? (
+                <Image
+                  src={p.image}
+                  alt={p.name}
+                  className="size-full object-cover"
+                  width={40}
+                  height={40}
+                />
+              ) : (
+                <div className="size-full flex items-center justify-center text-xs font-bold bg-gray-800">
+                  {p.name?.slice(0, 2).toUpperCase() ||
+                    p.userId.slice(0, 2).toUpperCase()}
+                </div>
+              )}
+            </div>
+            {/* Tooltip */}
+            <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 bg-black/90 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap border border-white/10">
+              {p.name || p.userId}
+            </div>
           </div>
         ))}
+        {otherParticipants.length > 4 && (
+          <div className="w-16 h-16 rounded-2xl bg-gray-800/50 border-2 border-dashed border-gray-700 flex items-center justify-center text-xs font-bold text-gray-500">
+            +{otherParticipants.length - 4}
+          </div>
+        )}
       </div>
     </div>
   );

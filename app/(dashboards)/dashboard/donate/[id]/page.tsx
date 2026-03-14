@@ -306,17 +306,19 @@ export default function CampaignDetailsDonations({
                     Support This Campaign
                   </h3>
 
-                  <div className="mb-6">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm">Remaining Amount</span>
-                      <span className="text-lg font-bold ">
-                        {formatCurrency(
-                          campaign.goal_amount - campaign.amountRaised,
-                        )}
-                      </span>
+                  {campaign.isPublic && (
+                    <div className="mb-6">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm">Remaining Amount</span>
+                        <span className="text-lg font-bold ">
+                          {formatCurrency(
+                            campaign.goal_amount - campaign.amountRaised,
+                          )}
+                        </span>
+                      </div>
+                      <Progress value={calculateProgress()} className="h-2" />
                     </div>
-                    <Progress value={calculateProgress()} className="h-2" />
-                  </div>
+                  )}
 
                   <div className="space-y-4">
                     <Button

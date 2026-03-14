@@ -1,7 +1,6 @@
 import {
   Bell,
   Calendar,
-  ChurchIcon as Mosque,
   Clock,
   CreditCard,
   Smartphone,
@@ -9,6 +8,7 @@ import {
   UsersRound,
   Zap,
 } from "lucide-react";
+import { MosqueIcon } from "../icons/MosqueIcon";
 
 export function FeatureSection() {
   const features = [
@@ -25,7 +25,7 @@ export function FeatureSection() {
         "Receive timely reminders for prayers with customizable azan sounds",
     },
     {
-      icon: Mosque,
+      icon: MosqueIcon,
       title: "Masjid Discovery",
       description:
         "Find and connect with masjids in your area, complete with ratings and reviews",

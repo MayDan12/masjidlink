@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { auth } from "@/firebase/client";
+import { useCall } from "@stream-io/video-react-sdk";
+import { toast } from "sonner";
+
 interface DonationModalProps {
   isOpen: boolean;
   onClose: () => void;
   imamId?: string;
 }
+
 function DonationModal({ isOpen, onClose, imamId }: DonationModalProps) {
   const [amount, setAmount] = useState("");
   const [message, setMessage] = useState("");
@@ -14,6 +18,7 @@ function DonationModal({ isOpen, onClose, imamId }: DonationModalProps) {
 
   const stripe = useStripe();
   const elements = useElements();
+  const call = useCall();
 
   if (!isOpen) return null;
 
@@ -52,9 +57,26 @@ function DonationModal({ isOpen, onClose, imamId }: DonationModalProps) {
       });
 
       if (result.error) {
-        alert(result.error.message);
+        toast.error(result.error.message || "Payment failed");
       } else if (result.paymentIntent?.status === "succeeded") {
-        alert("Donation successful!");
+        toast.success("Donation successful!");
+
+        // Send a custom event via Stream to notify everyone (especially the Imam)
+        if (call) {
+          try {
+            await call.sendCustomEvent({
+              type: "donation",
+              custom: {
+                amount: donationAmount,
+                message: isAnonymous ? "" : message,
+                isAnonymous,
+              },
+            });
+          } catch (streamError) {
+            console.error("Failed to send custom donation event:", streamError);
+          }
+        }
+
         // Optional: store donation in Firestore
         await fetch("/api/store-donation", {
           method: "POST",
@@ -71,9 +93,13 @@ function DonationModal({ isOpen, onClose, imamId }: DonationModalProps) {
         });
         onClose();
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      alert(err.message || "An error occurred. Please try again.");
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "An error occurred. Please try again.";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
